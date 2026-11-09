@@ -1,0 +1,362 @@
+"use client";
+
+import { BanIcon, CalendarPlusIcon, CornerDownLeftIcon, PenLineIcon, PencilIcon, PlayIcon, PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useState, useTransition } from "react";
+import { toast } from "sonner";
+import { useAgency } from "@/components/app/agency-context";
+import { Ltr } from "@/components/app/ltr";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { ChoiceChips } from "@/components/ui/choice-chips";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field } from "@/components/ui/field";
+import { DateField, MoneyField, TimeField } from "@/components/ui/fields";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { YesNo } from "@/components/ui/yes-no";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
+import type { ActionResult } from "@/lib/action-result";
+import { casablancaToIso, formatMoney, isoToCasablanca } from "@/lib/format";
+import { rentalDays } from "@/lib/revenue";
+import {
+  addPaymentAction,
+  cancelReservationAction,
+  extendReservationAction,
+  returnReservationAction,
+  signReservationAction,
+  startRentalAction,
+} from "../actions";
+import { PAYMENT_METHODS } from "../schema";
+import { FuelPicker } from "./reservation-wizard";
+
+type R = {
+  id: string;
+  status: "reserved" | "on_rental" | "returned" | "cancelled";
+  signed: boolean;
+  start_at: string;
+  end_at: string;
+  daily_price: number;
+  km_out: number | null;
+  deposit_taken: boolean;
+  deposit_amount: number;
+  balance: number;
+  planned_days: number;
+};
+
+type Dialogs = "return" | "extend" | "cancel" | "payment" | null;
+
+export function ReservationActions({ reservation: r, initialAction }: { reservation: R; initialAction: string | null }) {
+  const t = useTranslations("reservations.actions");
+  const te = useTranslations("errors");
+  const router = useRouter();
+  const pathname = usePathname();
+  const { writable } = useAgency();
+  const [pending, startTransition] = useTransition();
+  const [open, setOpen] = useState<Dialogs>(initialAction === "return" && r.status === "on_rental" ? "return" : null);
+
+  const run = (action: () => Promise<ActionResult>, success: string) =>
+    startTransition(async () => {
+      const result = await action();
+      if (!result.ok) return void toast.error(te(result.error));
+      toast.success(success);
+      setOpen(null);
+      router.replace(pathname);
+    });
+
+  const close = () => {
+    setOpen(null);
+    if (initialAction) router.replace(pathname);
+  };
+
+  return (
+    <div className="flex flex-wrap gap-2" data-testid="reservation-actions">
+      {r.status === "reserved" && !r.signed ? (
+        <Button size="lg" disabled={!writable || pending} onClick={() => run(() => signReservationAction(r.id), t("signed"))}>
+          <PenLineIcon aria-hidden />
+          {t("sign")}
+        </Button>
+      ) : null}
+      {r.status === "reserved" ? (
+        <Button
+          size="lg"
+          variant={r.signed ? "default" : "outline"}
+          disabled={!writable || pending || !r.signed}
+          title={r.signed ? undefined : t("signFirst")}
+          onClick={() => run(() => startRentalAction(r.id), t("started"))}
+        >
+          <PlayIcon aria-hidden />
+          {t("start")}
+        </Button>
+      ) : null}
+      {r.status === "reserved" && !r.signed && initialAction === "start" ? (
+        <Alert variant="warning" className="basis-full">{t("signFirst")}</Alert>
+      ) : null}
+      {r.status === "on_rental" ? (
+        <Button size="lg" disabled={!writable} onClick={() => setOpen("return")}>
+          <CornerDownLeftIcon aria-hidden />
+          {t("return")}
+        </Button>
+      ) : null}
+      {r.status === "reserved" || r.status === "on_rental" ? (
+        <Button size="lg" variant="outline" disabled={!writable} onClick={() => setOpen("extend")}>
+          <CalendarPlusIcon aria-hidden />
+          {t("extend")}
+        </Button>
+      ) : null}
+      {r.status === "reserved" ? (
+        <Button size="lg" variant="outline" asChild disabled={!writable}>
+          <Link href={`/reservations/${r.id}/edit`}>
+            <PencilIcon aria-hidden />
+            {t("edit")}
+          </Link>
+        </Button>
+      ) : null}
+      {r.status !== "cancelled" ? (
+        <Button size="lg" variant="ghost" disabled={!writable} onClick={() => setOpen("payment")}>
+          <PlusIcon aria-hidden />
+          {t("payment")}
+        </Button>
+      ) : null}
+      {r.status === "reserved" ? (
+        <Button size="lg" variant="ghost" className="text-destructive" disabled={!writable} onClick={() => setOpen("cancel")}>
+          <BanIcon aria-hidden />
+          {t("cancel")}
+        </Button>
+      ) : null}
+
+      {open === "return" ? <ReturnDialog r={r} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
+      {open === "extend" ? <ExtendDialog r={r} pending={pending} onClose={close} onSubmit={(d, tm) => run(() => extendReservationAction(r.id, d, tm), t("extended"))} /> : null}
+      {open === "cancel" ? <CancelDialog pending={pending} onClose={close} onSubmit={(reason) => run(() => cancelReservationAction(r.id, reason), t("cancelled"))} /> : null}
+      {open === "payment" ? <PaymentDialog balance={r.balance} pending={pending} onClose={close} onSubmit={(p) => run(() => addPaymentAction(r.id, p), t("paymentAdded"))} /> : null}
+    </div>
+  );
+}
+
+function useDialogTexts() {
+  return { t: useTranslations("reservations.actions"), tp: useTranslations("reservations.payment"), tc: useTranslations("common") };
+}
+
+function ReturnDialog({
+  r,
+  pending,
+  onClose,
+  onSubmit,
+}: {
+  r: R;
+  pending: boolean;
+  onClose: () => void;
+  onSubmit: (input: Parameters<typeof returnReservationAction>[1]) => void;
+}) {
+  const { t, tp, tc } = useDialogTexts();
+  const now = isoToCasablanca(new Date().toISOString());
+  const [date, setDate] = useState(now.date);
+  const [time, setTime] = useState(now.time);
+  const [km, setKm] = useState<string>("");
+  const [fuel, setFuel] = useState<number | null>(null);
+  const actualIso = date && time ? casablancaToIso(date, time) : r.end_at;
+  const extraDays = Math.max(0, rentalDays(r.start_at, actualIso) - r.planned_days);
+  const extraAmount = extraDays * r.daily_price;
+  const due = Math.max(0, r.balance + extraAmount);
+  const [amount, setAmount] = useState<number | null>(null);
+  const [method, setMethod] = useState<(typeof PAYMENT_METHODS)[number]>("cash");
+  const [refund, setRefund] = useState<boolean>(r.deposit_taken);
+  const [refundAmount, setRefundAmount] = useState<number | null>(r.deposit_amount);
+  const [refundMethod, setRefundMethod] = useState<(typeof PAYMENT_METHODS)[number]>("cash");
+  const [notes, setNotes] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const kmNumber = km === "" ? null : Number(km);
+
+  const submit = () => {
+    if (kmNumber === null || fuel === null) return setError(t("returnMissing"));
+    if (r.km_out !== null && kmNumber < r.km_out) return setError(t("kmInBeforeOut", { km: r.km_out }));
+    setError(null);
+    onSubmit({
+      return_date: date,
+      return_time: time,
+      km_in: kmNumber,
+      fuel_in: fuel,
+      balance_amount: amount ?? due,
+      balance_method: method,
+      refund_deposit: refund,
+      refund_amount: refundAmount ?? 0,
+      refund_method: refundMethod,
+      notes,
+    });
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent closeLabel={tc("close")}>
+        <DialogHeader>
+          <DialogTitle>{t("returnTitle")}</DialogTitle>
+          <DialogDescription>{t("returnSubtitle")}</DialogDescription>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Field id="ret-date" label={t("returnDate")}>
+              <DateField id="ret-date" value={date} onChange={setDate} />
+            </Field>
+            <Field id="ret-time" label={t("returnTime")}>
+              <TimeField id="ret-time" value={time} onChange={setTime} />
+            </Field>
+          </div>
+          <Field id="ret-km" label={t("kmIn")} hint={r.km_out !== null ? t("kmOutWas", { km: r.km_out }) : undefined}>
+            <Input id="ret-km" inputMode="numeric" dir="ltr" value={km} onChange={(e) => setKm(e.target.value.replace(/\D/g, ""))} />
+          </Field>
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium">{t("fuelIn")}</span>
+            <FuelPicker value={fuel} onChange={setFuel} label={t("fuelIn")} />
+          </div>
+          {extraDays > 0 ? (
+            <Alert variant="warning" data-testid="extra-days">
+              {t("extraDays", { count: extraDays, amount: formatMoney(extraAmount) })}
+            </Alert>
+          ) : null}
+          <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
+            <Field id="ret-amount" label={t("balanceToPay")} hint={t("balanceDue", { amount: formatMoney(due) })}>
+              <MoneyField id="ret-amount" value={amount ?? due} onChange={setAmount} />
+            </Field>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium">{t("method")}</span>
+              <ChoiceChips name="ret-method" label={t("method")} value={method} onChange={setMethod} className="grid-cols-2" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
+            </div>
+          </div>
+          {r.deposit_taken ? (
+            <div className="flex flex-col gap-3 border-t pt-4">
+              <span className="font-semibold">{t("refundDeposit", { amount: formatMoney(r.deposit_amount) })}</span>
+              <YesNo label={t("refundDeposit", { amount: formatMoney(r.deposit_amount) })} value={refund} onChange={setRefund} />
+              {refund ? (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Field id="ret-refund" label={t("refundAmount")}>
+                    <MoneyField id="ret-refund" value={refundAmount} onChange={setRefundAmount} />
+                  </Field>
+                  <div className="flex flex-col gap-2">
+                    <span className="text-sm font-medium">{t("method")}</span>
+                    <ChoiceChips name="ret-refund-method" label={t("method")} value={refundMethod} onChange={setRefundMethod} className="grid-cols-2" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
+          <Field id="ret-notes" label={t("notes")}>
+            <Textarea id="ret-notes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </Field>
+          {error ? <Alert variant="danger">{error}</Alert> : null}
+        </div>
+        <DialogFooter>
+          <Button size="lg" onClick={submit} disabled={pending}>
+            <CornerDownLeftIcon aria-hidden />
+            {t("confirmReturn")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ExtendDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolean; onClose: () => void; onSubmit: (date: string, time: string) => void }) {
+  const { t, tc } = useDialogTexts();
+  const current = isoToCasablanca(r.end_at);
+  const [date, setDate] = useState(current.date);
+  const [time, setTime] = useState(current.time);
+  const newEnd = date && time ? casablancaToIso(date, time) : r.end_at;
+  const added = Math.max(0, rentalDays(r.start_at, newEnd) - rentalDays(r.start_at, r.end_at));
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent closeLabel={tc("close")}>
+        <DialogHeader>
+          <DialogTitle>{t("extendTitle")}</DialogTitle>
+          <DialogDescription>{t("extendSubtitle")}</DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-3">
+          <Field id="ext-date" label={t("newEndDate")}>
+            <DateField id="ext-date" value={date} onChange={setDate} min={current.date} />
+          </Field>
+          <Field id="ext-time" label={t("returnTime")}>
+            <TimeField id="ext-time" value={time} onChange={setTime} />
+          </Field>
+        </div>
+        {added > 0 ? (
+          <p className="text-sm">
+            {t("extendSummary", { count: added })} · <Ltr>{formatMoney(added * r.daily_price)}</Ltr>
+          </p>
+        ) : null}
+        <DialogFooter>
+          <Button size="lg" onClick={() => onSubmit(date, time)} disabled={pending || added === 0}>
+            <CalendarPlusIcon aria-hidden />
+            {t("confirmExtend")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function CancelDialog({ pending, onClose, onSubmit }: { pending: boolean; onClose: () => void; onSubmit: (reason: string) => void }) {
+  const { t, tc } = useDialogTexts();
+  const [reason, setReason] = useState("");
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent closeLabel={tc("close")}>
+        <DialogHeader>
+          <DialogTitle>{t("cancelTitle")}</DialogTitle>
+          <DialogDescription>{t("cancelSubtitle")}</DialogDescription>
+        </DialogHeader>
+        <Field id="cancel-reason" label={t("cancelReason")}>
+          <Textarea id="cancel-reason" rows={2} value={reason} onChange={(e) => setReason(e.target.value)} />
+        </Field>
+        <DialogFooter>
+          <Button size="lg" variant="destructive" onClick={() => onSubmit(reason)} disabled={pending || reason.trim().length < 3}>
+            <BanIcon aria-hidden />
+            {t("confirmCancel")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PaymentDialog({
+  balance,
+  pending,
+  onClose,
+  onSubmit,
+}: {
+  balance: number;
+  pending: boolean;
+  onClose: () => void;
+  onSubmit: (p: Parameters<typeof addPaymentAction>[1]) => void;
+}) {
+  const { t, tp, tc } = useDialogTexts();
+  const [amount, setAmount] = useState<number | null>(balance > 0 ? balance : null);
+  const [method, setMethod] = useState<(typeof PAYMENT_METHODS)[number]>("cash");
+  const [kind, setKind] = useState<"advance" | "balance" | "extra" | "deposit" | "deposit_refund">("balance");
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent closeLabel={tc("close")}>
+        <DialogHeader>
+          <DialogTitle>{t("paymentTitle")}</DialogTitle>
+          <DialogDescription>{t("paymentSubtitle", { amount: formatMoney(balance) })}</DialogDescription>
+        </DialogHeader>
+        <Field id="pay-amount" label={t("amount")}>
+          <MoneyField id="pay-amount" value={amount} onChange={setAmount} />
+        </Field>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium">{t("kind")}</span>
+          <ChoiceChips name="pay-kind" label={t("kind")} value={kind} onChange={setKind} className="grid-cols-2" options={(["balance", "advance", "extra", "deposit", "deposit_refund"] as const).map((k) => ({ value: k, label: tp(`kinds.${k}`) }))} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium">{t("method")}</span>
+          <ChoiceChips name="pay-method" label={t("method")} value={method} onChange={setMethod} className="grid-cols-2" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
+        </div>
+        <DialogFooter>
+          <Button size="lg" onClick={() => amount && onSubmit({ amount, method, kind, note: "" })} disabled={pending || !amount}>
+            <PlusIcon aria-hidden />
+            {t("savePayment")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

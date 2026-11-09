@@ -39,3 +39,13 @@ describe("plateNorm", () => {
     expect(plateNorm(" 12345 A 6 ")).toBe("12345A6");
   });
 });
+
+import { casablancaToIso, isoToCasablanca } from "./format";
+
+describe("Casablanca local time ↔ UTC", () => {
+  it("round-trips whatever the offset", () => {
+    for (const [d, t] of [["2026-11-12", "10:30"], ["2026-03-20", "00:15"], ["2026-07-01", "23:45"]]) {
+      expect(isoToCasablanca(casablancaToIso(d, t))).toEqual({ date: d, time: t });
+    }
+  });
+});

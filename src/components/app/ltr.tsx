@@ -12,3 +12,12 @@ export function Ltr({ children, className }: { children: ReactNode; className?: 
     </bdi>
   );
 }
+
+/** "→" between two dates; points the reading direction in Arabic too. */
+export function Arrow() {
+  return (
+    <span aria-hidden className="mx-1 inline-block rtl:-scale-x-100">
+      →
+    </span>
+  );
+}

@@ -4,7 +4,7 @@ import { TriangleAlertIcon, WrenchIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Ltr } from "@/components/app/ltr";
+import { Arrow, Ltr } from "@/components/app/ltr";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ChoiceChips } from "@/components/ui/choice-chips";
@@ -108,7 +108,7 @@ export function MaintenanceSheet({
                 <ul className="flex flex-col gap-0.5">
                   {overlaps.map((r) => (
                     <li key={r.id}>
-                      <Ltr>{r.contract_number}</Ltr> · {r.client} · <Ltr>{formatDateTime(r.start_at)}</Ltr> → <Ltr>{formatDateTime(r.end_at)}</Ltr>
+                      <Ltr>{r.contract_number}</Ltr> · {r.client} · <Ltr>{formatDateTime(r.start_at)}</Ltr><Arrow /><Ltr>{formatDateTime(r.end_at)}</Ltr>
                     </li>
                   ))}
                 </ul>

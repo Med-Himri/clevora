@@ -42,7 +42,17 @@ export function Stepper({
  * Action buttons: fixed at the bottom on phones, inline from 640 px.
  * Inside the app it sits just above the bottom navigation bar.
  */
-export function StickyActionBar({ children, className, aboveNav = true }: { children: ReactNode; className?: string; aboveNav?: boolean }) {
+export function StickyActionBar({
+  children,
+  className,
+  innerClassName,
+  aboveNav = true,
+}: {
+  children: ReactNode;
+  className?: string;
+  innerClassName?: string;
+  aboveNav?: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -51,7 +61,7 @@ export function StickyActionBar({ children, className, aboveNav = true }: { chil
         className,
       )}
     >
-      <div className="mx-auto flex max-w-3xl gap-2 sm:justify-end">{children}</div>
+      <div className={cn("mx-auto flex max-w-3xl gap-2 sm:justify-end", innerClassName)}>{children}</div>
     </div>
   );
 }

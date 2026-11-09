@@ -72,3 +72,34 @@ export function normalizePlateInput(input: string): string {
 export function plateNorm(input: string): string {
   return input.toUpperCase().replace(/[\s\-./|]/g, "");
 }
+
+/** Minutes to add to UTC to get Casablanca local time at that instant. */
+function casablancaOffsetMinutes(at: Date): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE,
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).formatToParts(at);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  return Math.round((asUtc - at.getTime()) / 60_000);
+}
+
+/** "2026-11-12" + "10:30" typed in Casablanca → ISO instant in UTC. */
+export function casablancaToIso(date: string, time: string): string {
+  const naive = new Date(`${date}T${time || "00:00"}:00Z`);
+  let utc = naive.getTime() - casablancaOffsetMinutes(naive) * 60_000;
+  // second pass in case the offset changes between the two instants (Ramadan / DST)
+  utc = naive.getTime() - casablancaOffsetMinutes(new Date(utc)) * 60_000;
+  return new Date(utc).toISOString();
+}
+
+/** ISO instant → { date: "yyyy-mm-dd", time: "HH:mm" } in Casablanca. */
+export function isoToCasablanca(iso: string): { date: string; time: string } {
+  return { date: dayKey(iso), time: formatTime(iso) };
+}

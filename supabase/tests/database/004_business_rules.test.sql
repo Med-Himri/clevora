@@ -72,7 +72,7 @@ select is(public.preview_contract_number(tests.id('a_agency')), 'C-7', 'the coun
 -- Agency B numbering is independent (B also has C-1 from the fixture)
 reset role;
 select is(
-  (select count(*)::int from public.reservations where contract_number = 'C-1'), 2,
+  (select count(*)::int from public.reservations where contract_number = 'C-1' and agency_id in (tests.id('a_agency'), tests.id('b_agency'))), 2,
   'two agencies can both have contract C-1');
 
 -- ===========================================================================
@@ -88,7 +88,7 @@ select is(
 -- ===========================================================================
 -- Activity log
 -- ===========================================================================
-update public.reservations set status = 'on_rental', km_out = 50000, fuel_out = 4
+update public.reservations set status = 'on_rental', signed_at = now(), km_out = 50000, fuel_out = 4
  where id = tests.id('a_reservation');
 reset role;
 select ok(

@@ -3,7 +3,7 @@ import { ArrowLeftIcon, CalendarCheckIcon, DropletIcon, ShieldCheckIcon, WalletI
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { Ltr } from "@/components/app/ltr";
+import { Arrow, Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTile } from "@/components/app/stat-tile";
 import { Badge } from "@/components/ui/badge";
@@ -161,7 +161,7 @@ export default async function VehicleDetailPage({ params }: PageProps<"/[locale]
                       <Ltr>{r.contract_number}</Ltr> · {r.client?.full_name}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      <Ltr>{formatDateTime(r.start_at)}</Ltr> → <Ltr>{formatDateTime(r.end_at)}</Ltr>
+                      <Ltr>{formatDateTime(r.start_at)}</Ltr><Arrow /><Ltr>{formatDateTime(r.end_at)}</Ltr>
                     </span>
                   </li>
                 ))}
@@ -189,7 +189,7 @@ export default async function VehicleDetailPage({ params }: PageProps<"/[locale]
                       {m.ended_on === null && m.starts_on <= today ? <Badge variant="warning">{t("detail.inProgress")}</Badge> : null}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      <Ltr>{formatDate(m.starts_on)}</Ltr> → <Ltr>{m.ended_on ? formatDate(m.ended_on) : m.expected_end_on ? formatDate(m.expected_end_on) : "…"}</Ltr>
+                      <Ltr>{formatDate(m.starts_on)}</Ltr><Arrow /><Ltr>{m.ended_on ? formatDate(m.ended_on) : m.expected_end_on ? formatDate(m.expected_end_on) : "…"}</Ltr>
                       {m.note ? ` · ${m.note}` : ""}
                     </span>
                   </li>

@@ -762,6 +762,13 @@ export type Database = {
             foreignKeyName: "reservation_payments_agency_id_reservation_id_fkey";
             columns: ["agency_id", "reservation_id"];
             isOneToOne: false;
+            referencedRelation: "reservation_totals";
+            referencedColumns: ["agency_id", "id"];
+          },
+          {
+            foreignKeyName: "reservation_payments_agency_id_reservation_id_fkey";
+            columns: ["agency_id", "reservation_id"];
+            isOneToOne: false;
             referencedRelation: "reservations";
             referencedColumns: ["agency_id", "id"];
           },
@@ -1015,7 +1022,45 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      reservation_totals: {
+        Row: {
+          agency_id: string;
+          balance: number | null;
+          days: number | null;
+          id: string;
+          paid: number | null;
+          planned_days: number | null;
+          total: number | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id?: string | null;
+          balance?: never;
+          days?: never;
+          id?: string | null;
+          paid?: never;
+          planned_days?: never;
+          total?: never;
+        };
+        Update: {
+          agency_id?: string | null;
+          balance?: never;
+          days?: never;
+          id?: string | null;
+          paid?: never;
+          planned_days?: never;
+          total?: never;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reservations_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
       _create_agency: {
@@ -1030,6 +1075,7 @@ export type Database = {
         Returns: string;
       };
       _next_contract_number: { Args: { p_agency: string }; Returns: string };
+      _upsert_client: { Args: { p: Json; p_agency: string }; Returns: string };
       accept_invitation: { Args: { p_token: string }; Returns: string };
       create_agency: {
         Args: {
@@ -1084,10 +1130,31 @@ export type Database = {
       };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
+      rental_days: { Args: { p_end: string; p_start: string }; Returns: number };
       reservation_days: { Args: { p_end_at: string; p_start_at: string }; Returns: unknown };
+      return_reservation: {
+        Args: { p: Json; p_agency: string; p_reservation: string };
+        Returns: undefined;
+      };
+      save_reservation: {
+        Args: { p: Json; p_agency: string; p_reservation: string };
+        Returns: string;
+      };
+      search_reservation_ids: { Args: { p_agency: string; p_q: string }; Returns: string[] };
       subscription_is_writable: {
         Args: { p_current_period_end: string; p_status: string; p_trial_ends_at: string };
         Returns: boolean;
+      };
+      vehicle_availability: {
+        Args: { p_agency: string; p_end: string; p_exclude_reservation?: string; p_start: string };
+        Returns: {
+          reason: string;
+          vehicle_id: string;
+        }[];
+      };
+      who_had_car: {
+        Args: { p_agency: string; p_from: string; p_plate: string; p_to: string };
+        Returns: string[];
       };
       writable_agency_ids: { Args: { p_roles?: string[] }; Returns: string[] };
     };
