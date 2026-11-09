@@ -40,7 +40,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
 
   return (
     <html lang={locale} dir={dir} className={`${latin.variable} ${arabic.variable}`} suppressHydrationWarning>
-      <body className="min-h-dvh">
+      {/* suppressHydrationWarning: browser extensions (e.g. Grammarly) add attributes to <body> */}
+      <body className="min-h-dvh" suppressHydrationWarning>
         <NextIntlClientProvider>
           <Providers dir={dir}>{children}</Providers>
         </NextIntlClientProvider>
