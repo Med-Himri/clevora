@@ -39,7 +39,12 @@
     "emailTaken": "An account already exists with this email. Log in instead.",
     "alreadyMember": "This person is already in the team.",
     "currentPasswordWrong": "The current password is wrong.",
-    "samePassword": "Choose a password different from the old one."
+    "samePassword": "Choose a password different from the old one.",
+    "date": "Invalid date.",
+    "number": "Enter a number (no letters).",
+    "oilNextAfterLast": "The next oil change must be after the last one.",
+    "endBeforeStart": "The end date must be after the start date.",
+    "plateTaken": "A car in your fleet already has this plate."
   },
   "errors": {
     "invalidCredentials": "Wrong email or password. Check and try again.",
@@ -66,7 +71,10 @@
     "emailFailed": "The email could not be sent. Try again in a moment.",
     "notFound": "Item not found. Refresh the page.",
     "selfChange": "You can't change your own role or status.",
-    "unknown": "Something went wrong. Try again; if it keeps happening, contact Parcolia support."
+    "unknown": "Something went wrong. Try again; if it keeps happening, contact Parcolia support.",
+    "plateTaken": "A car in your fleet already has this plate.",
+    "vehicleHasHistory": "This car has reservations or expenses: mark it as sold instead of deleting it.",
+    "vehicleInMaintenance": "This car is in maintenance on these dates."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
@@ -353,5 +361,198 @@
   "comingSoon": {
     "title": "This page is coming soon",
     "body": "It is being built. Meanwhile, use the other pages in the menu."
+  },
+  "fleet": {
+    "title": "Fleet",
+    "subtitle": "{count, plural, one {# car} other {# cars}}",
+    "usage": "{count} / {max} cars in your plan",
+    "add": "Add a car",
+    "addSubtitle": "Type the details from the registration card and papers.",
+    "edit": "Edit car",
+    "filters": "Filter cars",
+    "search": "Plate or model",
+    "upgrade": "See plans",
+    "limitReached": "You reached the {max}-car limit of the {plan} plan. Upgrade to add more.",
+    "age": "{years, plural, =0 {Under 1 year} one {# year} other {# years}}",
+    "tabs": {
+      "all": "All",
+      "available": "Available",
+      "on_rental": "On rental",
+      "maintenance": "Maintenance"
+    },
+    "columns": {
+      "car": "Car",
+      "status": "Status",
+      "type": "Type",
+      "km": "Mileage",
+      "rate": "Price/day",
+      "age": "Age"
+    },
+    "empty": {
+      "title": "No cars yet",
+      "admin": "Add your first car, or import your whole fleet from an Excel file.",
+      "staff": "Ask the admin to add the agency's cars."
+    },
+    "noResult": {
+      "title": "No car found",
+      "body": "Try another plate or model, or another filter."
+    },
+    "categories": {
+      "economy": "Economy",
+      "compact": "Compact",
+      "suv": "SUV",
+      "van": "Van",
+      "luxury": "Luxury"
+    },
+    "fuels": {
+      "essence": "Petrol",
+      "diesel": "Diesel",
+      "hybride": "Hybrid",
+      "electrique": "Electric"
+    },
+    "gearboxes": {
+      "manuelle": "Manual",
+      "automatique": "Automatic"
+    },
+    "reasons": {
+      "panne": "Breakdown",
+      "accident": "Accident",
+      "carrosserie": "Bodywork",
+      "pneus": "Tyres",
+      "entretien": "Service",
+      "autre": "Other"
+    },
+    "chargeCategories": {
+      "carburant": "Fuel",
+      "lavage": "Washing",
+      "vidange": "Oil change",
+      "reparation": "Repair",
+      "assurance": "Insurance",
+      "visite": "Inspection / road tax",
+      "publicite": "Advertising / campaign",
+      "salaires": "Salaries",
+      "loyer": "Rent",
+      "autre": "Other"
+    },
+    "status": {
+      "available": "Available",
+      "on_rental": "On rental",
+      "blocked": "Blocked: insurance expired",
+      "reserved_today": "Leaves today",
+      "maintenance": "Maintenance",
+      "sold": "Sold",
+      "until": "until"
+    },
+    "form": {
+      "car": "Car",
+      "plate": "Plate",
+      "brandModel": "Make and model",
+      "category": "Category",
+      "fuel": "Fuel",
+      "gearbox": "Gearbox",
+      "dailyRate": "Price per day",
+      "perDay": "per day",
+      "currentKm": "Current mileage",
+      "firstRegistration": "First registration date",
+      "papers": "Papers",
+      "insuranceEnd": "Insurance end",
+      "visitEnd": "Technical inspection end",
+      "oil": "Oil change",
+      "oilLastKm": "Last oil change (km)",
+      "oilLastDate": "Last oil change date",
+      "oilNextKm": "Next oil change (km)",
+      "oilHint": "Type the mileage your mechanic gave you: Parcolia never assumes an interval.",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "maintenance": {
+      "title": "Put in maintenance",
+      "reason": "Reason",
+      "reasonRequired": "Choose a reason.",
+      "startsOn": "Start",
+      "expectedEnd": "Expected return",
+      "expectedEndHint": "Leave empty if you don't know yet.",
+      "note": "Note (optional)",
+      "overlapTitle": "{count, plural, one {Warning: one reservation falls in this period} other {Warning: # reservations fall in this period}}",
+      "overlapHelp": "Change the car of these reservations or tell the clients.",
+      "submit": "Put in maintenance",
+      "saved": "Car put in maintenance."
+    },
+    "actions": {
+      "maintenance": "Maintenance",
+      "endMaintenance": "Back in service",
+      "backInService": "The car is available again.",
+      "edit": "Edit",
+      "more": "More actions",
+      "sell": "Mark as sold",
+      "unsell": "Back in the fleet",
+      "delete": "Delete",
+      "deleteTitle": "Delete this car?",
+      "deleteBody": "Only cars without reservations or expenses can be deleted. Otherwise mark it as sold: its history is kept."
+    },
+    "detail": {
+      "unknown": "Not set",
+      "expired": "Expired",
+      "inDays": "{days, plural, =0 {Today} one {In # day} other {In # days}}",
+      "revenueMonth": "Revenue this month",
+      "chargesMonth": "Expenses this month",
+      "info": "Details",
+      "papers": "Insurance, inspection and oil",
+      "oil": "Next oil change",
+      "oilDue": "Due",
+      "kmLeft": "In {km} km",
+      "upcoming": "Upcoming reservations",
+      "noUpcoming": "No upcoming reservation.",
+      "maintenanceHistory": "Maintenance history",
+      "inProgress": "In progress",
+      "noMaintenance": "No maintenance recorded.",
+      "charges": "Expenses for this car",
+      "noCharges": "No expense for this car.",
+      "backToList": "Back to fleet"
+    },
+    "import": {
+      "button": "Import",
+      "title": "Import cars",
+      "subtitle": "Excel (.xlsx) or CSV file. Columns are recognised automatically, in French or English. A car already in the fleet (same plate) is updated.",
+      "chooseFile": "Choose a file",
+      "otherFile": "Choose another file",
+      "template": "Download the template",
+      "readError": "This file could not be read. Save it as .xlsx or .csv and try again.",
+      "done": "{created, plural, =0 {No car added} one {# car added} other {# cars added}}, {updated, plural, =0 {none updated} one {# updated} other {# updated}}.",
+      "summary": "{valid, plural, =0 {no valid row} one {# valid row} other {# valid rows}}, {invalid, plural, =0 {no error} one {# row skipped} other {# rows skipped}}",
+      "missingColumns": "Columns not found: {columns}. Add them or use the template.",
+      "line": "Row {line}",
+      "willUpdate": "Update",
+      "willCreate": "New",
+      "ignored": "Skipped",
+      "submit": "{count, plural, one {Import # car} other {Import # cars}}",
+      "errors": {
+        "plateRequired": "missing plate",
+        "plateTooLong": "plate too long",
+        "modelRequired": "missing model",
+        "categoryUnknown": "unknown category",
+        "fuelUnknown": "unknown fuel",
+        "gearboxUnknown": "unknown gearbox",
+        "priceRequired": "missing price/day",
+        "dateInvalid": "invalid date: {field} (dd/mm/yyyy)",
+        "numberInvalid": "invalid number: {field}",
+        "duplicateInFile": "plate twice in the file"
+      },
+      "fields": {
+        "plate": "Plate",
+        "brand_model": "Model",
+        "category": "Category",
+        "fuel": "Fuel",
+        "gearbox": "Gearbox",
+        "daily_rate": "Price/day",
+        "current_km": "Km",
+        "first_registration_date": "First registration",
+        "insurance_expires_on": "Insurance end",
+        "technical_visit_expires_on": "Inspection end",
+        "oil_last_km": "Last oil change km",
+        "oil_last_date": "Last oil change date",
+        "oil_next_km": "Next oil change km"
+      }
+    }
   }
 }

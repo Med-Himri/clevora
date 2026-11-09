@@ -39,7 +39,12 @@
     "emailTaken": "Un compte existe déjà avec cet e-mail. Connectez-vous plutôt.",
     "alreadyMember": "Cette personne fait déjà partie de l'équipe.",
     "currentPasswordWrong": "Le mot de passe actuel est incorrect.",
-    "samePassword": "Choisissez un mot de passe différent de l'ancien."
+    "samePassword": "Choisissez un mot de passe différent de l'ancien.",
+    "date": "Date invalide.",
+    "number": "Entrez un nombre (sans lettres).",
+    "oilNextAfterLast": "La prochaine vidange doit être après la dernière.",
+    "endBeforeStart": "La date de fin doit être après la date de début.",
+    "plateTaken": "Une voiture de votre parc a déjà ce matricule."
   },
   "errors": {
     "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
@@ -66,7 +71,10 @@
     "emailFailed": "L'e-mail n'a pas pu être envoyé. Réessayez dans un instant.",
     "notFound": "Élément introuvable. Actualisez la page.",
     "selfChange": "Vous ne pouvez pas modifier votre propre rôle ou statut.",
-    "unknown": "Une erreur est survenue. Réessayez ; si cela continue, contactez le support Parcolia."
+    "unknown": "Une erreur est survenue. Réessayez ; si cela continue, contactez le support Parcolia.",
+    "plateTaken": "Une voiture de votre parc a déjà ce matricule.",
+    "vehicleHasHistory": "Cette voiture a des réservations ou des charges : marquez-la comme vendue au lieu de la supprimer.",
+    "vehicleInMaintenance": "Cette voiture est en maintenance sur ces dates."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
@@ -353,5 +361,198 @@
   "comingSoon": {
     "title": "Cette page arrive bientôt",
     "body": "Elle est en cours de construction. En attendant, utilisez les autres pages du menu."
+  },
+  "fleet": {
+    "title": "Parc auto",
+    "subtitle": "{count, plural, one {# voiture} other {# voitures}}",
+    "usage": "{count} / {max} voitures de votre forfait",
+    "add": "Ajouter une voiture",
+    "addSubtitle": "Tapez les informations de la carte grise et des papiers.",
+    "edit": "Modifier la voiture",
+    "filters": "Filtrer les voitures",
+    "search": "Matricule ou modèle",
+    "upgrade": "Voir les forfaits",
+    "limitReached": "Vous avez atteint la limite de {max} voitures du forfait {plan}. Passez à un forfait supérieur pour en ajouter.",
+    "age": "{years, plural, =0 {Moins d'1 an} one {# an} other {# ans}}",
+    "tabs": {
+      "all": "Toutes",
+      "available": "Disponibles",
+      "on_rental": "En location",
+      "maintenance": "Maintenance"
+    },
+    "columns": {
+      "car": "Voiture",
+      "status": "Statut",
+      "type": "Type",
+      "km": "Kilométrage",
+      "rate": "Prix/jour",
+      "age": "Âge"
+    },
+    "empty": {
+      "title": "Aucune voiture pour le moment",
+      "admin": "Ajoutez votre première voiture, ou importez tout votre parc depuis un fichier Excel.",
+      "staff": "Demandez à l'administrateur d'ajouter les voitures de l'agence."
+    },
+    "noResult": {
+      "title": "Aucune voiture trouvée",
+      "body": "Essayez un autre matricule ou modèle, ou un autre filtre."
+    },
+    "categories": {
+      "economy": "Économique",
+      "compact": "Compacte",
+      "suv": "SUV",
+      "van": "Utilitaire / Van",
+      "luxury": "Luxe"
+    },
+    "fuels": {
+      "essence": "Essence",
+      "diesel": "Diesel",
+      "hybride": "Hybride",
+      "electrique": "Électrique"
+    },
+    "gearboxes": {
+      "manuelle": "Manuelle",
+      "automatique": "Automatique"
+    },
+    "reasons": {
+      "panne": "Panne",
+      "accident": "Accident",
+      "carrosserie": "Carrosserie",
+      "pneus": "Pneus",
+      "entretien": "Entretien",
+      "autre": "Autre"
+    },
+    "chargeCategories": {
+      "carburant": "Carburant",
+      "lavage": "Lavage",
+      "vidange": "Vidange",
+      "reparation": "Réparation",
+      "assurance": "Assurance",
+      "visite": "Visite technique / vignette",
+      "publicite": "Publicité / campagne",
+      "salaires": "Salaires",
+      "loyer": "Loyer",
+      "autre": "Autre"
+    },
+    "status": {
+      "available": "Disponible",
+      "on_rental": "En location",
+      "blocked": "Bloquée : assurance expirée",
+      "reserved_today": "Réservée aujourd'hui",
+      "maintenance": "Maintenance",
+      "sold": "Vendue",
+      "until": "jusqu'au"
+    },
+    "form": {
+      "car": "Voiture",
+      "plate": "Matricule",
+      "brandModel": "Marque et modèle",
+      "category": "Catégorie",
+      "fuel": "Carburant",
+      "gearbox": "Boîte de vitesses",
+      "dailyRate": "Prix par jour",
+      "perDay": "par jour",
+      "currentKm": "Kilométrage actuel",
+      "firstRegistration": "Date de mise en circulation",
+      "papers": "Papiers",
+      "insuranceEnd": "Fin de l'assurance",
+      "visitEnd": "Fin de la visite technique",
+      "oil": "Vidange",
+      "oilLastKm": "Dernière vidange (km)",
+      "oilLastDate": "Date de la dernière vidange",
+      "oilNextKm": "Prochaine vidange (km)",
+      "oilHint": "Tapez le kilométrage indiqué par votre garagiste : Parcolia ne suppose aucun intervalle.",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
+    "maintenance": {
+      "title": "Mettre en maintenance",
+      "reason": "Motif",
+      "reasonRequired": "Choisissez un motif.",
+      "startsOn": "Début",
+      "expectedEnd": "Retour prévu",
+      "expectedEndHint": "Laissez vide si vous ne savez pas encore.",
+      "note": "Note (facultatif)",
+      "overlapTitle": "{count, plural, one {Attention : une réservation tombe pendant cette période} other {Attention : # réservations tombent pendant cette période}}",
+      "overlapHelp": "Changez la voiture de ces réservations ou prévenez les clients.",
+      "submit": "Mettre en maintenance",
+      "saved": "Voiture mise en maintenance."
+    },
+    "actions": {
+      "maintenance": "Maintenance",
+      "endMaintenance": "Remettre en service",
+      "backInService": "La voiture est de nouveau disponible.",
+      "edit": "Modifier",
+      "more": "Plus d'actions",
+      "sell": "Marquer comme vendue",
+      "unsell": "Remettre dans le parc",
+      "delete": "Supprimer",
+      "deleteTitle": "Supprimer cette voiture ?",
+      "deleteBody": "Seules les voitures sans réservation ni charge peuvent être supprimées. Sinon, marquez-la comme vendue : l'historique est conservé."
+    },
+    "detail": {
+      "unknown": "Non renseigné",
+      "expired": "Expirée",
+      "inDays": "{days, plural, =0 {Aujourd'hui} one {Dans # jour} other {Dans # jours}}",
+      "revenueMonth": "Chiffre d'affaires ce mois",
+      "chargesMonth": "Charges ce mois",
+      "info": "Informations",
+      "papers": "Assurance, visite et vidange",
+      "oil": "Prochaine vidange",
+      "oilDue": "À faire",
+      "kmLeft": "Dans {km} km",
+      "upcoming": "Réservations à venir",
+      "noUpcoming": "Aucune réservation à venir.",
+      "maintenanceHistory": "Historique de maintenance",
+      "inProgress": "En cours",
+      "noMaintenance": "Aucune maintenance enregistrée.",
+      "charges": "Charges de cette voiture",
+      "noCharges": "Aucune charge pour cette voiture.",
+      "backToList": "Retour au parc"
+    },
+    "import": {
+      "button": "Importer",
+      "title": "Importer des voitures",
+      "subtitle": "Fichier Excel (.xlsx) ou CSV. Les colonnes sont reconnues automatiquement, en français ou en anglais. Une voiture déjà présente (même matricule) est mise à jour.",
+      "chooseFile": "Choisir un fichier",
+      "otherFile": "Choisir un autre fichier",
+      "template": "Télécharger le modèle",
+      "readError": "Ce fichier n'a pas pu être lu. Enregistrez-le en .xlsx ou .csv et réessayez.",
+      "done": "{created, plural, =0 {Aucune voiture ajoutée} one {# voiture ajoutée} other {# voitures ajoutées}}, {updated, plural, =0 {aucune mise à jour} one {# mise à jour} other {# mises à jour}}.",
+      "summary": "{valid, plural, =0 {aucune ligne valide} one {# ligne valide} other {# lignes valides}}, {invalid, plural, =0 {aucune erreur} one {# ligne ignorée} other {# lignes ignorées}}",
+      "missingColumns": "Colonnes introuvables : {columns}. Ajoutez-les ou utilisez le modèle.",
+      "line": "Ligne {line}",
+      "willUpdate": "Mise à jour",
+      "willCreate": "Nouvelle",
+      "ignored": "Ignorée",
+      "submit": "{count, plural, one {Importer # voiture} other {Importer # voitures}}",
+      "errors": {
+        "plateRequired": "matricule manquant",
+        "plateTooLong": "matricule trop long",
+        "modelRequired": "modèle manquant",
+        "categoryUnknown": "catégorie inconnue (Économique, Compacte, SUV, Utilitaire, Luxe)",
+        "fuelUnknown": "carburant inconnu (Essence, Diesel, Hybride, Électrique)",
+        "gearboxUnknown": "boîte inconnue (Manuelle, Automatique)",
+        "priceRequired": "prix/jour manquant",
+        "dateInvalid": "date invalide : {field} (jj/mm/aaaa)",
+        "numberInvalid": "nombre invalide : {field}",
+        "duplicateInFile": "matricule en double dans le fichier"
+      },
+      "fields": {
+        "plate": "Matricule",
+        "brand_model": "Modèle",
+        "category": "Catégorie",
+        "fuel": "Carburant",
+        "gearbox": "Boîte",
+        "daily_rate": "Prix/jour",
+        "current_km": "Km",
+        "first_registration_date": "Mise en circulation",
+        "insurance_expires_on": "Fin assurance",
+        "technical_visit_expires_on": "Fin visite",
+        "oil_last_km": "Dernière vidange km",
+        "oil_last_date": "Dernière vidange date",
+        "oil_next_km": "Prochaine vidange km"
+      }
+    }
   }
 }

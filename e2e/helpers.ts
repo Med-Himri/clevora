@@ -79,3 +79,41 @@ export async function latestEmailHtml(to: string): Promise<string> {
   }
   throw new Error(`No email for ${to}`);
 }
+
+/** Adds a confirmed user with a role to an existing agency (test setup). */
+export async function addMember(agencyId: string, role: "admin" | "staff") {
+  const sb = admin();
+  const id = uid();
+  const email = `${role}-${id}@test.parcolia.ma`;
+  const { data, error } = await sb.auth.admin.createUser({
+    email,
+    password: PASSWORD,
+    email_confirm: true,
+    user_metadata: { full_name: `${role} ${id}`, locale: "fr" },
+  });
+  if (error || !data.user) throw error ?? new Error("createUser failed");
+  const { error: memberError } = await sb.from("agency_members").insert({ agency_id: agencyId, user_id: data.user.id, role });
+  if (memberError) throw memberError;
+  return { email, password: PASSWORD, userId: data.user.id };
+}
+
+/** Inserts a car directly (test setup). */
+export async function addVehicle(agencyId: string, values: { plate: string; brand_model?: string; daily_rate?: number }) {
+  const { data, error } = await admin()
+    .from("vehicles")
+    .insert({
+      agency_id: agencyId,
+      plate: values.plate,
+      brand_model: values.brand_model ?? "Dacia Logan",
+      category: "economy",
+      fuel: "diesel",
+      gearbox: "manuelle",
+      daily_rate: values.daily_rate ?? 250,
+      current_km: 40000,
+      insurance_expires_on: "2099-01-01",
+    })
+    .select("id")
+    .single();
+  if (error || !data) throw error ?? new Error("insert vehicle failed");
+  return data.id;
+}

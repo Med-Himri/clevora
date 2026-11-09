@@ -38,12 +38,16 @@ export function Stepper({
   );
 }
 
-/** Action buttons: fixed at the bottom on phones (above the safe area), inline from 640 px. */
-export function StickyActionBar({ children, className }: { children: ReactNode; className?: string }) {
+/**
+ * Action buttons: fixed at the bottom on phones, inline from 640 px.
+ * Inside the app it sits just above the bottom navigation bar.
+ */
+export function StickyActionBar({ children, className, aboveNav = true }: { children: ReactNode; className?: string; aboveNav?: boolean }) {
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:static sm:z-auto sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none",
+        aboveNav ? "bottom-[calc(3.5rem+env(safe-area-inset-bottom))]" : "bottom-0",
+        "fixed inset-x-0 z-40 border-t bg-card/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:static sm:z-auto sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none",
         className,
       )}
     >

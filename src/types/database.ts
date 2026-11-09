@@ -1068,6 +1068,10 @@ export type Database = {
       };
       is_member: { Args: { p_agency: string }; Returns: boolean };
       is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
+      maintenance_blocked_days: {
+        Args: { p_ended_on: string; p_expected_end_on: string; p_starts_on: string };
+        Returns: unknown;
+      };
       match_chunks: {
         Args: { p_agency: string; p_k?: number; p_query_embedding: string };
         Returns: {
@@ -1080,6 +1084,7 @@ export type Database = {
       };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
+      reservation_days: { Args: { p_end_at: string; p_start_at: string }; Returns: unknown };
       subscription_is_writable: {
         Args: { p_current_period_end: string; p_status: string; p_trial_ends_at: string };
         Returns: boolean;

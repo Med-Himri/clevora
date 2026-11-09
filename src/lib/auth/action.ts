@@ -41,6 +41,7 @@ export function dbErrorKey(error: { code?: string; message?: string; hint?: stri
   if (error.hint === "last_admin") return "lastAdmin";
   if (error.hint === "plan_limit_users") return "planLimitUsers";
   if (error.hint === "plan_limit_vehicles") return "planLimitVehicles";
+  if (error.hint === "vehicle_in_maintenance") return "vehicleInMaintenance";
   if (error.code === "42501") return "forbidden";
   if (error.code === "23505") return "duplicate";
   if (error.code === "23P01") return "doubleBooking";
