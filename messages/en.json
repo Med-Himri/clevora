@@ -54,7 +54,11 @@
     "receiptType": "The receipt must be a photo (JPG, PNG, WEBP) or a PDF.",
     "receiptSize": "The receipt is too large: 5 MB maximum.",
     "docTooShort": "The text is too short (20 characters min).",
-    "tooLong": "The text is too long."
+    "tooLong": "The text is too long.",
+    "ice": "The ICE has 15 digits.",
+    "minAge": "18 years minimum.",
+    "tooMany": "30 items maximum.",
+    "confirmName": "The name does not match."
   },
   "errors": {
     "invalidCredentials": "Wrong email or password. Check and try again.",
@@ -1121,6 +1125,95 @@
       "deleteTitle": "Delete this document?",
       "deleteBody": "The assistant will no longer use it. This cannot be undone.",
       "deleteConfirm": "Delete"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitleAdmin": "Your agency, contracts, alerts and preferences.",
+    "subtitleStaff": "Your language and how the app looks.",
+    "sections": "Settings sections",
+    "save": "Save",
+    "sections_": {
+      "agency": "Agency",
+      "legal": "Legal information",
+      "contract": "Contract",
+      "alerts": "Alerts",
+      "assistant": "AI assistant",
+      "display": "Display",
+      "data": "Data"
+    },
+    "descriptions": {
+      "agency": "Name, logo, colour and contact details: shown in the app and on contracts.",
+      "legal": "These numbers are printed at the bottom of contracts and invoices.",
+      "contract": "Values suggested for each new booking, and the text on the back of the contract.",
+      "alerts": "When to warn about insurance, technical inspection and oil changes, and who gets the emails.",
+      "assistant": "Allow the AI assistant in your agency or not.",
+      "display": "Language and theme, for you only.",
+      "data": "Download all your data or delete the agency."
+    },
+    "agency": {
+      "name": "Agency name",
+      "address": "Address",
+      "city": "City",
+      "phone": "Phone",
+      "email": "Agency email"
+    },
+    "legal": {
+      "hint": "Leave empty what you don't have.",
+      "rc": "RC (Trade register)",
+      "ice": "ICE",
+      "iceHint": "15 digits",
+      "if_number": "IF (Tax ID)",
+      "patente": "Patente",
+      "cnss": "CNSS"
+    },
+    "contract": {
+      "minAge": "Minimum driver age",
+      "minLicenseYears": "Minimum years of licence",
+      "default_deposit": "Default deposit (MAD)",
+      "default_franchise": "Default excess (MAD)",
+      "prefix": "Contract number prefix",
+      "prefixHint": "Next contract: {example}",
+      "equipment": "Equipment to check at departure",
+      "equipmentHint": "Spare wheel, jack, baby seat…",
+      "documents": "Documents given to the client",
+      "documentsHint": "Registration, insurance certificate…",
+      "newItem": "Add an item",
+      "newItemLabel": "New item for “{list}”",
+      "addItem": "Add",
+      "removeItem": "Remove “{item}”",
+      "terms": "Terms and conditions (back of the contract)",
+      "termsHint": "Printed on the back of every contract PDF."
+    },
+    "alerts": {
+      "days": "Warn before expiry (days)",
+      "daysHint": "For insurance and technical inspection.",
+      "km": "Warn before the oil change (km)",
+      "kmHint": "For example 1,500 km before.",
+      "who": "Who gets the alert emails?",
+      "adminsOnly": "Admins only",
+      "adminsOnlyHint": "Staff still see the alerts in the app.",
+      "everyone": "Admins and staff",
+      "everyoneHint": "Everyone gets the morning email."
+    },
+    "assistant": {
+      "enabled": "Turn on the AI assistant?",
+      "hint": "When off, the AI assistant page tells members it is turned off. Nothing else changes.",
+      "notInPlan": "Your current plan does not include the assistant: this setting applies when you change plan."
+    },
+    "data": {
+      "exportTitle": "Download my data",
+      "exportBody": "One Excel file with your cars, clients, bookings, payments, maintenance and expenses.",
+      "export": "Download (Excel)",
+      "deleteTitle": "Delete the agency",
+      "deleteBody": "Deletes the agency and all its data (cars, clients, contracts, expenses, documents). Members lose access.",
+      "delete": "Delete the agency",
+      "confirmTitle": "Delete the agency for good?",
+      "confirmBody": "Download your data first if you want to keep it.",
+      "confirmWarning": "This cannot be undone: nothing can be recovered.",
+      "typeName": "To confirm, type the agency name: {name}",
+      "deleteForever": "Delete for good",
+      "deleted": "The agency was deleted."
     }
   }
 }

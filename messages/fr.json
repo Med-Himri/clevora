@@ -54,7 +54,11 @@
     "receiptType": "Le reçu doit être une photo (JPG, PNG, WEBP) ou un PDF.",
     "receiptSize": "Le reçu est trop lourd : 5 Mo maximum.",
     "docTooShort": "Le texte est trop court (20 caractères minimum).",
-    "tooLong": "Le texte est trop long."
+    "tooLong": "Le texte est trop long.",
+    "ice": "L'ICE contient 15 chiffres.",
+    "minAge": "18 ans minimum.",
+    "tooMany": "30 éléments maximum.",
+    "confirmName": "Le nom ne correspond pas."
   },
   "errors": {
     "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
@@ -1121,6 +1125,95 @@
       "deleteTitle": "Supprimer ce document ?",
       "deleteBody": "L'assistant ne pourra plus s'en servir. Cette action est définitive.",
       "deleteConfirm": "Supprimer"
+    }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "subtitleAdmin": "Votre agence, vos contrats, vos alertes et vos préférences.",
+    "subtitleStaff": "Votre langue et l'apparence de l'application.",
+    "sections": "Rubriques des paramètres",
+    "save": "Enregistrer",
+    "sections_": {
+      "agency": "Agence",
+      "legal": "Informations légales",
+      "contract": "Contrat",
+      "alerts": "Alertes",
+      "assistant": "Assistant IA",
+      "display": "Affichage",
+      "data": "Données"
+    },
+    "descriptions": {
+      "agency": "Nom, logo, couleur et coordonnées : affichés dans l'application et sur les contrats.",
+      "legal": "Ces numéros apparaissent en bas des contrats et des factures.",
+      "contract": "Les valeurs proposées à chaque nouvelle réservation, et le texte au dos du contrat.",
+      "alerts": "Quand prévenir pour l'assurance, la visite technique et la vidange, et qui reçoit les e-mails.",
+      "assistant": "Autoriser ou non l'assistant IA dans votre agence.",
+      "display": "Langue et thème, pour vous seulement.",
+      "data": "Télécharger toutes vos données ou supprimer l'agence."
+    },
+    "agency": {
+      "name": "Nom de l'agence",
+      "address": "Adresse",
+      "city": "Ville",
+      "phone": "Téléphone",
+      "email": "E-mail de l'agence"
+    },
+    "legal": {
+      "hint": "Laissez vide ce que vous n'avez pas.",
+      "rc": "RC (Registre du commerce)",
+      "ice": "ICE",
+      "iceHint": "15 chiffres",
+      "if_number": "IF (Identifiant fiscal)",
+      "patente": "Patente",
+      "cnss": "CNSS"
+    },
+    "contract": {
+      "minAge": "Âge minimum du conducteur",
+      "minLicenseYears": "Années de permis minimum",
+      "default_deposit": "Caution par défaut (MAD)",
+      "default_franchise": "Franchise par défaut (MAD)",
+      "prefix": "Début du numéro de contrat",
+      "prefixHint": "Prochain contrat : {example}",
+      "equipment": "Équipements à cocher au départ",
+      "equipmentHint": "Roue de secours, cric, siège bébé…",
+      "documents": "Documents remis au client",
+      "documentsHint": "Carte grise, attestation d'assurance…",
+      "newItem": "Ajouter un élément",
+      "newItemLabel": "Nouvel élément pour « {list} »",
+      "addItem": "Ajouter",
+      "removeItem": "Retirer « {item} »",
+      "terms": "Conditions générales (dos du contrat)",
+      "termsHint": "Imprimées au dos de chaque contrat PDF."
+    },
+    "alerts": {
+      "days": "Prévenir avant l'expiration (jours)",
+      "daysHint": "Pour l'assurance et la visite technique.",
+      "km": "Prévenir avant la vidange (km)",
+      "kmHint": "Par exemple 1 500 km avant.",
+      "who": "Qui reçoit les e-mails d'alerte ?",
+      "adminsOnly": "Administrateurs seulement",
+      "adminsOnlyHint": "Les employés voient quand même les alertes dans l'application.",
+      "everyone": "Administrateurs et employés",
+      "everyoneHint": "Tout le monde reçoit l'e-mail du matin."
+    },
+    "assistant": {
+      "enabled": "Activer l'assistant IA ?",
+      "hint": "Désactivé, la page Assistant IA explique aux membres qu'il est coupé. Rien d'autre ne change.",
+      "notInPlan": "Votre forfait actuel n'inclut pas l'assistant : ce réglage s'appliquera quand vous changerez de forfait."
+    },
+    "data": {
+      "exportTitle": "Télécharger mes données",
+      "exportBody": "Un fichier Excel avec vos voitures, clients, réservations, paiements, entretiens et charges.",
+      "export": "Télécharger (Excel)",
+      "deleteTitle": "Supprimer l'agence",
+      "deleteBody": "Supprime l'agence et toutes ses données (voitures, clients, contrats, charges, documents). Les membres perdent l'accès.",
+      "delete": "Supprimer l'agence",
+      "confirmTitle": "Supprimer définitivement l'agence ?",
+      "confirmBody": "Téléchargez d'abord vos données si vous voulez les garder.",
+      "confirmWarning": "Cette action est définitive : rien ne pourra être récupéré.",
+      "typeName": "Pour confirmer, écrivez le nom de l'agence : {name}",
+      "deleteForever": "Supprimer définitivement",
+      "deleted": "L'agence a été supprimée."
     }
   }
 }

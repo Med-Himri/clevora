@@ -1140,6 +1140,7 @@ export type Database = {
         Returns: string;
       };
       current_agency_ids: { Args: { p_roles?: string[] }; Returns: string[] };
+      delete_agency: { Args: { p_agency: string; p_confirm_name: string }; Returns: undefined };
       generate_recurring_charges: { Args: { p_agency: string; p_month?: string }; Returns: number };
       has_role: { Args: { p_agency: string; p_roles: string[] }; Returns: boolean };
       invitation_preview: {

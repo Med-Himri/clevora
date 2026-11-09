@@ -1,20 +1,21 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ImageUpIcon, Trash2Icon, UserIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ImageUpIcon, Trash2Icon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type * as React from "react";
 import { useForm, useWatch, type FieldPath } from "react-hook-form";
 import { z } from "zod";
 import { AgencyLogo } from "@/components/app/agency-logo";
+import { brandVars, ColorPicker, HeaderPreview } from "@/components/app/brand-picker";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Field, fieldAria } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { BRAND_PRESETS, FALLBACK_BRAND, resolveBrandColor } from "@/lib/brand";
+import { FALLBACK_BRAND } from "@/lib/brand";
 import { LOGO_MAX_BYTES, LOGO_TYPES } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { signupAgencyOnlySchema, signupSchema } from "../schema";
@@ -272,11 +273,6 @@ export function SignupWizard({ loggedInName }: { loggedInName: string | null }) 
 }
 
 /** CSS variables so everything inside previews the chosen (contrast-checked) colour. */
-function brandVars(color: string): React.CSSProperties {
-  const brand = resolveBrandColor(color);
-  return { ["--brand" as string]: brand.brand, ["--brand-foreground" as string]: brand.foreground };
-}
-
 function StepIndicator({
   steps,
   index,
@@ -298,96 +294,6 @@ function StepIndicator({
           <li key={s} className={cn("h-1.5 flex-1 rounded-full", i <= index ? "bg-primary dark:bg-ring" : "bg-border")} />
         ))}
       </ol>
-    </div>
-  );
-}
-
-function ColorPicker({
-  value,
-  onChange,
-  label,
-  customLabel,
-}: {
-  value: string;
-  onChange: (color: string) => void;
-  label: string;
-  customLabel: string;
-}) {
-  return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="mb-2 text-sm font-medium">{label}</legend>
-      <div className="flex flex-wrap gap-2">
-        {BRAND_PRESETS.map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => onChange(c)}
-            aria-label={c}
-            aria-pressed={value.toUpperCase() === c}
-            className={cn(
-              "inline-flex size-11 items-center justify-center rounded-full border-2 border-transparent",
-              value.toUpperCase() === c && "border-foreground",
-            )}
-          >
-            <span className="size-8 rounded-full ring-1 ring-black/10 dark:ring-white/25" style={{ backgroundColor: c }} />
-          </button>
-        ))}
-        <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border px-3 text-sm font-medium hover:bg-accent">
-          <input
-            type="color"
-            value={value}
-            onChange={(e) => onChange(e.target.value.toUpperCase())}
-            className="size-7 cursor-pointer rounded-full border-0 bg-transparent p-0"
-          />
-          {customLabel}
-        </label>
-      </div>
-    </fieldset>
-  );
-}
-
-/** Live preview of the app header with the chosen logo and colour. */
-function HeaderPreview({
-  agencyName,
-  userName,
-  logoUrl,
-  color,
-  labels,
-}: {
-  agencyName: string;
-  userName: string;
-  logoUrl: string | null;
-  color: string;
-  labels: { preview: string; role: string; button: string; fallback: string };
-}) {
-  const brand = resolveBrandColor(color);
-  const name = agencyName.trim() || "—";
-  return (
-    <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium">{labels.preview}</span>
-      <div className="overflow-hidden rounded-xl border bg-background" style={brandVars(color)} aria-hidden>
-        <div className="flex items-center justify-between gap-3 border-b bg-card px-3 py-2">
-          <div className="flex min-w-0 items-center gap-2">
-            <AgencyLogo name={name} url={logoUrl} size={36} />
-            <span className="truncate font-semibold">{name}</span>
-          </div>
-          <div className="flex min-w-0 items-center gap-2 text-end">
-            <span className="flex min-w-0 flex-col leading-tight">
-              <span className="truncate text-sm font-medium">{userName.trim() || "—"}</span>
-              <span className="text-xs text-muted-foreground">{labels.role}</span>
-            </span>
-            <span className="hidden size-8 shrink-0 items-center justify-center rounded-full bg-muted sm:inline-flex">
-              <UserIcon className="size-4" />
-            </span>
-          </div>
-        </div>
-        <div className="p-3">
-          <span className="inline-flex h-10 items-center rounded-lg bg-brand px-4 text-sm font-semibold text-brand-foreground">
-            {labels.button}
-          </span>
-        </div>
-      </div>
-      {brand.usedFallback ? <p className="text-sm text-warning">{labels.fallback}</p> : null}
     </div>
   );
 }
