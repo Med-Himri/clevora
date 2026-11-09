@@ -15,6 +15,7 @@ declare
   c_agency   constant uuid := 'd0000000-0000-4000-8000-000000000001';
   c_admin    constant uuid := 'd0000000-0000-4000-8000-0000000000a1';
   c_staff    constant uuid := 'd0000000-0000-4000-8000-0000000000a2';
+  v_doc      uuid;
   v_today    date := (now() at time zone 'Africa/Casablanca')::date;
   v_pro      uuid;
   v_vehicle  uuid[] := '{}';
@@ -343,8 +344,14 @@ begin
          (c_agency, v_today - 60, 'visite',    v_vehicle[6], 300,  'Visite technique',   c_admin),
          (c_agency, v_today - 3,  'reparation', v_vehicle[10], 2500, 'Embrayage (acompte garage)', c_admin);
 
-  -- AI knowledge: one system document (no embeddings in the seed)
+  -- Assistant IA: the agency's rental terms, searchable by the assistant
   insert into public.ai_documents (agency_id, title, source, created_by)
-  values (c_agency, 'Conditions générales de location', 'system', c_admin);
+  values (c_agency, 'Conditions générales de location', 'system', c_admin)
+  returning id into v_doc;
+  insert into public.ai_chunks (agency_id, document_id, content, metadata) values
+    (c_agency, v_doc, 'Âge et permis : le conducteur doit avoir au moins 21 ans et un permis de plus de 2 ans. Pièces demandées : CIN ou passeport et permis de conduire original.', '{"index":0}'),
+    (c_agency, v_doc, 'Caution : 5 000 MAD pour les voitures économiques, 10 000 MAD pour les SUV et le haut de gamme, par chèque ou empreinte de carte. Elle est rendue au retour si la voiture est rendue sans dommage. Franchise en cas d''accident : 3 000 MAD.', '{"index":1}'),
+    (c_agency, v_doc, 'Carburant : la voiture est rendue avec le même niveau qu''au départ, sinon le plein est facturé 15 MAD le litre. Retard : au-delà d''une heure, une journée supplémentaire est facturée. Livraison à l''aéroport Mohammed V : 200 MAD.', '{"index":2}'),
+    (c_agency, v_doc, 'Sortie du territoire interdite. Kilométrage illimité au Maroc. Les amendes et infractions pendant la location sont à la charge du client.', '{"index":3}');
 end;
 $seed$;

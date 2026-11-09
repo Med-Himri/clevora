@@ -58,6 +58,7 @@ export type Database = {
       agencies: {
         Row: {
           address: string | null;
+          ai_enabled: boolean;
           alert_days_before: number;
           alert_km_before: number;
           alert_roles: string[];
@@ -95,6 +96,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           address?: string | null;
+          ai_enabled?: boolean;
           alert_days_before?: number;
           alert_km_before?: number;
           alert_roles?: string[];
@@ -131,6 +133,7 @@ export type Database = {
         };
         Update: {
           address?: string | null;
+          ai_enabled?: boolean;
           alert_days_before?: number;
           alert_km_before?: number;
           alert_roles?: string[];
@@ -238,6 +241,7 @@ export type Database = {
           created_at: string;
           document_id: string;
           embedding: string | null;
+          fts: unknown;
           id: string;
           metadata: NonNullable<Json>;
           updated_at: string;
@@ -249,6 +253,7 @@ export type Database = {
           created_at?: string;
           document_id: string;
           embedding?: string | null;
+          fts?: never;
           id?: string;
           metadata?: NonNullable<Json>;
           updated_at?: string;
@@ -259,6 +264,7 @@ export type Database = {
           created_at?: string;
           document_id?: string;
           embedding?: string | null;
+          fts?: never;
           id?: string;
           metadata?: NonNullable<Json>;
           updated_at?: string;
@@ -628,6 +634,7 @@ export type Database = {
         Row: {
           active: boolean;
           ai_enabled: boolean;
+          ai_monthly_questions: number | null;
           code: string;
           created_at: string;
           id: string;
@@ -642,6 +649,7 @@ export type Database = {
         Insert: {
           active?: boolean;
           ai_enabled?: boolean;
+          ai_monthly_questions?: number | null;
           code: string;
           created_at?: string;
           id?: string;
@@ -655,6 +663,7 @@ export type Database = {
         Update: {
           active?: boolean;
           ai_enabled?: boolean;
+          ai_monthly_questions?: number | null;
           code?: string;
           created_at?: string;
           id?: string;
@@ -1100,6 +1109,15 @@ export type Database = {
       _next_contract_number: { Args: { p_agency: string }; Returns: string };
       _upsert_client: { Args: { p: Json; p_agency: string }; Returns: string };
       accept_invitation: { Args: { p_token: string }; Returns: string };
+      ai_quota: {
+        Args: { p_agency: string };
+        Returns: {
+          enabled: boolean;
+          plan_allows: boolean;
+          quota: number;
+          used: number;
+        }[];
+      };
       create_agency: {
         Args: {
           p_brand_color?: string;
@@ -1172,6 +1190,16 @@ export type Database = {
       save_reservation: {
         Args: { p: Json; p_agency: string; p_reservation: string };
         Returns: string;
+      };
+      search_chunks: {
+        Args: { p_agency: string; p_k?: number; p_query: string };
+        Returns: {
+          chunk_id: string;
+          content: string;
+          document_id: string;
+          rank: number;
+          title: string;
+        }[];
       };
       search_reservation_ids: { Args: { p_agency: string; p_q: string }; Returns: string[] };
       stats_by_vehicle: {

@@ -78,3 +78,11 @@ npm run test:e2e
 - `src/components/app` — Parcolia components: shell (sidebar / rail / bottom nav), ResponsiveList, UrgencyGroups, StatTile, EmptyState, Stepper, SearchBar, `<Ltr>`
 - `/dev/ui` — every shared component in one page (development only, or with `PARCOLIA_DEV_UI=1`)
 - `messages/{fr,ar,en}.json` — all texts; `supabase/` — migrations, seed, email templates, pgTAP tests
+- `src/lib/ai` — Assistant IA: tools (each runs with the user's own session, so RLS applies; staff never get money tools), Claude provider (`claude-opus-5-5`, streaming tool loop), offline mock (`AI_PROVIDER=mock`, tests only)
+
+## Assistant IA
+
+- Set `ANTHROPIC_API_KEY` (server only) in `.env.local` and on Vercel. Without it the page says the assistant is not connected yet.
+- Included in the Pro (300 questions / month) and Illimité (1 500) plans; admins can switch it off per agency (`agencies.ai_enabled`).
+- Nothing of the conversation is stored. One `activity_log` row per question keeps only the tools used and token counts.
+- Admins add agency documents (règlement, conditions, tarifs) as text; the assistant searches them (Postgres full-text search, `search_chunks`) and cites them.
