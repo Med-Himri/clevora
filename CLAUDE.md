@@ -2,7 +2,7 @@
 
 ## Product
 Clévora is a multi-tenant SaaS for car rental agencies in Morocco. One app, one database; each agency (tenant) sees only its own data and works under its own name and logo. Brand name in the UI: "Clévora". In code, folders, packages and domains: "clevora" (no accent).
-Users: agency owners, admins and staff working at a desk or on a phone in the parking lot. Many are not technical. EASY TO USE is the top priority: few clicks, big clear buttons, plain words, no jargon.
+Users: agency admins (the owners) and staff working at a desk or on a phone in the parking lot. Many are not technical. EASY TO USE is the top priority: few clicks, big clear buttons, plain words, no jargon.
 
 ## Stack
 - Next.js (App Router, latest stable) + TypeScript (strict) + React Server Components where sensible
@@ -27,8 +27,8 @@ Users: agency owners, admins and staff working at a desk or on a phone in the pa
 - Platform super admins (Clévora staff) are in a separate platform_admins table and use a separate /platform area.
 
 ## Roles inside an agency
-- owner: everything, including billing and deleting the agency. An agency can have several owners.
-- admin: everything except billing; can add admins and staff.
+Only two roles: 'admin' and 'staff'. There is no separate "owner" role.
+- admin: the agency owner(s). Everything, including billing, deleting the agency, adding admins and staff, seeing money. An agency can have several admins, all with the same powers. The person who creates the agency becomes its first admin. The last active admin can never be removed, disabled or demoted.
 - staff: daily work (reservations, contracts, fleet status, maintenance, vidange, assurance, assistant). Cannot add users, cannot see statistics, charges or revenue.
 Enforce roles in RLS AND hide forbidden UI. Never rely on UI hiding alone.
 
