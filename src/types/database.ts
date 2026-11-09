@@ -339,7 +339,10 @@ export type Database = {
           created_by: string | null;
           date: string;
           id: string;
+          is_recurring: boolean;
           note: string | null;
+          receipt_path: string | null;
+          recurring_parent_id: string | null;
           updated_at: string;
           vehicle_id: string | null;
         };
@@ -353,7 +356,10 @@ export type Database = {
           created_by?: string | null;
           date?: string;
           id?: string;
+          is_recurring?: boolean;
           note?: string | null;
+          receipt_path?: string | null;
+          recurring_parent_id?: string | null;
           updated_at?: string;
           vehicle_id?: string | null;
         };
@@ -366,7 +372,10 @@ export type Database = {
           created_by?: string | null;
           date?: string;
           id?: string;
+          is_recurring?: boolean;
           note?: string | null;
+          receipt_path?: string | null;
+          recurring_parent_id?: string | null;
           updated_at?: string;
           vehicle_id?: string | null;
         };
@@ -390,6 +399,13 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "charges_recurring_parent_id_fkey";
+            columns: ["recurring_parent_id"];
+            isOneToOne: false;
+            referencedRelation: "charges";
             referencedColumns: ["id"];
           },
         ];
@@ -1069,6 +1085,7 @@ export type Database = {
       };
     };
     Functions: {
+      _assert_admin: { Args: { p_agency: string }; Returns: undefined };
       _create_agency: {
         Args: {
           p_brand_color?: string;
@@ -1105,6 +1122,7 @@ export type Database = {
         Returns: string;
       };
       current_agency_ids: { Args: { p_roles?: string[] }; Returns: string[] };
+      generate_recurring_charges: { Args: { p_agency: string; p_month?: string }; Returns: number };
       has_role: { Args: { p_agency: string; p_roles: string[] }; Returns: boolean };
       invitation_preview: {
         Args: { p_token: string };
@@ -1136,6 +1154,15 @@ export type Database = {
       };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
+      rental_day_rows: {
+        Args: { p_agency: string; p_from: string; p_to: string };
+        Returns: {
+          day: string;
+          reservation_id: string;
+          revenue: number;
+          vehicle_id: string;
+        }[];
+      };
       rental_days: { Args: { p_end: string; p_start: string }; Returns: number };
       reservation_days: { Args: { p_end_at: string; p_start_at: string }; Returns: unknown };
       return_reservation: {
@@ -1147,6 +1174,26 @@ export type Database = {
         Returns: string;
       };
       search_reservation_ids: { Args: { p_agency: string; p_q: string }; Returns: string[] };
+      stats_by_vehicle: {
+        Args: { p_agency: string; p_from: string; p_to: string };
+        Returns: {
+          brand_model: string;
+          charges: number;
+          plate: string;
+          rented_days: number;
+          revenue: number;
+          vehicle_id: string;
+        }[];
+      };
+      stats_daily: {
+        Args: { p_agency: string; p_from: string; p_to: string };
+        Returns: {
+          charges: number;
+          day: string;
+          rented_days: number;
+          revenue: number;
+        }[];
+      };
       subscription_is_writable: {
         Args: { p_current_period_end: string; p_status: string; p_trial_ends_at: string };
         Returns: boolean;

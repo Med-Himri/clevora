@@ -11,7 +11,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 /**
- * Daily alerts (insurance, technical visit, oil change, late returns): one
+ * Daily job: creates this month's recurring charges, then sends the alerts
+ * (insurance, technical visit, oil change, late returns): one
  * summary per agency to the chosen roles. Called once a day by a scheduler
  * (Vercel Cron or Supabase Cron) with `Authorization: Bearer CRON_SECRET`.
  * Sends at most once per agency per day unless ?force=1.
@@ -37,6 +38,8 @@ export async function GET(request: NextRequest) {
 
   const report: Array<{ agency: string; alerts: number; sent: number; skipped?: string }> = [];
   for (const a of agencies ?? []) {
+    // Monthly recurring charges (rent, salaries…): created once per month
+    await sb.rpc("generate_recurring_charges", { p_agency: a.id, p_month: today });
     if (!force && a.alerts_sent_on === today) {
       report.push({ agency: a.id, alerts: 0, sent: 0, skipped: "already_sent" });
       continue;

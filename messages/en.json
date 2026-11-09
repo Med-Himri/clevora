@@ -50,7 +50,9 @@
     "chooseCar": "Choose a car.",
     "contractNumberTaken": "This contract number already exists in your agency.",
     "extendAfterEnd": "The new date must be after the planned return.",
-    "kmInBeforeOut": "Mileage at return cannot be lower than at departure."
+    "kmInBeforeOut": "Mileage at return cannot be lower than at departure.",
+    "receiptType": "The receipt must be a photo (JPG, PNG, WEBP) or a PDF.",
+    "receiptSize": "The receipt is too large: 5 MB maximum."
   },
   "errors": {
     "invalidCredentials": "Wrong email or password. Check and try again.",
@@ -967,5 +969,74 @@
       "ok": "Up to date",
       "unknown": "Next oil change not set"
     }
+  },
+  "charges": {
+    "title": "Expenses",
+    "add": "Add an expense",
+    "addTitle": "New expense",
+    "edit": "Edit",
+    "editTitle": "Edit expense",
+    "category": "Category",
+    "categoryRequired": "Choose a category.",
+    "date": "Date",
+    "amount": "Amount",
+    "for": "For",
+    "forAgency": "Agency",
+    "forCar": "A car",
+    "chooseCar": "Choose the car",
+    "campaign": "Campaign name",
+    "campaignPlaceholder": "E.g. Facebook summer 2026",
+    "note": "Note (optional)",
+    "recurring": "Monthly expense?",
+    "recurringHint": "Yes: it will be created again automatically every month (rent, salaries…). You can edit it.",
+    "receipt": "Receipt photo",
+    "viewReceipt": "Receipt",
+    "save": "Save",
+    "delete": "Delete",
+    "deleteTitle": "Delete this expense?",
+    "deleteBody": "It will be removed from the totals and statistics.",
+    "monthly": "Monthly",
+    "export": "Export (Excel)",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "empty": "No expense this month",
+    "emptyBody": "Add fuel, washing, rent… to see your real profit in Statistics.",
+    "tiles": {
+      "total": "Total expenses",
+      "cars": "Car expenses",
+      "agency": "Agency expenses",
+      "ads": "Advertising and campaigns"
+    }
+  },
+  "statistics": {
+    "title": "Statistics",
+    "period": "Period from",
+    "periodLabel": "Choose the period",
+    "periods": {
+      "months": "By month (12 months)",
+      "days": "By day (30 days)",
+      "custom": "Choose dates"
+    },
+    "from": "From",
+    "to": "To",
+    "apply": "Show",
+    "revenue": "Revenue",
+    "charges": "Expenses",
+    "net": "Net profit",
+    "daysRented": "Days rented",
+    "occupancy": "Occupancy",
+    "occupancyValue": "{pct} % occupied",
+    "bestCar": "Best car",
+    "revenueByMonth": "Revenue by month",
+    "revenueByDay": "Revenue by day",
+    "partial": "current or partial month",
+    "showTable": "Show the numbers",
+    "periodColumn": "Period",
+    "perCar": "Performance per car",
+    "perCarHint": "Ranked by net profit = revenue − that car's expenses (agency expenses are not split).",
+    "car": "Car",
+    "carCharges": "Car expenses",
+    "exportExcel": "Export (Excel)",
+    "exportPdf": "PDF report"
   }
 }

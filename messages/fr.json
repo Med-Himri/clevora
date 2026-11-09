@@ -50,7 +50,9 @@
     "chooseCar": "Choisissez une voiture.",
     "contractNumberTaken": "Ce numéro de contrat existe déjà dans votre agence.",
     "extendAfterEnd": "La nouvelle date doit être après le retour prévu.",
-    "kmInBeforeOut": "Le kilométrage au retour ne peut pas être inférieur au départ."
+    "kmInBeforeOut": "Le kilométrage au retour ne peut pas être inférieur au départ.",
+    "receiptType": "Le reçu doit être une photo (JPG, PNG, WEBP) ou un PDF.",
+    "receiptSize": "Le reçu est trop lourd : 5 Mo maximum."
   },
   "errors": {
     "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
@@ -967,5 +969,74 @@
       "ok": "À jour",
       "unknown": "Prochaine vidange non renseignée"
     }
+  },
+  "charges": {
+    "title": "Charges",
+    "add": "Ajouter une charge",
+    "addTitle": "Nouvelle charge",
+    "edit": "Modifier",
+    "editTitle": "Modifier la charge",
+    "category": "Catégorie",
+    "categoryRequired": "Choisissez une catégorie.",
+    "date": "Date",
+    "amount": "Montant",
+    "for": "Pour",
+    "forAgency": "Agence",
+    "forCar": "Une voiture",
+    "chooseCar": "Choisir la voiture",
+    "campaign": "Nom de la campagne",
+    "campaignPlaceholder": "Ex. : Facebook été 2026",
+    "note": "Note (facultatif)",
+    "recurring": "Charge mensuelle ?",
+    "recurringHint": "Oui : elle sera recréée automatiquement chaque mois (loyer, salaires…). Vous pourrez la modifier.",
+    "receipt": "Photo du reçu",
+    "viewReceipt": "Reçu",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer cette charge ?",
+    "deleteBody": "Elle sera retirée des totaux et des statistiques.",
+    "monthly": "Mensuelle",
+    "export": "Exporter (Excel)",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "empty": "Aucune charge ce mois-ci",
+    "emptyBody": "Ajoutez le carburant, les lavages, le loyer… pour voir votre bénéfice réel dans Statistiques.",
+    "tiles": {
+      "total": "Total des charges",
+      "cars": "Charges des voitures",
+      "agency": "Charges de l'agence",
+      "ads": "Publicité et campagnes"
+    }
+  },
+  "statistics": {
+    "title": "Statistiques",
+    "period": "Période du",
+    "periodLabel": "Choisir la période",
+    "periods": {
+      "months": "Par mois (12 mois)",
+      "days": "Par jour (30 jours)",
+      "custom": "Choisir les dates"
+    },
+    "from": "Du",
+    "to": "Au",
+    "apply": "Afficher",
+    "revenue": "Chiffre d'affaires",
+    "charges": "Charges",
+    "net": "Bénéfice net",
+    "daysRented": "Jours loués",
+    "occupancy": "Taux d'occupation",
+    "occupancyValue": "{pct} % occupée",
+    "bestCar": "Meilleure voiture",
+    "revenueByMonth": "Chiffre d'affaires par mois",
+    "revenueByDay": "Chiffre d'affaires par jour",
+    "partial": "mois en cours ou partiel",
+    "showTable": "Voir les chiffres",
+    "periodColumn": "Période",
+    "perCar": "Performance par voiture",
+    "perCarHint": "Classées par bénéfice net = chiffre d'affaires − charges de la voiture (les charges de l'agence ne sont pas réparties).",
+    "car": "Voiture",
+    "carCharges": "Charges de la voiture",
+    "exportExcel": "Exporter (Excel)",
+    "exportPdf": "Rapport PDF"
   }
 }

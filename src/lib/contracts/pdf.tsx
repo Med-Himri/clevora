@@ -9,7 +9,7 @@ import { LABELS, type LabelKey } from "./labels";
 
 const FONT_DIR = path.join(process.cwd(), "src/assets/fonts");
 let fontsRegistered = false;
-function registerFonts() {
+export function registerFonts() {
   if (fontsRegistered) return;
   Font.register({
     family: "NotoSans",
@@ -30,7 +30,7 @@ function registerFonts() {
 }
 
 /** Latin first, Arabic glyphs fall back to Noto Sans Arabic (names, addresses, labels). */
-const FAMILY = ["NotoSans", "NotoSansArabic"];
+export const FAMILY = ["NotoSans", "NotoSansArabic"];
 
 function styles(brand: string, compact: boolean) {
   const gap = compact ? 4 : 7;

@@ -1,15 +1,188 @@
+import { BarChart3Icon, CalendarDaysIcon, CarIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { ComingSoon } from "@/components/app/coming-soon";
+import { getFormatter, getTranslations } from "next-intl/server";
+import { ExcelExport } from "@/components/app/excel-export";
+import { Ltr } from "@/components/app/ltr";
+import { PageHeader } from "@/components/app/page-header";
+import { ResponsiveList, type Column } from "@/components/app/responsive-list";
+import { StatTile } from "@/components/app/stat-tile";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link } from "@/i18n/navigation";
 import { requireRole } from "@/lib/auth/session";
+import { dayKey, formatDate, formatMoney } from "@/lib/format";
+import { occupancy, occupancyTone, PERIODS, resolvePeriod, toBuckets, type DailyRow } from "@/lib/stats";
+import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
+import { RevenueChartLazy } from "./components/revenue-chart-lazy";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
   return { title: t("statistics") };
 }
 
-/** Admins only (staff never see money; RLS enforces it too). */
-export default async function Page() {
-  await requireRole(["admin"]);
-  return <ComingSoon section="statistics" />;
+/** Statistiques — admins only (the SQL functions refuse anyone else too). */
+export default async function StatisticsPage({ searchParams }: PageProps<"/[locale]/statistics">) {
+  const { agency } = await requireRole(["admin"]);
+  const sp = await searchParams;
+  const today = dayKey(new Date());
+  const { period, from, to } = resolvePeriod(sp, today);
+  const t = await getTranslations("statistics");
+  const format = await getFormatter();
+  const supabase = await createClient();
+  const [{ data: daily }, { data: perCar }, { count: carCount }] = await Promise.all([
+    supabase.rpc("stats_daily", { p_agency: agency.id, p_from: from, p_to: to }),
+    supabase.rpc("stats_by_vehicle", { p_agency: agency.id, p_from: from, p_to: to }),
+    supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "active"),
+  ]);
+  const rows = (daily ?? []) as DailyRow[];
+  const buckets = toBuckets(rows, from, to, today);
+  const days = rows.length;
+  const revenue = buckets.reduce((s, b) => s + b.revenue, 0);
+  const charges = buckets.reduce((s, b) => s + b.charges, 0);
+  const rentedDays = buckets.reduce((s, b) => s + b.rentedDays, 0);
+  const cars = (perCar ?? [])
+    .map((c) => {
+      const rev = Number(c.revenue);
+      const ch = Number(c.charges);
+      return { ...c, revenue: rev, charges: ch, net: rev - ch, occupancy: occupancy(c.rented_days, 1, days) };
+    })
+    .sort((a, b) => b.net - a.net);
+  const best = cars.find((c) => c.revenue > 0);
+  const labels = Object.fromEntries(
+    buckets.map((b) => [
+      b.key,
+      b.key.length === 7
+        ? format.dateTime(new Date(`${b.from}T12:00:00Z`), { month: "short", year: "2-digit" })
+        : format.dateTime(new Date(`${b.from}T12:00:00Z`), { day: "2-digit", month: "2-digit" }),
+    ]),
+  );
+
+  const columns: Column<(typeof cars)[number]>[] = [
+    { key: "car", header: t("car"), priority: "primary", cell: (c) => <span>{c.brand_model} <Ltr className="text-sm font-normal text-muted-foreground">{c.plate}</Ltr></span> },
+    { key: "net", header: t("net"), priority: "high", align: "end", cell: (c) => <Ltr className={cn("font-bold", c.net < 0 && "text-destructive")}>{formatMoney(c.net)}</Ltr> },
+    { key: "occupancy", header: t("occupancy"), priority: "high", hideLabelInCard: true, cell: (c) => <Badge variant={occupancyTone(c.occupancy)}>{t("occupancyValue", { pct: c.occupancy })}</Badge> },
+    { key: "revenue", header: t("revenue"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.revenue)}</Ltr> },
+    { key: "charges", header: t("carCharges"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.charges)}</Ltr> },
+    { key: "days", header: t("daysRented"), priority: "low", align: "end", cell: (c) => <Ltr>{c.rented_days}</Ltr> },
+  ];
+  const qs = `from=${from}&to=${to}`;
+
+  return (
+    <>
+      <PageHeader
+        title={t("title")}
+        subtitle={<>{t("period")} <Ltr>{formatDate(from)}</Ltr> – <Ltr>{formatDate(to)}</Ltr></>}
+        action={
+          <>
+            <ExcelExport
+              fileName={`statistiques-${from}-${to}.xlsx`}
+              label={t("exportExcel")}
+              header={[t("periodColumn"), t("revenue"), t("charges"), t("net"), t("daysRented")]}
+              rows={[
+                ...buckets.map((b) => [labels[b.key], b.revenue, b.charges, b.net, b.rentedDays]),
+                [],
+                [t("car"), t("revenue"), t("carCharges"), t("net"), t("daysRented"), t("occupancy")],
+                ...cars.map((c) => [`${c.brand_model} ${c.plate}`, c.revenue, c.charges, c.net, c.rented_days, `${c.occupancy} %`]),
+              ]}
+            />
+            <Button variant="outline" size="lg" asChild>
+              <a href={`/api/statistics/pdf?${qs}`} target="_blank" rel="noopener">
+                <FileTextIcon aria-hidden />
+                {t("exportPdf")}
+              </a>
+            </Button>
+          </>
+        }
+      />
+
+      <div className="mb-4 flex flex-col gap-3">
+        <nav aria-label={t("periodLabel")} className="flex flex-wrap gap-2">
+          {PERIODS.map((p) => (
+            <Link
+              key={p}
+              href={p === "custom" ? `/statistics?period=custom&${qs}` : `/statistics?period=${p}`}
+              aria-current={period === p ? "page" : undefined}
+              className={cn("inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold", period === p ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-accent")}
+            >
+              {t(`periods.${p}`)}
+            </Link>
+          ))}
+        </nav>
+        {period === "custom" ? (
+          <form method="get" className="flex flex-wrap items-end gap-3">
+            <input type="hidden" name="period" value="custom" />
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="stats-from">{t("from")}</Label>
+              <Input id="stats-from" name="from" type="date" defaultValue={from} required className="w-44" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="stats-to">{t("to")}</Label>
+              <Input id="stats-to" name="to" type="date" defaultValue={to} required className="w-44" />
+            </div>
+            <Button type="submit" size="lg">
+              <CalendarDaysIcon aria-hidden />
+              {t("apply")}
+            </Button>
+          </form>
+        ) : null}
+      </div>
+
+      <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-6">
+        <li><StatTile label={t("revenue")} value={<Ltr>{formatMoney(revenue)}</Ltr>} icon={WalletIcon} tone="success" testId="stats-revenue" /></li>
+        <li><StatTile label={t("charges")} value={<Ltr>{formatMoney(charges)}</Ltr>} icon={WalletIcon} tone="warning" testId="stats-charges" /></li>
+        <li><StatTile label={t("net")} value={<Ltr>{formatMoney(revenue - charges)}</Ltr>} icon={TrendingUpIcon} tone={revenue - charges < 0 ? "danger" : "success"} testId="stats-net" /></li>
+        <li><StatTile label={t("daysRented")} value={rentedDays} icon={CalendarDaysIcon} /></li>
+        <li><StatTile label={t("occupancy")} value={<Ltr>{occupancy(rentedDays, carCount ?? 0, days)} %</Ltr>} icon={PercentIcon} testId="stats-occupancy" /></li>
+        <li><StatTile label={t("bestCar")} value={<span className="text-lg sm:text-xl">{best ? best.brand_model : "—"}</span>} hint={best ? <Ltr>{best.plate}</Ltr> : undefined} icon={TrophyIcon} /></li>
+      </ul>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3Icon className="size-5 text-muted-foreground" aria-hidden />
+            {buckets[0]?.key.length === 7 ? t("revenueByMonth") : t("revenueByDay")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <RevenueChartLazy buckets={buckets} labels={labels} />
+          <details className="mt-3 text-sm">
+            <summary className="inline-flex min-h-11 cursor-pointer items-center font-medium text-muted-foreground">{t("showTable")}</summary>
+            <table className="mt-2 w-full text-sm">
+              <thead className="text-muted-foreground">
+                <tr>
+                  <th scope="col" className="py-1 text-start font-medium">{t("periodColumn")}</th>
+                  <th scope="col" className="py-1 text-end font-medium">{t("revenue")}</th>
+                  <th scope="col" className="py-1 text-end font-medium">{t("charges")}</th>
+                  <th scope="col" className="py-1 text-end font-medium">{t("net")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {buckets.map((b) => (
+                  <tr key={b.key}>
+                    <td className="py-1">{labels[b.key]}{b.partial ? ` (${t("partial")})` : ""}</td>
+                    <td className="py-1 text-end"><Ltr>{formatMoney(b.revenue)}</Ltr></td>
+                    <td className="py-1 text-end"><Ltr>{formatMoney(b.charges)}</Ltr></td>
+                    <td className="py-1 text-end"><Ltr>{formatMoney(b.net)}</Ltr></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </details>
+        </CardContent>
+      </Card>
+
+      <section aria-labelledby="perf-title">
+        <h2 id="perf-title" className="mb-1 flex items-center gap-2 text-xl font-bold">
+          <CarIcon className="size-5 text-muted-foreground" aria-hidden />
+          {t("perCar")}
+        </h2>
+        <p className="mb-3 text-sm text-muted-foreground">{t("perCarHint")}</p>
+        <ResponsiveList rows={cars} columns={columns} rowKey={(c) => c.vehicle_id} rowHref={(c) => `/fleet/${c.vehicle_id}`} caption={t("perCar")} testId="per-car" />
+      </section>
+    </>
+  );
 }
