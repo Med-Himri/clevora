@@ -255,13 +255,39 @@
   },
   "dashboard": {
     "title": "Today",
+    "carsInFleet": "{count, plural, one {car} other {cars}} in the fleet",
+    "newReservation": "New reservation",
+    "deliveryAt": "Delivery: {place}",
+    "returnAt": "Return: {place}",
+    "call": "Call {name}",
+    "callShort": "Call",
+    "return": "Return",
+    "open": "Open",
+    "sign": "To sign",
+    "returns": "Upcoming returns",
+    "departures": "Upcoming departures",
+    "noReturns": "No car on rental.",
+    "noDepartures": "No departure in the next 7 days.",
     "tiles": {
-      "vehicles": "Cars",
-      "clients": "Clients",
-      "reservations": "Reservations",
-      "members": "Team members"
+      "available": "Available",
+      "onRental": "On rental",
+      "departuresToday": "Departures today",
+      "returnsToday": "Returns today",
+      "maintenance": "In maintenance",
+      "revenueMonth": "Revenue this month"
     },
-    "comingSoon": "The full dashboard (departures, returns, alerts) comes in the next step."
+    "alerts": {
+      "title": "Alerts",
+      "none": "Nothing urgent. All good.",
+      "toSign": "{count, plural, one {# contract to sign before departure} other {# contracts to sign before departure}}",
+      "insurance": "Insurance of {car}: ends on {date} ({days, plural, =0 {today} one {in # day} other {in # days}})",
+      "insuranceExpired": "Insurance expired: {car} cannot be rented",
+      "visit": "Inspection of {car}: ends on {date} ({days, plural, =0 {today} one {in # day} other {in # days}})",
+      "visitExpired": "Inspection expired: {car}",
+      "oil": "Oil change of {car} in {km} km",
+      "oilDue": "Oil change due: {car}",
+      "maintenanceLate": "{car}: expected back from maintenance on {date}, still at the garage"
+    }
   },
   "billing": {
     "title": "Subscription",
@@ -860,6 +886,28 @@
       "arabic": "PDF with Arabic",
       "whatsapp": "Send by WhatsApp",
       "whatsappMessage": "Hello {name}, here is the summary of your rental with {agency}: contract {number}, {car}, from {start} to {end}. Left to pay: {balance}. Thank you and safe travels!"
+    }
+  },
+  "planning": {
+    "title": "Planning",
+    "previousWeek": "Previous week",
+    "nextWeek": "Next week",
+    "today": "Today",
+    "pickDay": "Pick the day",
+    "car": "Car",
+    "leaving": "Departures ({count})",
+    "returning": "Returns ({count})",
+    "outAllDay": "On rental ({count})",
+    "free": "Free ({count}): tap to book",
+    "delivery": "delivery",
+    "bookCell": "Book {car} on {date}",
+    "noCars": "No car in the fleet.",
+    "legend": {
+      "reserved": "Reserved",
+      "onRental": "On rental",
+      "returned": "Returned",
+      "maintenance": "Maintenance",
+      "delivery": "Delivery"
     }
   }
 }

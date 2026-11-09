@@ -255,13 +255,39 @@
   },
   "dashboard": {
     "title": "اليوم",
+    "carsInFleet": "{count, plural, zero {سيارة} one {سيارة} two {سيارتان} few {سيارات} many {سيارة} other {سيارة}} في الأسطول",
+    "newReservation": "حجز جديد",
+    "deliveryAt": "التوصيل: {place}",
+    "returnAt": "الإرجاع: {place}",
+    "call": "الاتصال بـ {name}",
+    "callShort": "اتصال",
+    "return": "إرجاع",
+    "open": "فتح",
+    "sign": "للتوقيع",
+    "returns": "الإرجاعات القادمة",
+    "departures": "المغادرات القادمة",
+    "noReturns": "لا توجد سيارة مؤجرة.",
+    "noDepartures": "لا توجد مغادرات في الأيام السبعة القادمة.",
     "tiles": {
-      "vehicles": "السيارات",
-      "clients": "الزبناء",
-      "reservations": "الحجوزات",
-      "members": "أعضاء الفريق"
+      "available": "متاحة",
+      "onRental": "مؤجرة",
+      "departuresToday": "مغادرات اليوم",
+      "returnsToday": "إرجاعات اليوم",
+      "maintenance": "في الصيانة",
+      "revenueMonth": "رقم معاملات الشهر"
     },
-    "comingSoon": "لوحة القيادة الكاملة (المغادرات، الإرجاعات، التنبيهات) ستأتي في المرحلة القادمة."
+    "alerts": {
+      "title": "التنبيهات",
+      "none": "لا شيء مستعجل. كل شيء على ما يرام.",
+      "toSign": "{count, plural, one {عقد واحد للتوقيع قبل المغادرة} two {عقدان للتوقيع قبل المغادرة} few {# عقود للتوقيع قبل المغادرة} many {# عقدًا للتوقيع قبل المغادرة} other {# عقد للتوقيع قبل المغادرة}}",
+      "insurance": "تأمين {car}: ينتهي في {date} ({days, plural, =0 {اليوم} one {بعد يوم} two {بعد يومين} few {بعد # أيام} many {بعد # يومًا} other {بعد # يوم}})",
+      "insuranceExpired": "تأمين منتهٍ: لا يمكن كراء {car}",
+      "visit": "الفحص التقني لـ {car}: ينتهي في {date} ({days, plural, =0 {اليوم} one {بعد يوم} two {بعد يومين} few {بعد # أيام} many {بعد # يومًا} other {بعد # يوم}})",
+      "visitExpired": "الفحص التقني منتهٍ: {car}",
+      "oil": "تغيير زيت {car} بعد {km} كلم",
+      "oilDue": "تغيير الزيت مستحق: {car}",
+      "maintenanceLate": "{car}: كان من المتوقع خروجها من الصيانة في {date}، ولا تزال في المرأب"
+    }
   },
   "billing": {
     "title": "الاشتراك",
@@ -860,6 +886,28 @@
       "arabic": "PDF بالعربية",
       "whatsapp": "إرسال عبر واتساب",
       "whatsappMessage": "السلام عليكم {name}، هذا ملخص كرائك لدى {agency}: العقد {number}، {car}، من {start} إلى {end}. الباقي للأداء: {balance}. شكرًا وطريق السلامة!"
+    }
+  },
+  "planning": {
+    "title": "الجدول",
+    "previousWeek": "الأسبوع السابق",
+    "nextWeek": "الأسبوع التالي",
+    "today": "اليوم",
+    "pickDay": "اختيار اليوم",
+    "car": "السيارة",
+    "leaving": "المغادرات ({count})",
+    "returning": "الإرجاعات ({count})",
+    "outAllDay": "مؤجرة ({count})",
+    "free": "متاحة ({count}): اضغط للحجز",
+    "delivery": "توصيل",
+    "bookCell": "حجز {car} يوم {date}",
+    "noCars": "لا توجد سيارات في الأسطول.",
+    "legend": {
+      "reserved": "محجوزة",
+      "onRental": "مؤجرة",
+      "returned": "مُرجعة",
+      "maintenance": "صيانة",
+      "delivery": "توصيل"
     }
   }
 }

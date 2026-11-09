@@ -34,7 +34,7 @@ export function StatTile({
     <Card className={cn("h-full", href && "transition-colors hover:bg-accent")}>
       <CardContent className="flex flex-col gap-1 pt-4 sm:pt-5">
         {Icon ? <Icon className={cn("size-5", TONES[tone])} aria-hidden /> : null}
-        <span className="text-2xl font-bold tabular-nums sm:text-3xl" data-testid={testId}>
+        <span className="min-w-0 break-words text-2xl font-bold tabular-nums sm:text-3xl [&_bdi]:whitespace-normal" data-testid={testId}>
           {value}
         </span>
         <span className="text-sm text-muted-foreground">{label}</span>

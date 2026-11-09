@@ -255,13 +255,39 @@
   },
   "dashboard": {
     "title": "Aujourd'hui",
+    "carsInFleet": "{count, plural, one {voiture} other {voitures}} dans le parc",
+    "newReservation": "Nouvelle réservation",
+    "deliveryAt": "Livraison : {place}",
+    "returnAt": "Retour : {place}",
+    "call": "Appeler {name}",
+    "callShort": "Appeler",
+    "return": "Retour",
+    "open": "Ouvrir",
+    "sign": "À signer",
+    "returns": "Retours à venir",
+    "departures": "Départs à venir",
+    "noReturns": "Aucune voiture en location.",
+    "noDepartures": "Aucun départ dans les 7 prochains jours.",
     "tiles": {
-      "vehicles": "Voitures",
-      "clients": "Clients",
-      "reservations": "Réservations",
-      "members": "Membres de l'équipe"
+      "available": "Disponibles",
+      "onRental": "En location",
+      "departuresToday": "Départs aujourd'hui",
+      "returnsToday": "Retours aujourd'hui",
+      "maintenance": "En maintenance",
+      "revenueMonth": "Chiffre d'affaires du mois"
     },
-    "comingSoon": "Le tableau de bord complet (départs, retours, alertes) arrive à la prochaine étape."
+    "alerts": {
+      "title": "Alertes",
+      "none": "Rien d'urgent. Tout est en ordre.",
+      "toSign": "{count, plural, one {# contrat à faire signer avant le départ} other {# contrats à faire signer avant le départ}}",
+      "insurance": "Assurance de {car} : fin le {date} ({days, plural, =0 {aujourd'hui} one {dans # jour} other {dans # jours}})",
+      "insuranceExpired": "Assurance expirée : {car} ne peut pas être louée",
+      "visit": "Visite technique de {car} : fin le {date} ({days, plural, =0 {aujourd'hui} one {dans # jour} other {dans # jours}})",
+      "visitExpired": "Visite technique expirée : {car}",
+      "oil": "Vidange de {car} dans {km} km",
+      "oilDue": "Vidange à faire : {car}",
+      "maintenanceLate": "{car} : retour de maintenance prévu le {date}, toujours au garage"
+    }
   },
   "billing": {
     "title": "Abonnement",
@@ -860,6 +886,28 @@
       "arabic": "PDF avec l'arabe",
       "whatsapp": "Envoyer par WhatsApp",
       "whatsappMessage": "Bonjour {name}, voici le récapitulatif de votre location chez {agency} : contrat {number}, {car}, du {start} au {end}. Reste à payer : {balance}. Merci et bonne route !"
+    }
+  },
+  "planning": {
+    "title": "Planning",
+    "previousWeek": "Semaine précédente",
+    "nextWeek": "Semaine suivante",
+    "today": "Aujourd'hui",
+    "pickDay": "Choisir le jour",
+    "car": "Voiture",
+    "leaving": "Départs ({count})",
+    "returning": "Retours ({count})",
+    "outAllDay": "En location ({count})",
+    "free": "Libres ({count}) : touchez pour réserver",
+    "delivery": "livraison",
+    "bookCell": "Réserver {car} le {date}",
+    "noCars": "Aucune voiture dans le parc.",
+    "legend": {
+      "reserved": "Réservée",
+      "onRental": "En location",
+      "returned": "Rendue",
+      "maintenance": "Maintenance",
+      "delivery": "Livraison"
     }
   }
 }
