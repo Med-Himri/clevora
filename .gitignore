@@ -5,3 +5,13 @@ node_modules/
 supabase/.branches
 supabase/.temp
 .DS_Store
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+playwright-report/
+test-results/
+blob-report/
+.vercel

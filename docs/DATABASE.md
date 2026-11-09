@@ -13,12 +13,14 @@ All schema changes are Supabase migrations in `supabase/migrations/`. Never edit
 | `…090600_rls_policies.sql` | RLS on every table |
 | `…090700_storage.sql` | buckets `agency-logos` (public) and `agency-docs` (private) + policies |
 | `…090800_default_plans.sql` | Essentiel / Pro / Illimité (placeholder prices, editable in the table) |
+| `…120000_auth_onboarding.sql` | `profiles.email`, `create_agency(name, slug, city, phone, colour)`, `create_agency_for_user` (service role), `invitation_preview(token)`, read-only mode (`writable_agency_ids()` in every write policy) |
 
 ## Roles
 
 - **admin** (agency owners, all equal): everything in their agency. Cannot change billing fields (`plan_id`, `subscription_status`, `trial_ends_at`, `current_period_end`): only Clévora platform admins, the service role or SECURITY DEFINER functions can.
 - **staff**: reads the agency's data except charges, invitations and the activity log; creates and edits clients, reservations, payments and maintenance; on cars, may only change km, vidange, assurance, visite technique and notes; never deletes.
 - The last active admin of an agency can never be removed, disabled or demoted. Nobody can change their own role or status.
+- **Read-only mode**: when the trial or paid period is over, or the agency is suspended/cancelled, every write (tables and storage) is refused; reads keep working. `past_due` stays writable (grace period).
 
 ## Things the app must know
 
@@ -38,21 +40,18 @@ All schema changes are Supabase migrations in `supabase/migrations/`. Never edit
 - `003` staff cannot see charges, the activity log or invitations, or change protected car fields; admins cannot change billing.
 - `004` double booking, contract numbering, advance sync, activity log, normalised plate/CIN, last admin, create_agency, invitations, plan limit.
 - `005` storage isolation by agency folder; receipts are admin-only.
+- `006` profile emails, agency creation, invitation preview, read-only mode.
 
-Run them without Docker (needs Postgres 15+ with pgvector, pgtap and `pg_prove`):
+Run them on the local Supabase (`npx supabase start` first):
 
 ```bash
 npm run db:test
 ```
 
-With Docker and a real local Supabase:
+Without Docker (needs Postgres 15+ with pgvector, pgtap and `pg_prove`):
 
 ```bash
-npx supabase start
-```
-
-```bash
-npx supabase test db
+npm run db:test:nodocker
 ```
 
 `scripts/db/supabase-shim.sql` is a **test-only** stand-in for Supabase's `auth` and `storage` schemas. Never apply it to a real project.

@@ -1,0 +1,322 @@
+{
+  "brand": {
+    "tagline": "Votre agence de location, simplement."
+  },
+  "common": {
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "close": "Fermer",
+    "cancel": "Annuler"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n'existe pas ou a été déplacée.",
+    "back": "Revenir à Aujourd'hui"
+  },
+  "roles": {
+    "admin": "Administrateur",
+    "staff": "Agent"
+  },
+  "validation": {
+    "required": "Ce champ est obligatoire.",
+    "email": "Entrez une adresse e-mail valide, par exemple nom@exemple.ma.",
+    "passwordMin": "Le mot de passe doit faire au moins 8 caractères.",
+    "passwordMax": "Le mot de passe est trop long (72 caractères maximum).",
+    "passwordLettersDigits": "Le mot de passe doit contenir des lettres et des chiffres.",
+    "passwordsDontMatch": "Les deux mots de passe ne sont pas identiques.",
+    "passwordRule": "Au moins 8 caractères, avec des lettres et des chiffres.",
+    "nameMin": "Entrez au moins 2 caractères.",
+    "nameMax": "Ce texte est trop long.",
+    "agencyNameMin": "Entrez le nom de l'agence (au moins 2 caractères).",
+    "phone": "Numéro invalide. Exemple : 06 12 34 56 78 ou +212 6 12 34 56 78.",
+    "phoneHint": "Exemple : 06 12 34 56 78",
+    "color": "Choisissez une couleur.",
+    "logoType": "Le logo doit être une image PNG, JPG, SVG ou WEBP.",
+    "logoSize": "Le logo est trop lourd : 1 Mo maximum.",
+    "emailTaken": "Un compte existe déjà avec cet e-mail. Connectez-vous plutôt.",
+    "alreadyMember": "Cette personne fait déjà partie de l'équipe.",
+    "currentPasswordWrong": "Le mot de passe actuel est incorrect.",
+    "samePassword": "Choisissez un mot de passe différent de l'ancien."
+  },
+  "errors": {
+    "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
+    "emailNotConfirmed": "Confirmez d'abord votre adresse e-mail : ouvrez le lien reçu par e-mail.",
+    "tooManyRequests": "Trop d'essais. Attendez une minute puis réessayez.",
+    "passwordWeak": "Mot de passe trop faible : utilisez au moins 8 caractères avec des lettres et des chiffres.",
+    "samePassword": "Choisissez un mot de passe différent de l'ancien.",
+    "invalidForm": "Corrigez les champs indiqués en rouge.",
+    "linkExpired": "Ce lien a expiré. Demandez-en un nouveau.",
+    "notLoggedIn": "Votre session a expiré. Reconnectez-vous.",
+    "noAgency": "Choisissez d'abord une agence.",
+    "forbidden": "Vous n'avez pas le droit de faire cette action.",
+    "readOnly": "L'agence est en lecture seule : choisissez un forfait pour modifier vos données.",
+    "lastAdmin": "L'agence doit garder au moins un administrateur actif.",
+    "planLimitUsers": "Votre forfait ne permet pas plus d'utilisateurs. Passez à un forfait supérieur.",
+    "planLimitVehicles": "Votre forfait ne permet pas plus de voitures. Passez à un forfait supérieur.",
+    "duplicate": "Cette valeur existe déjà.",
+    "doubleBooking": "Cette voiture est déjà réservée sur ces dates.",
+    "emailTaken": "Un compte existe déjà avec cet e-mail. Connectez-vous plutôt.",
+    "inviteInvalid": "Cette invitation n'est plus valable. Demandez une nouvelle invitation à l'agence.",
+    "inviteOtherEmail": "Cette invitation a été envoyée à une autre adresse e-mail.",
+    "accountExists": "Un compte existe déjà avec cet e-mail.",
+    "alreadyMember": "Cette personne fait déjà partie de l'équipe.",
+    "emailFailed": "L'e-mail n'a pas pu être envoyé. Réessayez dans un instant.",
+    "notFound": "Élément introuvable. Actualisez la page.",
+    "selfChange": "Vous ne pouvez pas modifier votre propre rôle ou statut.",
+    "unknown": "Une erreur est survenue. Réessayez ; si cela continue, contactez le support Clévora."
+  },
+  "notices": {
+    "passwordUpdated": "Mot de passe modifié.",
+    "agencyCreated": "Votre agence est prête ! Bienvenue sur Clévora.",
+    "joined": "Bienvenue dans l'équipe !",
+    "saved": "Modifications enregistrées.",
+    "denied": "Vous n'avez pas accès à cette page."
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Accédez à votre agence.",
+      "email": "Adresse e-mail",
+      "password": "Mot de passe",
+      "forgot": "Mot de passe oublié ?",
+      "submit": "Se connecter",
+      "submitting": "Connexion…",
+      "magicLink": "Recevoir un lien de connexion",
+      "magicLinkHelp": "Entrez votre e-mail : nous vous envoyons un lien pour vous connecter sans mot de passe.",
+      "sendMagicLink": "Envoyer le lien",
+      "magicLinkSent": "Si un compte existe avec cet e-mail, un lien de connexion vient d'être envoyé. Pensez à regarder dans les spams.",
+      "backToPassword": "Se connecter avec le mot de passe",
+      "noAccount": "Pas encore de compte ?",
+      "createAgency": "Créer mon agence (14 jours gratuits)",
+      "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Connectez-vous ou demandez un nouveau lien."
+    },
+    "forgot": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Entrez votre e-mail : nous vous envoyons un lien pour choisir un nouveau mot de passe.",
+      "email": "Adresse e-mail",
+      "submit": "Envoyer le lien",
+      "submitting": "Envoi…",
+      "sent": "Si un compte existe avec cet e-mail, un lien vient d'être envoyé. Pensez à regarder dans les spams.",
+      "backToLogin": "Retour à la connexion",
+      "linkExpired": "Ce lien a expiré. Demandez-en un nouveau ci-dessous."
+    },
+    "reset": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Compte : {email}",
+      "password": "Nouveau mot de passe",
+      "confirm": "Confirmer le mot de passe",
+      "submit": "Enregistrer le mot de passe",
+      "submitting": "Enregistrement…",
+      "linkExpired": "Ce lien a expiré ou a déjà été utilisé.",
+      "askAgain": "Demander un nouveau lien"
+    },
+    "checkEmail": {
+      "title": "Vérifiez votre boîte mail",
+      "body": "Nous avons envoyé un lien de confirmation à {email}. Cliquez dessus pour accéder à votre agence.",
+      "spam": "Rien reçu après 2 minutes ? Regardez dans les spams.",
+      "backToLogin": "Retour à la connexion"
+    },
+    "signup": {
+      "metaTitle": "Créer mon agence",
+      "steps": {
+        "account": "Vous",
+        "agency": "Votre agence",
+        "brand": "Logo et couleur"
+      },
+      "stepOf": "Étape {current} sur {total}",
+      "account": {
+        "title": "Créons votre compte",
+        "subtitle": "Vous serez l'administrateur de l'agence.",
+        "fullName": "Nom et prénom",
+        "email": "Adresse e-mail",
+        "phone": "Téléphone",
+        "password": "Mot de passe"
+      },
+      "agency": {
+        "title": "Votre agence",
+        "subtitle": "Ces informations apparaîtront sur vos contrats. Vous pourrez les modifier plus tard.",
+        "subtitleLoggedIn": "Nouvelle agence pour {name}.",
+        "name": "Nom de l'agence",
+        "city": "Ville",
+        "phone": "Téléphone de l'agence"
+      },
+      "brand": {
+        "title": "Logo et couleur",
+        "subtitle": "Facultatif : vous pourrez les ajouter plus tard dans Paramètres.",
+        "logo": "Logo (facultatif)",
+        "addLogo": "Ajouter un logo",
+        "changeLogo": "Changer le logo",
+        "removeLogo": "Retirer",
+        "logoHint": "PNG, JPG, SVG ou WEBP, 1 Mo maximum. Idéalement carré.",
+        "color": "Couleur de l'agence",
+        "customColor": "Autre couleur",
+        "preview": "Aperçu",
+        "previewRole": "Administrateur",
+        "previewButton": "Nouvelle réservation",
+        "tooLight": "Cette couleur est trop claire pour un texte blanc lisible : nous utiliserons le bleu nuit à la place."
+      },
+      "back": "Retour",
+      "next": "Continuer",
+      "create": "Créer mon agence",
+      "creating": "Création…",
+      "haveAccount": "Déjà un compte ?",
+      "login": "Se connecter"
+    },
+    "invite": {
+      "metaTitle": "Invitation",
+      "title": "Rejoindre {agency}",
+      "subtitle": "Vous êtes invité(e) en tant que {role}.",
+      "state": {
+        "invalid": {
+          "title": "Invitation introuvable",
+          "body": "Ce lien n'est pas valide. Vérifiez que vous avez copié le lien en entier, ou demandez une nouvelle invitation."
+        },
+        "expired": {
+          "title": "Invitation expirée",
+          "body": "Cette invitation a plus de 7 jours. Demandez à l'agence de vous la renvoyer."
+        },
+        "used": {
+          "title": "Invitation déjà utilisée",
+          "body": "Cette invitation a déjà été acceptée. Connectez-vous pour accéder à l'agence."
+        }
+      },
+      "goToApp": "Ouvrir Clévora",
+      "goToLogin": "Se connecter",
+      "wrongAccount": "Cette invitation est pour {invited}, mais vous êtes connecté avec {current}. Déconnectez-vous puis rouvrez le lien.",
+      "logout": "Se déconnecter",
+      "join": "Rejoindre l'agence",
+      "joining": "Un instant…",
+      "createAccount": "Créez votre accès",
+      "email": "Adresse e-mail",
+      "emailLocked": "L'invitation a été envoyée à cette adresse.",
+      "fullName": "Nom et prénom",
+      "phone": "Téléphone",
+      "password": "Mot de passe",
+      "createAndJoin": "Créer mon accès et rejoindre",
+      "haveAccount": "Vous avez déjà un compte Clévora ?",
+      "loginInstead": "Se connecter"
+    }
+  },
+  "selectAgency": {
+    "title": "Choisissez une agence",
+    "subtitle": "Vous faites partie de plusieurs agences. Dans laquelle voulez-vous travailler ?",
+    "noAgencyTitle": "Aucune agence pour le moment",
+    "noAgencyBody": "Créez votre agence, ou demandez à votre responsable de vous inviter.",
+    "disabledTitle": "Accès désactivé",
+    "disabledBadge": "Désactivé",
+    "disabledHelp": "Un administrateur de l'agence a désactivé votre accès. Contactez-le pour le réactiver.",
+    "createAgency": "Créer une agence",
+    "logout": "Se déconnecter"
+  },
+  "app": {
+    "poweredBy": "Propulsé par Clévora",
+    "menu": {
+      "open": "Ouvrir le menu du compte",
+      "account": "Mon compte",
+      "team": "Équipe",
+      "switchAgency": "Changer d'agence",
+      "logout": "Se déconnecter"
+    },
+    "subscription": {
+      "trial": "Essai gratuit : il reste {days, plural, one {# jour} other {# jours}}.",
+      "pastDue": "Paiement en attente : réglez votre abonnement pour éviter la suspension.",
+      "readOnly": {
+        "trial_ended": "Votre essai gratuit est terminé.",
+        "period_ended": "Votre abonnement est arrivé à échéance.",
+        "suspended": "Votre agence est suspendue.",
+        "cancelled": "Votre abonnement est résilié."
+      },
+      "readOnlyBody": "Vos données sont conservées. L'application est en lecture seule jusqu'au paiement.",
+      "choosePlan": "Choisir un forfait",
+      "askAdmin": "Contactez l'administrateur de l'agence."
+    }
+  },
+  "dashboard": {
+    "title": "Aujourd'hui",
+    "tiles": {
+      "vehicles": "Voitures",
+      "clients": "Clients",
+      "reservations": "Réservations",
+      "members": "Membres de l'équipe"
+    },
+    "comingSoon": "Le tableau de bord complet (départs, retours, alertes) arrive à la prochaine étape."
+  },
+  "billing": {
+    "title": "Abonnement",
+    "comingSoon": "Les forfaits et le paiement arrivent bientôt. Pour activer votre agence dès maintenant, contactez l'équipe Clévora."
+  },
+  "account": {
+    "title": "Mon compte",
+    "profile": {
+      "title": "Mes informations",
+      "fullName": "Nom et prénom",
+      "phone": "Téléphone",
+      "save": "Enregistrer"
+    },
+    "preferences": {
+      "title": "Langue et affichage",
+      "subtitle": "S'applique à vous seulement, sur tous vos appareils.",
+      "language": "Langue",
+      "theme": "Thème",
+      "light": "Clair",
+      "dark": "Sombre",
+      "system": "Automatique",
+      "save": "Enregistrer"
+    },
+    "password": {
+      "title": "Mot de passe",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe",
+      "save": "Changer le mot de passe"
+    }
+  },
+  "team": {
+    "title": "Équipe",
+    "subtitle": "{count, plural, one {# personne} other {# personnes}} dans l'agence",
+    "invite": {
+      "button": "Inviter",
+      "title": "Inviter une personne",
+      "subtitle": "Elle recevra un lien pour créer son accès. Le lien est valable 7 jours.",
+      "how": "Comment envoyer l'invitation ?",
+      "byEmail": "Par e-mail",
+      "byWhatsapp": "Par WhatsApp",
+      "email": "Adresse e-mail",
+      "phone": "Numéro WhatsApp",
+      "role": "Rôle",
+      "staffLabel": "Agent",
+      "staffHelp": "Réservations, contrats, voitures. Ne voit pas l'argent ni l'équipe.",
+      "adminLabel": "Administrateur",
+      "adminHelp": "Accès complet, comme vous : équipe, charges, statistiques, abonnement.",
+      "sendEmail": "Envoyer l'invitation",
+      "openWhatsapp": "Ouvrir WhatsApp",
+      "whatsappReady": "Invitation créée : envoyez le message dans WhatsApp.",
+      "emailSent": "Invitation envoyée à {email}."
+    },
+    "members": {
+      "title": "Membres",
+      "you": "Vous",
+      "status": {
+        "active": "Actif",
+        "disabled": "Désactivé"
+      },
+      "actionsFor": "Actions pour {name}",
+      "makeAdmin": "Passer administrateur",
+      "makeStaff": "Passer agent",
+      "disable": "Désactiver l'accès",
+      "enable": "Réactiver l'accès",
+      "remove": "Retirer de l'équipe",
+      "removeTitle": "Retirer {name} de l'équipe ?",
+      "removeBody": "Cette personne ne pourra plus accéder à l'agence. Les réservations et contrats qu'elle a saisis sont conservés."
+    },
+    "invitations": {
+      "title": "Invitations en attente",
+      "expired": "Expirée",
+      "expires": "Valable jusqu'au {date}",
+      "resend": "Renvoyer",
+      "cancel": "Annuler",
+      "resent": "Invitation renvoyée.",
+      "cancelled": "Invitation annulée."
+    }
+  }
+}

@@ -1,0 +1,322 @@
+{
+  "brand": {
+    "tagline": "Your rental agency, made simple."
+  },
+  "common": {
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "This page doesn't exist or has moved.",
+    "back": "Back to Today"
+  },
+  "roles": {
+    "admin": "Admin",
+    "staff": "Staff"
+  },
+  "validation": {
+    "required": "This field is required.",
+    "email": "Enter a valid email address, for example name@example.com.",
+    "passwordMin": "The password must be at least 8 characters.",
+    "passwordMax": "The password is too long (72 characters max).",
+    "passwordLettersDigits": "The password must contain letters and digits.",
+    "passwordsDontMatch": "The two passwords don't match.",
+    "passwordRule": "At least 8 characters, with letters and digits.",
+    "nameMin": "Enter at least 2 characters.",
+    "nameMax": "This text is too long.",
+    "agencyNameMin": "Enter the agency name (at least 2 characters).",
+    "phone": "Invalid number. Example: 06 12 34 56 78 or +212 6 12 34 56 78.",
+    "phoneHint": "Example: 06 12 34 56 78",
+    "color": "Choose a colour.",
+    "logoType": "The logo must be a PNG, JPG, SVG or WEBP image.",
+    "logoSize": "The logo is too large: 1 MB maximum.",
+    "emailTaken": "An account already exists with this email. Log in instead.",
+    "alreadyMember": "This person is already in the team.",
+    "currentPasswordWrong": "The current password is wrong.",
+    "samePassword": "Choose a password different from the old one."
+  },
+  "errors": {
+    "invalidCredentials": "Wrong email or password. Check and try again.",
+    "emailNotConfirmed": "Confirm your email first: open the link we sent you.",
+    "tooManyRequests": "Too many attempts. Wait a minute and try again.",
+    "passwordWeak": "Password too weak: use at least 8 characters with letters and digits.",
+    "samePassword": "Choose a password different from the old one.",
+    "invalidForm": "Fix the fields marked in red.",
+    "linkExpired": "This link has expired. Ask for a new one.",
+    "notLoggedIn": "Your session has expired. Log in again.",
+    "noAgency": "Choose an agency first.",
+    "forbidden": "You are not allowed to do this.",
+    "readOnly": "The agency is read-only: choose a plan to change your data.",
+    "lastAdmin": "The agency must keep at least one active admin.",
+    "planLimitUsers": "Your plan doesn't allow more users. Upgrade to a higher plan.",
+    "planLimitVehicles": "Your plan doesn't allow more cars. Upgrade to a higher plan.",
+    "duplicate": "This value already exists.",
+    "doubleBooking": "This car is already booked on these dates.",
+    "emailTaken": "An account already exists with this email. Log in instead.",
+    "inviteInvalid": "This invitation is no longer valid. Ask the agency for a new one.",
+    "inviteOtherEmail": "This invitation was sent to a different email address.",
+    "accountExists": "An account already exists with this email.",
+    "alreadyMember": "This person is already in the team.",
+    "emailFailed": "The email could not be sent. Try again in a moment.",
+    "notFound": "Item not found. Refresh the page.",
+    "selfChange": "You can't change your own role or status.",
+    "unknown": "Something went wrong. Try again; if it keeps happening, contact Clévora support."
+  },
+  "notices": {
+    "passwordUpdated": "Password changed.",
+    "agencyCreated": "Your agency is ready! Welcome to Clévora.",
+    "joined": "Welcome to the team!",
+    "saved": "Changes saved.",
+    "denied": "You don't have access to that page."
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "subtitle": "Open your agency.",
+      "email": "Email address",
+      "password": "Password",
+      "forgot": "Forgot password?",
+      "submit": "Log in",
+      "submitting": "Logging in…",
+      "magicLink": "Get a sign-in link",
+      "magicLinkHelp": "Enter your email: we'll send you a link to log in without a password.",
+      "sendMagicLink": "Send the link",
+      "magicLinkSent": "If an account exists with this email, a sign-in link has just been sent. Check your spam folder too.",
+      "backToPassword": "Log in with password",
+      "noAccount": "No account yet?",
+      "createAgency": "Create my agency (14 days free)",
+      "linkExpired": "This link has expired or was already used. Log in or ask for a new link."
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "subtitle": "Enter your email: we'll send you a link to choose a new password.",
+      "email": "Email address",
+      "submit": "Send the link",
+      "submitting": "Sending…",
+      "sent": "If an account exists with this email, a link has just been sent. Check your spam folder too.",
+      "backToLogin": "Back to log in",
+      "linkExpired": "This link has expired. Ask for a new one below."
+    },
+    "reset": {
+      "title": "New password",
+      "subtitle": "Account: {email}",
+      "password": "New password",
+      "confirm": "Confirm password",
+      "submit": "Save password",
+      "submitting": "Saving…",
+      "linkExpired": "This link has expired or was already used.",
+      "askAgain": "Ask for a new link"
+    },
+    "checkEmail": {
+      "title": "Check your inbox",
+      "body": "We sent a confirmation link to {email}. Click it to open your agency.",
+      "spam": "Nothing after 2 minutes? Check your spam folder.",
+      "backToLogin": "Back to log in"
+    },
+    "signup": {
+      "metaTitle": "Create my agency",
+      "steps": {
+        "account": "You",
+        "agency": "Your agency",
+        "brand": "Logo and colour"
+      },
+      "stepOf": "Step {current} of {total}",
+      "account": {
+        "title": "Let's create your account",
+        "subtitle": "You will be the agency admin.",
+        "fullName": "Full name",
+        "email": "Email address",
+        "phone": "Phone",
+        "password": "Password"
+      },
+      "agency": {
+        "title": "Your agency",
+        "subtitle": "This information appears on your contracts. You can change it later.",
+        "subtitleLoggedIn": "New agency for {name}.",
+        "name": "Agency name",
+        "city": "City",
+        "phone": "Agency phone"
+      },
+      "brand": {
+        "title": "Logo and colour",
+        "subtitle": "Optional: you can add them later in Settings.",
+        "logo": "Logo (optional)",
+        "addLogo": "Add a logo",
+        "changeLogo": "Change logo",
+        "removeLogo": "Remove",
+        "logoHint": "PNG, JPG, SVG or WEBP, 1 MB max. Square works best.",
+        "color": "Agency colour",
+        "customColor": "Other colour",
+        "preview": "Preview",
+        "previewRole": "Admin",
+        "previewButton": "New reservation",
+        "tooLight": "This colour is too light for readable white text: we'll use dark navy instead."
+      },
+      "back": "Back",
+      "next": "Continue",
+      "create": "Create my agency",
+      "creating": "Creating…",
+      "haveAccount": "Already have an account?",
+      "login": "Log in"
+    },
+    "invite": {
+      "metaTitle": "Invitation",
+      "title": "Join {agency}",
+      "subtitle": "You are invited as {role}.",
+      "state": {
+        "invalid": {
+          "title": "Invitation not found",
+          "body": "This link is not valid. Check you copied the whole link, or ask for a new invitation."
+        },
+        "expired": {
+          "title": "Invitation expired",
+          "body": "This invitation is more than 7 days old. Ask the agency to send it again."
+        },
+        "used": {
+          "title": "Invitation already used",
+          "body": "This invitation was already accepted. Log in to open the agency."
+        }
+      },
+      "goToApp": "Open Clévora",
+      "goToLogin": "Log in",
+      "wrongAccount": "This invitation is for {invited}, but you are logged in as {current}. Log out, then open the link again.",
+      "logout": "Log out",
+      "join": "Join the agency",
+      "joining": "One moment…",
+      "createAccount": "Create your access",
+      "email": "Email address",
+      "emailLocked": "The invitation was sent to this address.",
+      "fullName": "Full name",
+      "phone": "Phone",
+      "password": "Password",
+      "createAndJoin": "Create my access and join",
+      "haveAccount": "Already have a Clévora account?",
+      "loginInstead": "Log in"
+    }
+  },
+  "selectAgency": {
+    "title": "Choose an agency",
+    "subtitle": "You belong to several agencies. Which one do you want to work in?",
+    "noAgencyTitle": "No agency yet",
+    "noAgencyBody": "Create your agency, or ask your manager to invite you.",
+    "disabledTitle": "Access disabled",
+    "disabledBadge": "Disabled",
+    "disabledHelp": "An agency admin disabled your access. Contact them to turn it back on.",
+    "createAgency": "Create an agency",
+    "logout": "Log out"
+  },
+  "app": {
+    "poweredBy": "Powered by Clévora",
+    "menu": {
+      "open": "Open account menu",
+      "account": "My account",
+      "team": "Team",
+      "switchAgency": "Switch agency",
+      "logout": "Log out"
+    },
+    "subscription": {
+      "trial": "Free trial: {days, plural, one {# day} other {# days}} left.",
+      "pastDue": "Payment pending: pay your subscription to avoid suspension.",
+      "readOnly": {
+        "trial_ended": "Your free trial has ended.",
+        "period_ended": "Your subscription has expired.",
+        "suspended": "Your agency is suspended.",
+        "cancelled": "Your subscription is cancelled."
+      },
+      "readOnlyBody": "Your data is kept. The app is read-only until payment.",
+      "choosePlan": "Choose a plan",
+      "askAdmin": "Contact the agency admin."
+    }
+  },
+  "dashboard": {
+    "title": "Today",
+    "tiles": {
+      "vehicles": "Cars",
+      "clients": "Clients",
+      "reservations": "Reservations",
+      "members": "Team members"
+    },
+    "comingSoon": "The full dashboard (departures, returns, alerts) comes in the next step."
+  },
+  "billing": {
+    "title": "Subscription",
+    "comingSoon": "Plans and payment are coming soon. To activate your agency now, contact the Clévora team."
+  },
+  "account": {
+    "title": "My account",
+    "profile": {
+      "title": "My details",
+      "fullName": "Full name",
+      "phone": "Phone",
+      "save": "Save"
+    },
+    "preferences": {
+      "title": "Language and display",
+      "subtitle": "Applies to you only, on all your devices.",
+      "language": "Language",
+      "theme": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "Automatic",
+      "save": "Save"
+    },
+    "password": {
+      "title": "Password",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "save": "Change password"
+    }
+  },
+  "team": {
+    "title": "Team",
+    "subtitle": "{count, plural, one {# person} other {# people}} in the agency",
+    "invite": {
+      "button": "Invite",
+      "title": "Invite someone",
+      "subtitle": "They'll get a link to create their access. The link is valid for 7 days.",
+      "how": "How do you want to send the invitation?",
+      "byEmail": "By email",
+      "byWhatsapp": "By WhatsApp",
+      "email": "Email address",
+      "phone": "WhatsApp number",
+      "role": "Role",
+      "staffLabel": "Staff",
+      "staffHelp": "Reservations, contracts, cars. Doesn't see money or the team.",
+      "adminLabel": "Admin",
+      "adminHelp": "Full access, like you: team, expenses, statistics, subscription.",
+      "sendEmail": "Send invitation",
+      "openWhatsapp": "Open WhatsApp",
+      "whatsappReady": "Invitation created: send the message in WhatsApp.",
+      "emailSent": "Invitation sent to {email}."
+    },
+    "members": {
+      "title": "Members",
+      "you": "You",
+      "status": {
+        "active": "Active",
+        "disabled": "Disabled"
+      },
+      "actionsFor": "Actions for {name}",
+      "makeAdmin": "Make admin",
+      "makeStaff": "Make staff",
+      "disable": "Disable access",
+      "enable": "Enable access",
+      "remove": "Remove from team",
+      "removeTitle": "Remove {name} from the team?",
+      "removeBody": "This person will no longer be able to open the agency. The reservations and contracts they entered are kept."
+    },
+    "invitations": {
+      "title": "Pending invitations",
+      "expired": "Expired",
+      "expires": "Valid until {date}",
+      "resend": "Resend",
+      "cancel": "Cancel",
+      "resent": "Invitation sent again.",
+      "cancelled": "Invitation cancelled."
+    }
+  }
+}

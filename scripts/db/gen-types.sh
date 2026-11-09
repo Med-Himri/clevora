@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Generate TypeScript types for the database into src/types/database.ts.
 #
-#   npm run db:types                      # from the local test database (no Docker)
+#   npm run db:types                      # from the local Supabase (npx supabase start)
 #   DB_URL=postgresql://... npm run db:types
 #   npx supabase gen types typescript --local > src/types/database.ts   # with Docker
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-DB_URL="${DB_URL:-postgresql://${PGUSER:-$(whoami)}:${PGPASSWORD:-localtest}@localhost:5432/${CLEVORA_TEST_DB:-clevora_test}}"
+DB_URL="${DB_URL:-postgresql://postgres:postgres@127.0.0.1:54322/postgres}"
 OUT="$ROOT/src/types/database.ts"
 
 mkdir -p "$(dirname "$OUT")"

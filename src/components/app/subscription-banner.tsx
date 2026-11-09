@@ -1,0 +1,58 @@
+import { CircleAlertIcon, LockIcon, SparklesIcon } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import { Alert } from "@/components/ui/alert";
+import { Link } from "@/i18n/navigation";
+import type { Role } from "@/lib/auth/session";
+import type { SubscriptionState } from "@/lib/subscription";
+
+/** Trial days left, or the read-only explanation with a link to billing (admins). */
+export async function SubscriptionBanner({ subscription, role }: { subscription: SubscriptionState; role: Role }) {
+  const t = await getTranslations("app.subscription");
+  if (subscription.reason === "active") return null;
+
+  const billingLink =
+    role === "admin" ? (
+      <Link href="/billing" className="inline-flex min-h-11 items-center font-semibold underline underline-offset-4">
+        {t("choosePlan")}
+      </Link>
+    ) : (
+      <span className="text-muted-foreground">{t("askAdmin")}</span>
+    );
+
+  if (subscription.reason === "trial") {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 pt-4">
+        <Alert variant="info" data-testid="trial-banner" className="flex-wrap items-center py-2">
+          <SparklesIcon aria-hidden />
+          <span className="flex-1">{t("trial", { days: subscription.trialDaysLeft ?? 14 })}</span>
+          {billingLink}
+        </Alert>
+      </div>
+    );
+  }
+
+  if (subscription.reason === "past_due") {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-4 pt-4">
+        <Alert variant="warning" className="flex-wrap items-center py-2">
+          <CircleAlertIcon aria-hidden />
+          <span className="flex-1">{t("pastDue")}</span>
+          {billingLink}
+        </Alert>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-6xl px-4 pt-4">
+      <Alert variant="danger" data-testid="readonly-banner" className="flex-wrap items-center">
+        <LockIcon aria-hidden />
+        <span className="flex flex-1 flex-col gap-0.5">
+          <strong>{t(`readOnly.${subscription.reason}`)}</strong>
+          <span>{t("readOnlyBody")}</span>
+        </span>
+        {billingLink}
+      </Alert>
+    </div>
+  );
+}

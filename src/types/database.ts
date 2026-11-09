@@ -678,6 +678,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string;
+          email: string | null;
           full_name: string | null;
           id: string;
           phone: string | null;
@@ -688,6 +689,7 @@ export type Database = {
         ComputedFields: never;
         Insert: {
           created_at?: string;
+          email?: string | null;
           full_name?: string | null;
           id: string;
           phone?: string | null;
@@ -697,6 +699,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          email?: string | null;
           full_name?: string | null;
           id?: string;
           phone?: string | null;
@@ -1015,11 +1018,54 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      _create_agency: {
+        Args: {
+          p_brand_color?: string;
+          p_city?: string;
+          p_name: string;
+          p_phone?: string;
+          p_slug: string;
+          p_user: string;
+        };
+        Returns: string;
+      };
       _next_contract_number: { Args: { p_agency: string }; Returns: string };
       accept_invitation: { Args: { p_token: string }; Returns: string };
-      create_agency: { Args: { p_name: string; p_slug: string }; Returns: string };
+      create_agency: {
+        Args: {
+          p_brand_color?: string;
+          p_city?: string;
+          p_name: string;
+          p_phone?: string;
+          p_slug: string;
+        };
+        Returns: string;
+      };
+      create_agency_for_user: {
+        Args: {
+          p_brand_color?: string;
+          p_city?: string;
+          p_name: string;
+          p_phone?: string;
+          p_slug: string;
+          p_user: string;
+        };
+        Returns: string;
+      };
       current_agency_ids: { Args: { p_roles?: string[] }; Returns: string[] };
       has_role: { Args: { p_agency: string; p_roles: string[] }; Returns: boolean };
+      invitation_preview: {
+        Args: { p_token: string };
+        Returns: {
+          agency_name: string;
+          brand_color: string;
+          email: string;
+          logo_path: string;
+          phone: string;
+          role: string;
+          state: string;
+        }[];
+      };
       is_member: { Args: { p_agency: string }; Returns: boolean };
       is_platform_admin: { Args: Record<PropertyKey, never>; Returns: boolean };
       match_chunks: {
@@ -1034,6 +1080,11 @@ export type Database = {
       };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
+      subscription_is_writable: {
+        Args: { p_current_period_end: string; p_status: string; p_trial_ends_at: string };
+        Returns: boolean;
+      };
+      writable_agency_ids: { Args: { p_roles?: string[] }; Returns: string[] };
     };
     Enums: {
       [_ in never]: never;
