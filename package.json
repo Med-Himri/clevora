@@ -1,0 +1,12 @@
+{
+  "name": "clevora",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "db:test": "bash scripts/db/run-local-tests.sh",
+    "db:types": "bash scripts/db/gen-types.sh"
+  },
+  "devDependencies": {
+    "supabase": "^3.0.0"
+  }
+}
