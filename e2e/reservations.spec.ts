@@ -59,9 +59,9 @@ test("new reservation: an existing CIN fills the client, the car list only shows
   // Step 4 — check-out, then save
   await expect(page.getByText("Étape 4 sur 4")).toBeVisible();
   await page.getByRole("button", { name: "Enregistrer la réservation" }).click();
-  await page.waitForURL(/\/reservations\/[0-9a-f-]{36}$/);
-  await expect(page.getByRole("heading", { name: /^Contrat C-\d+$/ })).toBeVisible();
-  await expect(page.getByTestId("detail-balance")).toContainText("200 MAD");
+  await page.waitForURL(/\/contracts\/[0-9a-f-]{36}$/);
+  await expect(page.getByTestId("contract-title")).toHaveText(/^Contrat C-\d+$/);
+  await expect(page.getByTestId("contract-balance")).toContainText("200 MAD");
 
   // Editing the autofilled phone updated the same client (no duplicate)
   const { data: clients } = await admin().from("clients").select("id, phone").eq("agency_id", s.agency.agencyId);

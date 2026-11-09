@@ -40,7 +40,9 @@ export function ReservationWizard({
   initialCar,
   contractPlaceholder,
   settings,
+  initialStep = 0,
 }: {
+  initialStep?: number;
   reservationId?: string;
   initial: ReservationInput;
   initialCar?: AvailableCar | null;
@@ -53,7 +55,7 @@ export function ReservationWizard({
   const te = useTranslations("errors");
   const tc = useTranslations("common");
   const router = useRouter();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(Math.min(3, Math.max(0, initialStep)));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cars, setCars] = useState<AvailableCar[] | null>(initialCar ? [initialCar] : null);
   const [unavailable, setUnavailable] = useState({ booked: 0, maintenance: 0, insurance: 0 });
@@ -158,7 +160,7 @@ export function ReservationWizard({
         return;
       }
       toast.success(reservationId ? t("updated") : t("created"));
-      router.push(`/reservations/${result.data.id}`);
+      router.push(`/contracts/${result.data.id}`);
     });
   };
 

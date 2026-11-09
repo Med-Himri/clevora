@@ -778,5 +778,88 @@
       "kind": "Type",
       "savePayment": "Enregistrer le paiement"
     }
+  },
+  "contracts": {
+    "title": "Contrats",
+    "subtitle": "À signer, en cours, clôturés et annulés.",
+    "contract": "Contrat",
+    "paperTitle": "Contrat de location de véhicule",
+    "noLegal": "RC, ICE, IF, patente et CNSS à compléter dans Paramètres.",
+    "payments": "Paiements",
+    "noPayments": "Aucun paiement enregistré.",
+    "no": "Non",
+    "signClient": "Le locataire (lu et approuvé)",
+    "signAgency": "L'agence",
+    "poweredBy": "Propulsé par Parcolia",
+    "search": "N° de contrat, client, matricule",
+    "tabsLabel": "Filtrer les contrats",
+    "noResult": "Aucun contrat trouvé",
+    "tabs": {
+      "toSign": "À signer",
+      "active": "En cours",
+      "closed": "Clôturés",
+      "cancelled": "Annulés"
+    },
+    "empty": {
+      "toSign": "Aucun contrat à signer. Bravo !",
+      "active": "Aucune location en cours.",
+      "closed": "Aucun contrat clôturé pour le moment.",
+      "cancelled": "Aucun contrat annulé."
+    },
+    "missing": {
+      "title": "À compléter avant la signature :",
+      "ready": "Toutes les informations sont là : vous pouvez faire signer le contrat.",
+      "driver1Id": "Pièce d'identité du conducteur 1",
+      "driver1License": "Permis du conducteur 1",
+      "driver1Phone": "Téléphone du conducteur 1",
+      "driver2License": "Permis du conducteur 2",
+      "kmOut": "Kilométrage au départ",
+      "fuelOut": "Carburant au départ"
+    },
+    "sections": {
+      "rental": "Location",
+      "vehicle": "Véhicule",
+      "driver1": "Conducteur 1",
+      "driver2": "Conducteur 2",
+      "price": "Prix",
+      "checklist": "Équipements et documents"
+    },
+    "fields": {
+      "name": "Nom et prénom",
+      "birth": "Né(e) le / à",
+      "nationality": "Nationalité",
+      "address": "Adresse",
+      "phone": "Téléphone",
+      "passport": "Passeport",
+      "cin": "CIN",
+      "until": "jusqu'au",
+      "license": "Permis n°",
+      "licenseIssued": "Délivré le / à",
+      "departure": "Départ",
+      "plannedReturn": "Retour prévu",
+      "actualReturn": "Retour réel",
+      "delivery": "Livraison",
+      "model": "Modèle",
+      "plate": "Matricule",
+      "kmOut": "Km départ → retour",
+      "fuel": "Carburant",
+      "days": "Jours × prix",
+      "deliveryFee": "Frais de livraison",
+      "total": "Total",
+      "paid": "Déjà payé",
+      "balance": "Reste à payer",
+      "franchise": "Franchise",
+      "deposit": "Caution",
+      "equipment": "Équipements",
+      "documents": "Documents remis",
+      "notes": "Observations"
+    },
+    "share": {
+      "print": "Imprimer / PDF",
+      "download": "Télécharger",
+      "arabic": "PDF avec l'arabe",
+      "whatsapp": "Envoyer par WhatsApp",
+      "whatsappMessage": "Bonjour {name}, voici le récapitulatif de votre location chez {agency} : contrat {number}, {car}, du {start} au {end}. Reste à payer : {balance}. Merci et bonne route !"
+    }
   }
 }

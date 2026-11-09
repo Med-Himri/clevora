@@ -778,5 +778,88 @@
       "kind": "Type",
       "savePayment": "Save payment"
     }
+  },
+  "contracts": {
+    "title": "Contracts",
+    "subtitle": "To sign, in progress, closed and cancelled.",
+    "contract": "Contract",
+    "paperTitle": "Vehicle rental contract",
+    "noLegal": "Fill in RC, ICE, IF, patente and CNSS in Settings.",
+    "payments": "Payments",
+    "noPayments": "No payment recorded.",
+    "no": "No",
+    "signClient": "The renter (read and approved)",
+    "signAgency": "The agency",
+    "poweredBy": "Powered by Parcolia",
+    "search": "Contract no., client, plate",
+    "tabsLabel": "Filter contracts",
+    "noResult": "No contract found",
+    "tabs": {
+      "toSign": "To sign",
+      "active": "In progress",
+      "closed": "Closed",
+      "cancelled": "Cancelled"
+    },
+    "empty": {
+      "toSign": "No contract to sign. Well done!",
+      "active": "No rental in progress.",
+      "closed": "No closed contract yet.",
+      "cancelled": "No cancelled contract."
+    },
+    "missing": {
+      "title": "To complete before signing:",
+      "ready": "Everything is there: you can have the contract signed.",
+      "driver1Id": "Driver 1 ID document",
+      "driver1License": "Driver 1 licence",
+      "driver1Phone": "Driver 1 phone",
+      "driver2License": "Driver 2 licence",
+      "kmOut": "Mileage at departure",
+      "fuelOut": "Fuel at departure"
+    },
+    "sections": {
+      "rental": "Rental",
+      "vehicle": "Vehicle",
+      "driver1": "Driver 1",
+      "driver2": "Driver 2",
+      "price": "Price",
+      "checklist": "Equipment and documents"
+    },
+    "fields": {
+      "name": "Full name",
+      "birth": "Born on / in",
+      "nationality": "Nationality",
+      "address": "Address",
+      "phone": "Phone",
+      "passport": "Passport",
+      "cin": "ID card",
+      "until": "until",
+      "license": "Licence no.",
+      "licenseIssued": "Issued on / in",
+      "departure": "Departure",
+      "plannedReturn": "Planned return",
+      "actualReturn": "Actual return",
+      "delivery": "Delivery",
+      "model": "Model",
+      "plate": "Plate",
+      "kmOut": "Km out → in",
+      "fuel": "Fuel",
+      "days": "Days × price",
+      "deliveryFee": "Delivery fee",
+      "total": "Total",
+      "paid": "Already paid",
+      "balance": "Left to pay",
+      "franchise": "Excess",
+      "deposit": "Deposit",
+      "equipment": "Equipment",
+      "documents": "Documents given",
+      "notes": "Remarks"
+    },
+    "share": {
+      "print": "Print / PDF",
+      "download": "Download",
+      "arabic": "PDF with Arabic",
+      "whatsapp": "Send by WhatsApp",
+      "whatsappMessage": "Hello {name}, here is the summary of your rental with {agency}: contract {number}, {car}, from {start} to {end}. Left to pay: {balance}. Thank you and safe travels!"
+    }
   }
 }

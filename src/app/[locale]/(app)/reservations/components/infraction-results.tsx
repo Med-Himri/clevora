@@ -60,7 +60,7 @@ export async function InfractionResults({ agencyId, plate, date, time }: { agenc
       {(data ?? []).map((r) => (
         <li key={r.id} className="flex flex-col gap-3 rounded-xl border p-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <Link href={`/reservations/${r.id}`} className="font-bold hover:underline">
+            <Link href={`/contracts/${r.id}`} className="font-bold hover:underline">
               {t("contract")} <Ltr>{r.contract_number}</Ltr>
             </Link>
             <span className="text-sm text-muted-foreground">

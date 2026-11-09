@@ -35,8 +35,9 @@ function toDriver(c: ClientRow): DriverInput & { phone: string } {
   };
 }
 
-export default async function EditReservationPage({ params }: PageProps<"/[locale]/reservations/[id]/edit">) {
+export default async function EditReservationPage({ params, searchParams }: PageProps<"/[locale]/reservations/[id]/edit">) {
   const { id } = await params;
+  const step = Number((await searchParams).step ?? 0) || 0;
   const { agency } = await requireAgency();
   const t = await getTranslations("reservations");
   const supabase = await createClient();
@@ -87,7 +88,7 @@ export default async function EditReservationPage({ params }: PageProps<"/[local
   return (
     <>
       <PageHeader title={`${t("editTitle")} · ${r.contract_number}`} />
-      <ReservationWizard reservationId={r.id} initial={initial} initialCar={car} contractPlaceholder={r.contract_number} settings={settings} />
+      <ReservationWizard initialStep={step} reservationId={r.id} initial={initial} initialCar={car} contractPlaceholder={r.contract_number} settings={settings} />
     </>
   );
 }

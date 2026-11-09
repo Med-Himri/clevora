@@ -13,7 +13,7 @@ export async function ReservationRow({ r, now }: { r: ListedReservation; now: Da
   const late = r.status === "on_rental" && new Date(r.end_at) < now;
   return (
     <li className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs md:flex-row md:items-center" data-testid="reservation-row">
-      <Link href={`/reservations/${r.id}`} className="flex min-w-0 flex-1 flex-col gap-1 rounded-md">
+      <Link href={`/contracts/${r.id}`} className="flex min-w-0 flex-1 flex-col gap-1 rounded-md">
         <span className="flex flex-wrap items-center gap-2">
           <Ltr className="font-bold">{r.contract_number}</Ltr>
           <ReservationStatusBadge status={r.status} late={late} signed={Boolean(r.signed_at)} />
@@ -43,7 +43,7 @@ export async function ReservationRow({ r, now }: { r: ListedReservation; now: Da
         ) : null}
         {r.status === "reserved" ? (
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/reservations/${r.id}?do=start`}>
+            <Link href={`/contracts/${r.id}?do=start`}>
               <PlayIcon aria-hidden />
               {t("start")}
             </Link>
@@ -51,7 +51,7 @@ export async function ReservationRow({ r, now }: { r: ListedReservation; now: Da
         ) : null}
         {r.status === "on_rental" ? (
           <Button size="sm" asChild>
-            <Link href={`/reservations/${r.id}?do=return`}>
+            <Link href={`/contracts/${r.id}?do=return`}>
               <CornerDownLeftIcon aria-hidden />
               {t("return")}
             </Link>
