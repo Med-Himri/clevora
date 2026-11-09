@@ -909,5 +909,63 @@
       "maintenance": "Maintenance",
       "delivery": "Livraison"
     }
+  },
+  "insurance": {
+    "title": "Assurance et visite technique",
+    "subtitle": "Alerte {days} jours avant la fin.",
+    "empty": "Aucune voiture dans le parc.",
+    "edit": "Modifier",
+    "editTitle": "Assurance et visite technique",
+    "insuranceEnd": "Fin de l'assurance",
+    "visitEnd": "Fin de la visite technique",
+    "insurer": "Assureur (facultatif)",
+    "policy": "N° de police (facultatif)",
+    "quickHint": "Les boutons ci-dessous remplissent seulement la date : vérifiez-la avant d'enregistrer.",
+    "plus6m": "+6 mois",
+    "plus1y": "+1 an",
+    "save": "Enregistrer",
+    "expired": "Expirée",
+    "soon": "Bientôt",
+    "ok": "OK",
+    "unknown": "Non renseignée",
+    "inDays": "{days, plural, =0 {aujourd'hui} one {dans # jour} other {dans # jours}}",
+    "groups": {
+      "expired": "Expirées",
+      "week": "Cette semaine",
+      "month": "Ce mois",
+      "later": "Plus tard"
+    }
+  },
+  "oil": {
+    "title": "Vidange",
+    "subtitle": "Alerte {km} km avant la prochaine vidange.",
+    "empty": "Aucune voiture dans le parc.",
+    "due": "À faire",
+    "soon": "Bientôt",
+    "ok": "OK",
+    "unknown": "Non renseignée",
+    "kmLeft": "Dans {km} km",
+    "overBy": "Dépassée de {km} km",
+    "currentKm": "Km actuel",
+    "lastChange": "Dernière vidange",
+    "nextKm": "Prochaine vidange (km)",
+    "done_button": "Vidange faite",
+    "doneTitle": "Vidange faite",
+    "date": "Date",
+    "kmAtChange": "Km au moment de la vidange",
+    "nextKmHint": "Tapez le kilométrage donné par votre garagiste.",
+    "suggestion": "Même intervalle que la dernière fois ({interval} km) : {km} km",
+    "cost": "Coût (facultatif)",
+    "costHint": "Enregistré comme charge « Vidange » de cette voiture.",
+    "save": "Enregistrer",
+    "done": "Vidange enregistrée.",
+    "updateKm": "Mettre à jour le km",
+    "kmSaved": "Kilométrage mis à jour.",
+    "groups": {
+      "due": "À faire",
+      "soon": "Bientôt",
+      "ok": "À jour",
+      "unknown": "Prochaine vidange non renseignée"
+    }
   }
 }

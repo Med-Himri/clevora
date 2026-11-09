@@ -909,5 +909,63 @@
       "maintenance": "Maintenance",
       "delivery": "Delivery"
     }
+  },
+  "insurance": {
+    "title": "Insurance and inspection",
+    "subtitle": "Alert {days} days before the end.",
+    "empty": "No car in the fleet.",
+    "edit": "Edit",
+    "editTitle": "Insurance and inspection",
+    "insuranceEnd": "Insurance end",
+    "visitEnd": "Technical inspection end",
+    "insurer": "Insurer (optional)",
+    "policy": "Policy no. (optional)",
+    "quickHint": "The buttons below only fill in the date: check it before saving.",
+    "plus6m": "+6 months",
+    "plus1y": "+1 year",
+    "save": "Save",
+    "expired": "Expired",
+    "soon": "Soon",
+    "ok": "OK",
+    "unknown": "Not set",
+    "inDays": "{days, plural, =0 {today} one {in # day} other {in # days}}",
+    "groups": {
+      "expired": "Expired",
+      "week": "This week",
+      "month": "This month",
+      "later": "Later"
+    }
+  },
+  "oil": {
+    "title": "Oil change",
+    "subtitle": "Alert {km} km before the next oil change.",
+    "empty": "No car in the fleet.",
+    "due": "Due",
+    "soon": "Soon",
+    "ok": "OK",
+    "unknown": "Not set",
+    "kmLeft": "In {km} km",
+    "overBy": "Over by {km} km",
+    "currentKm": "Current km",
+    "lastChange": "Last oil change",
+    "nextKm": "Next oil change (km)",
+    "done_button": "Oil change done",
+    "doneTitle": "Oil change done",
+    "date": "Date",
+    "kmAtChange": "Km at the oil change",
+    "nextKmHint": "Type the mileage your mechanic gave you.",
+    "suggestion": "Same interval as last time ({interval} km): {km} km",
+    "cost": "Cost (optional)",
+    "costHint": "Saved as an “Oil change” expense for this car.",
+    "save": "Save",
+    "done": "Oil change saved.",
+    "updateKm": "Update km",
+    "kmSaved": "Mileage updated.",
+    "groups": {
+      "due": "Due",
+      "soon": "Soon",
+      "ok": "Up to date",
+      "unknown": "Next oil change not set"
+    }
   }
 }

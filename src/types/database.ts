@@ -60,6 +60,8 @@ export type Database = {
           address: string | null;
           alert_days_before: number;
           alert_km_before: number;
+          alert_roles: string[];
+          alerts_sent_on: string | null;
           brand_color: string | null;
           city: string | null;
           cnss: string | null;
@@ -95,6 +97,8 @@ export type Database = {
           address?: string | null;
           alert_days_before?: number;
           alert_km_before?: number;
+          alert_roles?: string[];
+          alerts_sent_on?: string | null;
           brand_color?: string | null;
           city?: string | null;
           cnss?: string | null;
@@ -129,6 +133,8 @@ export type Database = {
           address?: string | null;
           alert_days_before?: number;
           alert_km_before?: number;
+          alert_roles?: string[];
+          alerts_sent_on?: string | null;
           brand_color?: string | null;
           city?: string | null;
           cnss?: string | null;
