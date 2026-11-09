@@ -14,7 +14,8 @@
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
     "db:test:nodocker": "bash scripts/db/run-local-tests.sh",
-    "db:types": "bash scripts/db/gen-types.sh"
+    "db:types": "bash scripts/db/gen-types.sh",
+    "i18n:check": "node scripts/check-messages.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

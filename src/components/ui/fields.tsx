@@ -1,0 +1,100 @@
+"use client";
+
+import { CalendarIcon, ClockIcon } from "lucide-react";
+import { useState } from "react";
+import type * as React from "react";
+import { Input } from "@/components/ui/input";
+import { formatMoney, normalizePlateInput, parseMoney } from "@/lib/format";
+import { formatPhone, normalizePhone } from "@/lib/phone";
+import { cn } from "@/lib/utils";
+
+type Base = Omit<React.ComponentProps<"input">, "value" | "onChange" | "type">;
+
+/** Date (yyyy-mm-dd value). The phone's own date picker; shown as dd/mm/yyyy in French. */
+export function DateField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="relative">
+      <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} className={cn("pe-10", className)} {...props} />
+      <CalendarIcon className="pointer-events-none absolute end-3 top-3 size-5 text-muted-foreground" aria-hidden />
+    </div>
+  );
+}
+
+/** Time (HH:mm, 24 h). */
+export function TimeField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="relative">
+      <Input type="time" step={300} value={value} onChange={(e) => onChange(e.target.value)} className={cn("pe-10", className)} {...props} />
+      <ClockIcon className="pointer-events-none absolute end-3 top-3 size-5 text-muted-foreground" aria-hidden />
+    </div>
+  );
+}
+
+/** Amount in MAD. Accepts "1 250", "1250,50"… and shows "1 250" when not editing. */
+export function MoneyField({
+  value,
+  onChange,
+  className,
+  ...props
+}: Base & { value: number | null; onChange: (v: number | null) => void }) {
+  const formatted = value === null ? "" : formatMoney(value).replace(/ MAD$/, "");
+  // While typing we keep the raw text; otherwise we show the formatted amount.
+  const [draft, setDraft] = useState<string | null>(null);
+  const text = draft ?? formatted;
+  return (
+    <div className="relative">
+      <Input
+        inputMode="decimal"
+        dir="ltr"
+        value={text}
+        onFocus={() => setDraft(formatted)}
+        onBlur={() => setDraft(null)}
+        onChange={(e) => {
+          setDraft(e.target.value);
+          onChange(parseMoney(e.target.value));
+        }}
+        className={cn("pe-14 text-end tabular-nums", className)}
+        {...props}
+      />
+      <span className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-muted-foreground">MAD</span>
+    </div>
+  );
+}
+
+/** Matricule: uppercase as you type. */
+export function PlateField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+  return (
+    <Input
+      dir="ltr"
+      autoCapitalize="characters"
+      autoComplete="off"
+      spellCheck={false}
+      value={value}
+      onChange={(e) => onChange(normalizePlateInput(e.target.value))}
+      className={cn("font-semibold uppercase tracking-wide", className)}
+      placeholder="12345-A-6"
+      {...props}
+    />
+  );
+}
+
+/** Phone: free typing, formatted as +212 6 12 34 56 78 when leaving the field. */
+export function PhoneField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+  return (
+    <Input
+      type="tel"
+      inputMode="tel"
+      dir="ltr"
+      autoComplete="tel"
+      placeholder="06 12 34 56 78"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      onBlur={() => {
+        const n = normalizePhone(value);
+        if (n) onChange(formatPhone(n));
+      }}
+      className={className}
+      {...props}
+    />
+  );
+}

@@ -6,7 +6,10 @@
     "showPassword": "إظهار كلمة المرور",
     "hidePassword": "إخفاء كلمة المرور",
     "close": "إغلاق",
-    "cancel": "إلغاء"
+    "cancel": "إلغاء",
+    "yes": "نعم",
+    "no": "لا",
+    "clearSearch": "مسح البحث"
   },
   "notFound": {
     "title": "الصفحة غير موجودة",
@@ -318,5 +321,37 @@
       "resent": "تمت إعادة إرسال الدعوة.",
       "cancelled": "تم إلغاء الدعوة."
     }
+  },
+  "nav": {
+    "label": "القائمة الرئيسية",
+    "dashboard": "اليوم",
+    "reservations": "الحجوزات",
+    "contracts": "العقود",
+    "planning": "الجدول",
+    "fleet": "الأسطول",
+    "insurance": "التأمين",
+    "oil": "تغيير الزيت",
+    "charges": "المصاريف",
+    "statistics": "الإحصائيات",
+    "assistant": "المساعد الذكي",
+    "team": "الفريق",
+    "settings": "الإعدادات",
+    "account": "حسابي",
+    "newReservation": "حجز جديد",
+    "more": "المزيد",
+    "moreDescription": "جميع الصفحات الأخرى",
+    "expand": "فتح القائمة",
+    "collapse": "إغلاق القائمة",
+    "poweredBy": "بدعم من Parcolia"
+  },
+  "urgency": {
+    "late": "متأخر",
+    "today": "اليوم",
+    "tomorrow": "غدًا",
+    "afterTomorrow": "بعد غد"
+  },
+  "comingSoon": {
+    "title": "هذه الصفحة قادمة قريبًا",
+    "body": "الصفحة قيد الإنشاء. في الأثناء، استعمل الصفحات الأخرى من القائمة."
   }
 }

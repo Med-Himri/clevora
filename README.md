@@ -54,6 +54,10 @@ npm run db:test
 ```
 
 ```bash
+npm run i18n:check
+```
+
+```bash
 npm run build
 ```
 
@@ -70,5 +74,7 @@ npm run test:e2e
 - `src/app/auth/confirm` — landing route for links in Supabase emails
 - `src/proxy.ts` — locale prefix, session refresh, login redirects (Next.js 16 "proxy" = old middleware)
 - `src/lib/auth` — `getActiveAgency()`, `requireUser/requireAgency/requireRole`, server-action guard
-- `src/components/ui` — shadcn/ui-style components (Radix); `src/components/app` — Parcolia components
+- `src/components/ui` — shadcn/ui-style components (Radix): buttons, fields (date, time, MAD, matricule, phone), Oui/Non, dialogs
+- `src/components/app` — Parcolia components: shell (sidebar / rail / bottom nav), ResponsiveList, UrgencyGroups, StatTile, EmptyState, Stepper, SearchBar, `<Ltr>`
+- `/dev/ui` — every shared component in one page (development only, or with `PARCOLIA_DEV_UI=1`)
 - `messages/{fr,ar,en}.json` — all texts; `supabase/` — migrations, seed, email templates, pgTAP tests

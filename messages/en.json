@@ -6,7 +6,10 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "close": "Close",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "yes": "Yes",
+    "no": "No",
+    "clearSearch": "Clear search"
   },
   "notFound": {
     "title": "Page not found",
@@ -318,5 +321,37 @@
       "resent": "Invitation sent again.",
       "cancelled": "Invitation cancelled."
     }
+  },
+  "nav": {
+    "label": "Main navigation",
+    "dashboard": "Today",
+    "reservations": "Reservations",
+    "contracts": "Contracts",
+    "planning": "Planning",
+    "fleet": "Fleet",
+    "insurance": "Insurance",
+    "oil": "Oil change",
+    "charges": "Expenses",
+    "statistics": "Statistics",
+    "assistant": "AI assistant",
+    "team": "Team",
+    "settings": "Settings",
+    "account": "My account",
+    "newReservation": "New reservation",
+    "more": "More",
+    "moreDescription": "All other pages",
+    "expand": "Open menu",
+    "collapse": "Close menu",
+    "poweredBy": "Powered by Parcolia"
+  },
+  "urgency": {
+    "late": "Late",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "afterTomorrow": "Day after tomorrow"
+  },
+  "comingSoon": {
+    "title": "This page is coming soon",
+    "body": "It is being built. Meanwhile, use the other pages in the menu."
   }
 }

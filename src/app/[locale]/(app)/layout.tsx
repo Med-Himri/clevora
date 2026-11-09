@@ -4,18 +4,28 @@ import { AgencyProvider } from "@/components/app/agency-context";
 import { AppHeader } from "@/components/app/app-header";
 import { BrandStyle } from "@/components/app/brand-style";
 import { NoticeToast } from "@/components/app/notice-toast";
+import { BottomNav } from "@/components/app/shell/bottom-nav";
+import { Sidebar } from "@/components/app/shell/sidebar";
 import { SubscriptionBanner } from "@/components/app/subscription-banner";
 import { ThemeSync } from "@/components/app/theme-sync";
 import { getMemberships, getProfile, requireAgency } from "@/lib/auth/session";
+import { getNavBadges } from "@/lib/nav-badges";
+import { createClient } from "@/lib/supabase/server";
 
-/** Everything inside the agency: requires login + an active agency. */
+/**
+ * The app shell (everything inside an agency):
+ *  phone  < 768   sticky header + bottom navigation
+ *  tablet 768–1279 icon rail that opens over the content
+ *  laptop ≥ 1280  fixed sidebar + sticky header
+ */
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const { user, agency } = await requireAgency();
-  const [profile, memberships, tr, t] = await Promise.all([
+  const supabase = await createClient();
+  const [profile, memberships, badges, tr] = await Promise.all([
     getProfile(),
     getMemberships(),
+    getNavBadges(supabase, agency.id),
     getTranslations("roles"),
-    getTranslations("app"),
   ]);
   const activeAgencies = memberships.filter((m) => m.status === "active").length;
 
@@ -25,7 +35,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     >
       <BrandStyle brand={agency.brandColor} foreground={agency.brandForeground} />
       <ThemeSync theme={profile?.preferredTheme ?? "system"} />
-      <div className="flex min-h-dvh flex-col">
+      <Sidebar role={agency.role} badges={badges} agencyName={agency.name} agencyLogoUrl={agency.logoUrl} />
+      <div className="flex min-h-dvh flex-col md:ps-16 xl:ps-64">
         <AppHeader
           agencyName={agency.name}
           agencyLogoUrl={agency.logoUrl}
@@ -35,9 +46,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           canSwitchAgency={activeAgencies > 1}
         />
         <SubscriptionBanner subscription={agency.subscription} role={agency.role} />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-4 sm:py-6">{children}</main>
-        <footer className="px-4 pb-4 text-center text-xs text-muted-foreground">{t("poweredBy")}</footer>
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pb-28 pt-4 sm:pt-6 md:pb-8">{children}</main>
       </div>
+      <BottomNav role={agency.role} badges={badges} />
       <Suspense>
         <NoticeToast />
       </Suspense>

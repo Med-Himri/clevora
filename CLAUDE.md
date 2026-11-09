@@ -47,6 +47,7 @@ Enforce roles in RLS AND hide forbidden UI. Never rely on UI hiding alone.
 - Lists are grouped by urgency, most urgent first (late, today, tomorrow, after tomorrow, later).
 - Every action button has a small icon plus a short label.
 - Use logical CSS properties (ms-, me-, ps-, pe-, start, end) so Arabic RTL works without special cases.
+- Wrap amounts, dates, times, phones, plates, IDs and emails in <Ltr> (components/app/ltr.tsx) so they keep their order in Arabic.
 - Light and dark themes, both polished; language and theme are chosen in Settings, not in the header.
 - Empty states explain what to do next. Errors say how to fix them. Toasts confirm every save.
 - Accessibility: labels on every input, visible focus, AA contrast, aria on icon-only buttons.

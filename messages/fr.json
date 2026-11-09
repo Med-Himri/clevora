@@ -6,7 +6,10 @@
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "close": "Fermer",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "yes": "Oui",
+    "no": "Non",
+    "clearSearch": "Effacer la recherche"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -318,5 +321,37 @@
       "resent": "Invitation renvoyée.",
       "cancelled": "Invitation annulée."
     }
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "dashboard": "Aujourd'hui",
+    "reservations": "Réservations",
+    "contracts": "Contrats",
+    "planning": "Planning",
+    "fleet": "Parc auto",
+    "insurance": "Assurance",
+    "oil": "Vidange",
+    "charges": "Charges",
+    "statistics": "Statistiques",
+    "assistant": "Assistant IA",
+    "team": "Équipe",
+    "settings": "Paramètres",
+    "account": "Mon compte",
+    "newReservation": "Nouvelle réservation",
+    "more": "Plus",
+    "moreDescription": "Toutes les autres pages",
+    "expand": "Ouvrir le menu",
+    "collapse": "Fermer le menu",
+    "poweredBy": "Propulsé par Parcolia"
+  },
+  "urgency": {
+    "late": "En retard",
+    "today": "Aujourd'hui",
+    "tomorrow": "Demain",
+    "afterTomorrow": "Après-demain"
+  },
+  "comingSoon": {
+    "title": "Cette page arrive bientôt",
+    "body": "Elle est en cours de construction. En attendant, utilisez les autres pages du menu."
   }
 }
