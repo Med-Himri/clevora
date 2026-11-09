@@ -5,6 +5,10 @@ select plan(15);
 
 select tests.create_fixture();
 
+-- Real Supabase only allows deletes coming from the Storage API, which sets this
+-- flag and then relies on the RLS policies below. Set it so we test those policies.
+set local storage.allow_delete_query = 'true';
+
 create temp table ids as select tests.id('a_agency')::text as a, tests.id('b_agency')::text as b;
 grant select on ids to public;
 
