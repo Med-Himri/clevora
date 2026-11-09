@@ -1,4 +1,4 @@
-# Clévora — database
+# Parcolia — database
 
 All schema changes are Supabase migrations in `supabase/migrations/`. Never edit the database by hand.
 
@@ -17,7 +17,7 @@ All schema changes are Supabase migrations in `supabase/migrations/`. Never edit
 
 ## Roles
 
-- **admin** (agency owners, all equal): everything in their agency. Cannot change billing fields (`plan_id`, `subscription_status`, `trial_ends_at`, `current_period_end`): only Clévora platform admins, the service role or SECURITY DEFINER functions can.
+- **admin** (agency owners, all equal): everything in their agency. Cannot change billing fields (`plan_id`, `subscription_status`, `trial_ends_at`, `current_period_end`): only Parcolia platform admins, the service role or SECURITY DEFINER functions can.
 - **staff**: reads the agency's data except charges, invitations and the activity log; creates and edits clients, reservations, payments and maintenance; on cars, may only change km, vidange, assurance, visite technique and notes; never deletes.
 - The last active admin of an agency can never be removed, disabled or demoted. Nobody can change their own role or status.
 - **Read-only mode**: when the trial or paid period is over, or the agency is suspended/cancelled, every write (tables and storage) is refused; reads keep working. `past_due` stays writable (grace period).
@@ -68,5 +68,5 @@ This writes `src/types/database.ts`. Run it after every migration.
 
 `supabase/seed.sql` creates "Agence Démo" (12 cars, 25 fake clients, 40 reservations from −90 to +14 days, 6 months of charges). Local demo logins:
 
-- `admin@demo.clevora.ma` / `Demo-Clevora-2026`
-- `staff@demo.clevora.ma` / `Demo-Clevora-2026`
+- `admin@demo.parcolia.ma` / `Demo-Parcolia-2026`
+- `staff@demo.parcolia.ma` / `Demo-Parcolia-2026`

@@ -13,7 +13,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
-DB="${CLEVORA_TEST_DB:-clevora_test}"
+DB="${PARCOLIA_TEST_DB:-parcolia_test}"
 run_psql() { psql -X -v ON_ERROR_STOP=1 -q "$@"; }
 
 echo "▶ Recreating database $DB"

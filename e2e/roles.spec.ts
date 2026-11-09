@@ -25,6 +25,6 @@ test("admin can open /team and sees the members", async ({ page }) => {
   await page.getByTestId("menu-team").click();
   await page.waitForURL(/\/team/);
   await expect(page.getByRole("heading", { name: "Équipe" })).toBeVisible();
-  await expect(page.getByTestId("member-list")).toContainText("staff@demo.clevora.ma");
+  await expect(page.getByTestId("member-list")).toContainText("staff@demo.parcolia.ma");
   await expectNoHorizontalScroll(page);
 });

@@ -1,7 +1,7 @@
-# Clévora — project context
+# Parcolia — project context
 
 ## Product
-Clévora is a multi-tenant SaaS for car rental agencies in Morocco. One app, one database; each agency (tenant) sees only its own data and works under its own name and logo. Brand name in the UI: "Clévora". In code, folders, packages and domains: "clevora" (no accent).
+Parcolia is a multi-tenant SaaS for car rental agencies in Morocco. One app, one database; each agency (tenant) sees only its own data and works under its own name and logo. Brand name in the UI: "Parcolia". In code, folders, packages and domains: "parcolia" (no accent).
 Users: agency admins (the owners) and staff working at a desk or on a phone in the parking lot. Many are not technical. EASY TO USE is the top priority: few clicks, big clear buttons, plain words, no jargon.
 
 ## Stack
@@ -24,7 +24,7 @@ Users: agency admins (the owners) and staff working at a desk or on a phone in t
 - The service role key is used only in server code and Edge Functions, never in the browser.
 - Storage paths always start with the agency id: {agency_id}/logo.png, {agency_id}/docs/...; storage policies check that prefix.
 - Every query in the app is scoped to the active agency. A user can belong to several agencies; the active one is chosen at login and switchable.
-- Platform super admins (Clévora staff) are in a separate platform_admins table and use a separate /platform area.
+- Platform super admins (Parcolia staff) are in a separate platform_admins table and use a separate /platform area.
 
 ## Roles inside an agency
 Only two roles: 'admin' and 'staff'. There is no separate "owner" role.
@@ -34,7 +34,7 @@ Enforce roles in RLS AND hide forbidden UI. Never rely on UI hiding alone.
 
 ## Branding
 - Agency branding: name, logo, brand color, address, phone, email, RC, ICE, IF, patente, CNSS, contract terms. Shown in the app header, on contracts and PDFs.
-- Clévora branding: login, signup, marketing pages, emails, and a small "Propulsé par Clévora" line in the sidebar footer and the PDF footer.
+- Parcolia branding: login, signup, marketing pages, emails, and a small "Propulsé par Parcolia" line in the sidebar footer and the PDF footer.
 - The agency brand color drives the --brand CSS variable; check contrast and fall back to a dark navy if it is too light.
 
 ## Design rules

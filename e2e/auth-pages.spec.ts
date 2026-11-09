@@ -20,7 +20,7 @@ test("wrong password shows a clear message", async ({ page }) => {
   await expect(page.getByText("E-mail ou mot de passe incorrect.")).toBeVisible();
 });
 
-test("forgot password sends a Clévora email with a working reset link", async ({ page }, testInfo) => {
+test("forgot password sends a Parcolia email with a working reset link", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "laptop", "one run is enough (shared demo account)");
   await page.goto("/forgot-password");
   await page.getByLabel("Adresse e-mail").fill(DEMO.staff.email);
@@ -28,7 +28,7 @@ test("forgot password sends a Clévora email with a working reset link", async (
   await expect(page.getByText("un lien vient d'être envoyé")).toBeVisible();
 
   const html = await latestEmailHtml(DEMO.staff.email);
-  expect(html).toContain("Clévora");
+  expect(html).toContain("Parcolia");
   const link = /href="([^"]*\/auth\/confirm[^"]*)"/.exec(html)?.[1]?.replaceAll("&amp;", "&");
   expect(link).toContain("type=recovery");
   await page.goto(link!);

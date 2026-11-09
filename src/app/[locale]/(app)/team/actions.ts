@@ -36,9 +36,9 @@ async function sendInviteEmail(ctx: ActionContext, to: string, role: "admin" | "
 }
 
 const WHATSAPP_TEXT: Record<Locale, (agency: string, url: string) => string> = {
-  fr: (a, u) => `Bonjour ! ${a} vous invite à rejoindre son équipe sur Clévora. Ouvrez ce lien pour créer votre accès : ${u}`,
-  ar: (a, u) => `السلام عليكم! ${a} تدعوك للانضمام إلى فريقها على Clévora. افتح هذا الرابط لإنشاء حسابك: ${u}`,
-  en: (a, u) => `Hello! ${a} invites you to join its team on Clévora. Open this link to create your access: ${u}`,
+  fr: (a, u) => `Bonjour ! ${a} vous invite à rejoindre son équipe sur Parcolia. Ouvrez ce lien pour créer votre accès : ${u}`,
+  ar: (a, u) => `السلام عليكم! ${a} تدعوك للانضمام إلى فريقها على Parcolia. افتح هذا الرابط لإنشاء حسابك: ${u}`,
+  en: (a, u) => `Hello! ${a} invites you to join its team on Parcolia. Open this link to create your access: ${u}`,
 };
 
 function whatsappLink(phone: string, agency: string, token: string, locale: Locale): string {

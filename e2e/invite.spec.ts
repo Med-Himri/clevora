@@ -3,7 +3,7 @@ import { createTestAgency, latestEmailHtml, login, openUserMenu, uid } from "./h
 
 test("an admin invites by email; the person creates an account and joins as staff", async ({ page, browser }) => {
   const agency = await createTestAgency();
-  const invitee = `invitee-${uid()}@test.clevora.ma`;
+  const invitee = `invitee-${uid()}@test.parcolia.ma`;
 
   await login(page, agency.email, agency.password);
   await page.goto("/team");
@@ -16,7 +16,7 @@ test("an admin invites by email; the person creates an account and joins as staf
   // The branded email arrives in the local mailbox
   const html = await latestEmailHtml(invitee);
   expect(html).toContain(agency.name);
-  expect(html).toContain("Propulsé par Clévora");
+  expect(html).toContain("Propulsé par Parcolia");
   const link = /href="([^"]*\/invite\/[^"]+)"/.exec(html)?.[1]?.replaceAll("&amp;", "&");
   expect(link).toBeTruthy();
 

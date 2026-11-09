@@ -3,9 +3,9 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * Clévora design tokens.
+ * Parcolia design tokens.
  * --brand / --brand-foreground come from the active agency (set by <BrandStyle>);
- * Clévora pages (login, signup…) use the Clévora navy below.
+ * Parcolia pages (login, signup…) use the Parcolia navy below.
  */
 :root {
   --brand: #1e2a4a;
@@ -41,7 +41,7 @@
 }
 
 .dark {
-  /* Clévora pages only: agencies override --brand with their own colour */
+  /* Parcolia pages only: agencies override --brand with their own colour */
   --brand: #2f4170;
   --background: #0b1120;
   --foreground: #e2e8f0;

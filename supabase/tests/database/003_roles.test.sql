@@ -1,5 +1,5 @@
 -- Roles inside one agency: staff does daily work, never sees money or the team;
--- admins do everything except billing fields (Clévora only).
+-- admins do everything except billing fields (Parcolia only).
 begin;
 set local search_path = public, extensions, tests;
 select plan(41);
@@ -89,13 +89,13 @@ select throws_ok(
   '42501', null, 'activity log cannot be deleted, even by an admin');
 
 -- ===========================================================================
--- CLÉVORA platform admin
+-- PARCOLIA platform admin
 -- ===========================================================================
 select tests.authenticate_as(tests.id('e_platform'));
 select lives_ok(
   $$ update public.agencies set subscription_status = 'active', current_period_end = now() + interval '1 month'
       where id = tests.id('a_agency') $$,
-  'Clévora platform admin can confirm a payment (billing fields)');
+  'Parcolia platform admin can confirm a payment (billing fields)');
 
 select * from finish();
 rollback;

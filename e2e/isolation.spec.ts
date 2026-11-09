@@ -24,7 +24,7 @@ test("a user of agency A never sees agency B, even when forcing the agency cooki
   await expect(page.getByTestId("count-vehicles")).toHaveText("12");
 
   // Try to switch to B by forging the cookie: the server ignores it
-  await context.addCookies([{ name: "clevora_agency", value: b.agencyId, url: baseURL! }]);
+  await context.addCookies([{ name: "parcolia_agency", value: b.agencyId, url: baseURL! }]);
   await page.goto("/dashboard");
   await expect(page.getByTestId("header-agency-name")).toHaveText(DEMO.agencyName);
   await expect(page.getByTestId("count-vehicles")).toHaveText("12");

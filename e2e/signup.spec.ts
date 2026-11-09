@@ -9,7 +9,7 @@ test("signup in 3 steps creates an agency and lands on Aujourd'hui with the tria
   // Step 1 — the owner
   await expect(page.getByText("Étape 1 sur 3")).toBeVisible();
   await page.getByLabel("Nom et prénom").fill("Karim Test");
-  await page.getByLabel("Adresse e-mail").fill(`signup-${id}@test.clevora.ma`);
+  await page.getByLabel("Adresse e-mail").fill(`signup-${id}@test.parcolia.ma`);
   await page.getByLabel("Téléphone").fill("06 12 34 56 78");
   await page.getByLabel("Mot de passe", { exact: true }).fill("Atlas-2026-ok");
   await expectNoHorizontalScroll(page);
@@ -41,7 +41,7 @@ test("signup in 3 steps creates an agency and lands on Aujourd'hui with the tria
 test("signup refuses an email that already has an account", async ({ page }) => {
   await page.goto("/signup");
   await page.getByLabel("Nom et prénom").fill("Doublon");
-  await page.getByLabel("Adresse e-mail").fill("admin@demo.clevora.ma");
+  await page.getByLabel("Adresse e-mail").fill("admin@demo.parcolia.ma");
   await page.getByLabel("Téléphone").fill("0612345678");
   await page.getByLabel("Mot de passe", { exact: true }).fill("Doublon-2026");
   await page.getByRole("button", { name: "Continuer" }).click();

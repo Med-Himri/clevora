@@ -1,7 +1,7 @@
 import { BuildingIcon, LogOutIcon, PlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { ClevoraLogo } from "@/components/app/clevora-logo";
+import { ParcoliaLogo } from "@/components/app/parcolia-logo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,7 +25,7 @@ export default async function SelectAgencyPage() {
 
   return (
     <div className="flex min-h-dvh flex-col items-center bg-muted/60 px-4 py-8 dark:bg-background">
-      <ClevoraLogo className="mb-6" />
+      <ParcoliaLogo className="mb-6" />
       <main className="flex w-full max-w-lg flex-col gap-4">
         <h1 className="text-2xl font-bold">{active.length ? t("title") : t("noAgencyTitle")}</h1>
         <p className="text-muted-foreground">{active.length ? t("subtitle") : t("noAgencyBody")}</p>

@@ -63,11 +63,11 @@
     "emailFailed": "L'e-mail n'a pas pu être envoyé. Réessayez dans un instant.",
     "notFound": "Élément introuvable. Actualisez la page.",
     "selfChange": "Vous ne pouvez pas modifier votre propre rôle ou statut.",
-    "unknown": "Une erreur est survenue. Réessayez ; si cela continue, contactez le support Clévora."
+    "unknown": "Une erreur est survenue. Réessayez ; si cela continue, contactez le support Parcolia."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
-    "agencyCreated": "Votre agence est prête ! Bienvenue sur Clévora.",
+    "agencyCreated": "Votre agence est prête ! Bienvenue sur Parcolia.",
     "joined": "Bienvenue dans l'équipe !",
     "saved": "Modifications enregistrées.",
     "denied": "Vous n'avez pas accès à cette page."
@@ -180,7 +180,7 @@
           "body": "Cette invitation a déjà été acceptée. Connectez-vous pour accéder à l'agence."
         }
       },
-      "goToApp": "Ouvrir Clévora",
+      "goToApp": "Ouvrir Parcolia",
       "goToLogin": "Se connecter",
       "wrongAccount": "Cette invitation est pour {invited}, mais vous êtes connecté avec {current}. Déconnectez-vous puis rouvrez le lien.",
       "logout": "Se déconnecter",
@@ -193,7 +193,7 @@
       "phone": "Téléphone",
       "password": "Mot de passe",
       "createAndJoin": "Créer mon accès et rejoindre",
-      "haveAccount": "Vous avez déjà un compte Clévora ?",
+      "haveAccount": "Vous avez déjà un compte Parcolia ?",
       "loginInstead": "Se connecter"
     }
   },
@@ -209,7 +209,7 @@
     "logout": "Se déconnecter"
   },
   "app": {
-    "poweredBy": "Propulsé par Clévora",
+    "poweredBy": "Propulsé par Parcolia",
     "menu": {
       "open": "Ouvrir le menu du compte",
       "account": "Mon compte",
@@ -243,7 +243,7 @@
   },
   "billing": {
     "title": "Abonnement",
-    "comingSoon": "Les forfaits et le paiement arrivent bientôt. Pour activer votre agence dès maintenant, contactez l'équipe Clévora."
+    "comingSoon": "Les forfaits et le paiement arrivent bientôt. Pour activer votre agence dès maintenant, contactez l'équipe Parcolia."
   },
   "account": {
     "title": "Mon compte",

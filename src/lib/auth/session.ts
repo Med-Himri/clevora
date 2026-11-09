@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Cookie holding the id of the agency the user is working in. It is only a
  *  preference: every request checks the user is an active member of it. */
-export const ACTIVE_AGENCY_COOKIE = "clevora_agency";
+export const ACTIVE_AGENCY_COOKIE = "parcolia_agency";
 
 export const ACTIVE_AGENCY_COOKIE_OPTIONS = {
   httpOnly: true,

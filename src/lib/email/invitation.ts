@@ -13,38 +13,38 @@ type Input = {
 
 const COPY = {
   fr: {
-    subject: (a: string) => `${a} vous invite sur Clévora`,
+    subject: (a: string) => `${a} vous invite sur Parcolia`,
     title: (a: string) => `Rejoignez ${a}`,
     body: (inviter: string | null, a: string, role: string) =>
-      `${inviter ? `${inviter} vous invite` : "Vous êtes invité(e)"} à rejoindre l'équipe de ${a} sur Clévora, en tant que ${role}.`,
+      `${inviter ? `${inviter} vous invite` : "Vous êtes invité(e)"} à rejoindre l'équipe de ${a} sur Parcolia, en tant que ${role}.`,
     cta: "Rejoindre l'agence",
     expires: "Ce lien est valable 7 jours.",
     roles: { admin: "administrateur", staff: "agent" },
-    footer: "Propulsé par Clévora — la gestion de votre agence de location, simplement.",
+    footer: "Propulsé par Parcolia — la gestion de votre agence de location, simplement.",
   },
   ar: {
-    subject: (a: string) => `${a} تدعوك إلى Clévora`,
+    subject: (a: string) => `${a} تدعوك إلى Parcolia`,
     title: (a: string) => `انضم إلى ${a}`,
     body: (inviter: string | null, a: string, role: string) =>
-      `${inviter ? `${inviter} يدعوك` : "أنت مدعو"} للانضمام إلى فريق ${a} على Clévora بصفة ${role}.`,
+      `${inviter ? `${inviter} يدعوك` : "أنت مدعو"} للانضمام إلى فريق ${a} على Parcolia بصفة ${role}.`,
     cta: "الانضمام إلى الوكالة",
     expires: "هذا الرابط صالح لمدة 7 أيام.",
     roles: { admin: "مسؤول", staff: "موظف" },
-    footer: "بدعم من Clévora — وكالة الكراء ديالك، ببساطة.",
+    footer: "بدعم من Parcolia — وكالة الكراء ديالك، ببساطة.",
   },
   en: {
-    subject: (a: string) => `${a} invites you to Clévora`,
+    subject: (a: string) => `${a} invites you to Parcolia`,
     title: (a: string) => `Join ${a}`,
     body: (inviter: string | null, a: string, role: string) =>
-      `${inviter ? `${inviter} invites you` : "You are invited"} to join the ${a} team on Clévora as ${role}.`,
+      `${inviter ? `${inviter} invites you` : "You are invited"} to join the ${a} team on Parcolia as ${role}.`,
     cta: "Join the agency",
     expires: "This link is valid for 7 days.",
     roles: { admin: "an admin", staff: "staff" },
-    footer: "Powered by Clévora — your rental agency, made simple.",
+    footer: "Powered by Parcolia — your rental agency, made simple.",
   },
 } as const;
 
-/** Invitation email with the agency's logo and colour, and a Clévora footer. */
+/** Invitation email with the agency's logo and colour, and a Parcolia footer. */
 export function renderInvitationEmail(input: Input): { subject: string; html: string; text: string } {
   const c = COPY[input.locale];
   const role = c.roles[input.role];

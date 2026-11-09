@@ -63,11 +63,11 @@
     "emailFailed": "The email could not be sent. Try again in a moment.",
     "notFound": "Item not found. Refresh the page.",
     "selfChange": "You can't change your own role or status.",
-    "unknown": "Something went wrong. Try again; if it keeps happening, contact Clévora support."
+    "unknown": "Something went wrong. Try again; if it keeps happening, contact Parcolia support."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
-    "agencyCreated": "Your agency is ready! Welcome to Clévora.",
+    "agencyCreated": "Your agency is ready! Welcome to Parcolia.",
     "joined": "Welcome to the team!",
     "saved": "Changes saved.",
     "denied": "You don't have access to that page."
@@ -180,7 +180,7 @@
           "body": "This invitation was already accepted. Log in to open the agency."
         }
       },
-      "goToApp": "Open Clévora",
+      "goToApp": "Open Parcolia",
       "goToLogin": "Log in",
       "wrongAccount": "This invitation is for {invited}, but you are logged in as {current}. Log out, then open the link again.",
       "logout": "Log out",
@@ -193,7 +193,7 @@
       "phone": "Phone",
       "password": "Password",
       "createAndJoin": "Create my access and join",
-      "haveAccount": "Already have a Clévora account?",
+      "haveAccount": "Already have a Parcolia account?",
       "loginInstead": "Log in"
     }
   },
@@ -209,7 +209,7 @@
     "logout": "Log out"
   },
   "app": {
-    "poweredBy": "Powered by Clévora",
+    "poweredBy": "Powered by Parcolia",
     "menu": {
       "open": "Open account menu",
       "account": "My account",
@@ -243,7 +243,7 @@
   },
   "billing": {
     "title": "Subscription",
-    "comingSoon": "Plans and payment are coming soon. To activate your agency now, contact the Clévora team."
+    "comingSoon": "Plans and payment are coming soon. To activate your agency now, contact the Parcolia team."
   },
   "account": {
     "title": "My account",

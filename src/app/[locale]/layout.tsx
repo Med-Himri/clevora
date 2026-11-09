@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "brand" });
   return {
-    title: { default: "Clévora", template: "%s · Clévora" },
+    title: { default: "Parcolia", template: "%s · Parcolia" },
     description: t("tagline"),
   };
 }

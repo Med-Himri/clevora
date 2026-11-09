@@ -1,9 +1,9 @@
--- Clévora — demo seed (LOCAL and STAGING only — NEVER run on production).
+-- Parcolia — demo seed (LOCAL and STAGING only — NEVER run on production).
 -- All names, phone numbers, plates and CIN/passport numbers below are FAKE.
 --
 -- Demo logins (local only):
---   admin@demo.clevora.ma / Demo-Clevora-2026   (admin)
---   staff@demo.clevora.ma / Demo-Clevora-2026   (staff)
+--   admin@demo.parcolia.ma / Demo-Parcolia-2026   (admin)
+--   staff@demo.parcolia.ma / Demo-Parcolia-2026   (staff)
 --
 -- Dates are relative to "today" in Africa/Casablanca, so the demo always looks
 -- alive: 40 reservations from 90 days ago to 14 days ahead, 6 months of
@@ -46,12 +46,12 @@ begin
                           confirmation_token, recovery_token, email_change_token_new, email_change)
   values
     ('00000000-0000-0000-0000-000000000000', c_admin, 'authenticated', 'authenticated',
-     'admin@demo.clevora.ma', extensions.crypt('Demo-Clevora-2026', extensions.gen_salt('bf')), now(),
+     'admin@demo.parcolia.ma', extensions.crypt('Demo-Parcolia-2026', extensions.gen_salt('bf')), now(),
      '{"provider":"email","providers":["email"]}',
      '{"full_name":"Yassine Bennani (démo)","phone":"+212600000001"}',
      now(), now(), '', '', '', ''),
     ('00000000-0000-0000-0000-000000000000', c_staff, 'authenticated', 'authenticated',
-     'staff@demo.clevora.ma', extensions.crypt('Demo-Clevora-2026', extensions.gen_salt('bf')), now(),
+     'staff@demo.parcolia.ma', extensions.crypt('Demo-Parcolia-2026', extensions.gen_salt('bf')), now(),
      '{"provider":"email","providers":["email"]}',
      '{"full_name":"Salma Idrissi (démo)","phone":"+212600000002"}',
      now(), now(), '', '', '', '');
@@ -59,10 +59,10 @@ begin
   insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
   values
     (gen_random_uuid(), c_admin, c_admin::text,
-     jsonb_build_object('sub', c_admin::text, 'email', 'admin@demo.clevora.ma', 'email_verified', true),
+     jsonb_build_object('sub', c_admin::text, 'email', 'admin@demo.parcolia.ma', 'email_verified', true),
      'email', now(), now(), now()),
     (gen_random_uuid(), c_staff, c_staff::text,
-     jsonb_build_object('sub', c_staff::text, 'email', 'staff@demo.clevora.ma', 'email_verified', true),
+     jsonb_build_object('sub', c_staff::text, 'email', 'staff@demo.parcolia.ma', 'email_verified', true),
      'email', now(), now(), now());
   -- profiles are created by the on_auth_user_created trigger
 
@@ -75,7 +75,7 @@ begin
                                default_franchise, default_deposit,
                                contract_number_prefix, next_contract_number)
   values (c_agency, 'Agence Démo', 'agence-demo', '#0F4C81',
-          '12 Rue Exemple, Quartier Démo', 'Casablanca', '+212522000000', 'contact@demo.clevora.ma',
+          '12 Rue Exemple, Quartier Démo', 'Casablanca', '+212522000000', 'contact@demo.parcolia.ma',
           'RC-DEMO-0001', '000000000000001', 'IF-DEMO-01', 'PAT-DEMO-01', 'CNSS-DEMO-01',
           E'1. Le locataire doit être titulaire d''un permis valide depuis au moins 2 ans.\n'
           || E'2. Le véhicule est rendu avec le même niveau de carburant qu''au départ.\n'

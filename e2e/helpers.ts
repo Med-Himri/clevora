@@ -3,12 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "../src/types/database";
 
 export const DEMO = {
-  admin: { email: "admin@demo.clevora.ma", password: "Demo-Clevora-2026" },
-  staff: { email: "staff@demo.clevora.ma", password: "Demo-Clevora-2026" },
+  admin: { email: "admin@demo.parcolia.ma", password: "Demo-Parcolia-2026" },
+  staff: { email: "staff@demo.parcolia.ma", password: "Demo-Parcolia-2026" },
   agencyName: "Agence Démo",
 };
 
-export const PASSWORD = "Test-Clevora-2026";
+export const PASSWORD = "Test-Parcolia-2026";
 
 export function uid(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
@@ -25,7 +25,7 @@ export function admin() {
 export async function createTestAgency(options: { name?: string; trialEnded?: boolean } = {}) {
   const sb = admin();
   const id = uid();
-  const email = `owner-${id}@test.clevora.ma`;
+  const email = `owner-${id}@test.parcolia.ma`;
   const name = options.name ?? `Agence Test ${id}`;
   const { data: user, error } = await sb.auth.admin.createUser({
     email,

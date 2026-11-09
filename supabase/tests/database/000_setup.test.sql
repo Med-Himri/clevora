@@ -7,7 +7,7 @@ create schema if not exists tests;
 grant usage on schema tests to anon, authenticated, service_role;
 
 -- Fixed ids for the fixture: '<who>_<what>'
---   a_* = Agence A, b_* = Agence B, c_outsider = user without agency, e_platform = Clévora staff
+--   a_* = Agence A, b_* = Agence B, c_outsider = user without agency, e_platform = Parcolia staff
 create or replace function tests.id(p_name text)
 returns uuid
 language sql
@@ -195,7 +195,7 @@ end;
 $$;
 
 -- Two agencies with one row in every table, two users each, an outsider and a
--- Clévora platform admin. Run as superuser at the start of a test file.
+-- Parcolia platform admin. Run as superuser at the start of a test file.
 create or replace function tests.create_fixture()
 returns void
 language plpgsql
@@ -210,7 +210,7 @@ begin
     (tests.id('b_admin'),    'b.admin@test.ma',  '{"full_name":"Admin B"}'),
     (tests.id('b_staff'),    'b.staff@test.ma',  '{"full_name":"Staff B"}'),
     (tests.id('c_outsider'), 'outsider@test.ma', '{"full_name":"Outsider"}'),
-    (tests.id('e_platform'), 'platform@clevora.ma', '{"full_name":"Clévora"}');
+    (tests.id('e_platform'), 'platform@parcolia.ma', '{"full_name":"Parcolia"}');
 
   insert into public.platform_admins (user_id) values (tests.id('e_platform'));
 
