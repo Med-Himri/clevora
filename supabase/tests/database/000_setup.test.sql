@@ -35,6 +35,8 @@ as $$
       when 'doc'         then '000000000108'
       when 'chunk'       then '000000000109'
       when 'invitation'  then '00000000010a'
+      when 'subpay'      then '00000000010b'
+      when 'booking'     then '00000000010c'
     end
   )::uuid
 $$;
@@ -49,7 +51,8 @@ as $$
   values ('agencies','id'), ('agency_members','agency_id'), ('invitations','agency_id'),
          ('vehicles','agency_id'), ('maintenance_periods','agency_id'), ('clients','agency_id'),
          ('reservations','agency_id'), ('reservation_payments','agency_id'), ('charges','agency_id'),
-         ('ai_documents','agency_id'), ('ai_chunks','agency_id'), ('activity_log','agency_id')
+         ('ai_documents','agency_id'), ('ai_chunks','agency_id'), ('activity_log','agency_id'),
+         ('subscription_payments','agency_id'), ('booking_requests','agency_id')
 $$;
 
 -- Act as a logged-in user (like PostgREST does with the JWT)
@@ -163,6 +166,13 @@ begin
     when 'activity_log' then
       insert into public.activity_log (agency_id, actor_id, action, entity)
       values (p_agency, auth.uid(), 'pirate', 'pirate');
+    when 'subscription_payments' then
+      insert into public.subscription_payments (agency_id, plan_id, period, amount, method, reference, status, invoice_number, paid_at)
+      values (p_agency, (select id from public.plans where code = 'illimite'), 'year', 0, 'virement',
+              'PIRATE-' || substr(md5(random()::text), 1, 6), 'paid', 'F-PIRATE-' || substr(md5(random()::text), 1, 6), now());
+    when 'booking_requests' then
+      insert into public.booking_requests (agency_id, full_name, phone, start_date, end_date)
+      values (p_agency, 'Pirate', '0600000000', current_date + 1, current_date + 2);
     else
       raise exception 'unknown table %', p_table;
   end case;
@@ -248,6 +258,12 @@ begin
 
     insert into public.ai_documents (id, agency_id, title, storage_path)
     values (tests.id(x || '_doc'), v_agency, 'Règlement ' || x, v_agency::text || '/ai/reglement.pdf');
+
+    insert into public.subscription_payments (id, agency_id, plan_id, period, amount, method, reference)
+    values (tests.id(x || '_subpay'), v_agency, (select id from public.plans where code = 'pro'), 'month', 599, 'virement', 'PAR-TEST' || upper(x));
+
+    insert into public.booking_requests (id, agency_id, vehicle_id, full_name, phone, start_date, end_date)
+    values (tests.id(x || '_booking'), v_agency, tests.id(x || '_vehicle'), 'Web ' || x, '+212600000010', current_date + 10, current_date + 12);
 
     insert into public.ai_chunks (id, agency_id, document_id, content, embedding)
     values (tests.id(x || '_chunk'), v_agency, tests.id(x || '_doc'), 'Caution de l''agence ' || x,

@@ -87,6 +87,8 @@ export type Database = {
           patente: string | null;
           phone: string | null;
           plan_id: string | null;
+          public_booking_enabled: boolean;
+          public_booking_message: string | null;
           rc: string | null;
           slug: string;
           subscription_status: string;
@@ -125,6 +127,8 @@ export type Database = {
           patente?: string | null;
           phone?: string | null;
           plan_id?: string | null;
+          public_booking_enabled?: boolean;
+          public_booking_message?: string | null;
           rc?: string | null;
           slug: string;
           subscription_status?: string;
@@ -162,6 +166,8 @@ export type Database = {
           patente?: string | null;
           phone?: string | null;
           plan_id?: string | null;
+          public_booking_enabled?: boolean;
+          public_booking_message?: string | null;
           rc?: string | null;
           slug?: string;
           subscription_status?: string;
@@ -329,6 +335,83 @@ export type Database = {
           {
             foreignKeyName: "ai_documents_created_by_fkey";
             columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      booking_requests: {
+        Row: {
+          agency_id: string;
+          created_at: string;
+          delivery_place: string | null;
+          email: string | null;
+          end_date: string;
+          full_name: string;
+          handled_by: string | null;
+          id: string;
+          ip_hash: string | null;
+          message: string | null;
+          phone: string;
+          start_date: string;
+          status: string;
+          updated_at: string;
+          vehicle_id: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          created_at?: string;
+          delivery_place?: string | null;
+          email?: string | null;
+          end_date: string;
+          full_name: string;
+          handled_by?: string | null;
+          id?: string;
+          ip_hash?: string | null;
+          message?: string | null;
+          phone: string;
+          start_date: string;
+          status?: string;
+          updated_at?: string;
+          vehicle_id?: string | null;
+        };
+        Update: {
+          agency_id?: string;
+          created_at?: string;
+          delivery_place?: string | null;
+          email?: string | null;
+          end_date?: string;
+          full_name?: string;
+          handled_by?: string | null;
+          id?: string;
+          ip_hash?: string | null;
+          message?: string | null;
+          phone?: string;
+          start_date?: string;
+          status?: string;
+          updated_at?: string;
+          vehicle_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "booking_requests_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "booking_requests_agency_id_vehicle_id_fkey";
+            columns: ["agency_id", "vehicle_id"];
+            isOneToOne: false;
+            referencedRelation: "vehicles";
+            referencedColumns: ["agency_id", "id"];
+          },
+          {
+            foreignKeyName: "booking_requests_handled_by_fkey";
+            columns: ["handled_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];
@@ -967,6 +1050,99 @@ export type Database = {
           },
         ];
       };
+      subscription_payments: {
+        Row: {
+          agency_id: string;
+          amount: number;
+          confirmed_by: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          invoice_number: string | null;
+          method: string;
+          paid_at: string | null;
+          period: string;
+          period_end: string | null;
+          period_start: string | null;
+          plan_id: string;
+          provider: string;
+          provider_ref: string | null;
+          reference: string;
+          status: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          amount: number;
+          confirmed_by?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          invoice_number?: string | null;
+          method: string;
+          paid_at?: string | null;
+          period: string;
+          period_end?: string | null;
+          period_start?: string | null;
+          plan_id: string;
+          provider?: string;
+          provider_ref?: string | null;
+          reference: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          agency_id?: string;
+          amount?: number;
+          confirmed_by?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          invoice_number?: string | null;
+          method?: string;
+          paid_at?: string | null;
+          period?: string;
+          period_end?: string | null;
+          period_start?: string | null;
+          plan_id?: string;
+          provider?: string;
+          provider_ref?: string | null;
+          reference?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "subscription_payments_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscription_payments_confirmed_by_fkey";
+            columns: ["confirmed_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscription_payments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "subscription_payments_plan_id_fkey";
+            columns: ["plan_id"];
+            isOneToOne: false;
+            referencedRelation: "plans";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       vehicles: {
         Row: {
           agency_id: string;
@@ -1118,6 +1294,10 @@ export type Database = {
           used: number;
         }[];
       };
+      confirm_subscription_payment: {
+        Args: { p_payment: string; p_provider_ref?: string };
+        Returns: string;
+      };
       create_agency: {
         Args: {
           p_brand_color?: string;
@@ -1173,6 +1353,7 @@ export type Database = {
       };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
+      public_agency: { Args: { p_slug: string }; Returns: Json };
       rental_day_rows: {
         Args: { p_agency: string; p_from: string; p_to: string };
         Returns: {
@@ -1183,6 +1364,14 @@ export type Database = {
         }[];
       };
       rental_days: { Args: { p_end: string; p_start: string }; Returns: number };
+      request_subscription: {
+        Args: { p_agency: string; p_method: string; p_period: string; p_plan_code: string };
+        Returns: {
+          amount: number;
+          id: string;
+          reference: string;
+        }[];
+      };
       reservation_days: { Args: { p_end_at: string; p_start_at: string }; Returns: unknown };
       return_reservation: {
         Args: { p: Json; p_agency: string; p_reservation: string };

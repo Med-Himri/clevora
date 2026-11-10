@@ -1,7 +1,7 @@
 -- A user of agency A can NOT read or write any row of agency B — on every table.
 begin;
 set local search_path = public, extensions, tests;
-select plan(129);
+select plan(149);
 
 select tests.create_fixture();
 
