@@ -295,11 +295,85 @@
       "oil": "Vidange de {car} dans {km} km",
       "oilDue": "Vidange à faire : {car}",
       "maintenanceLate": "{car} : retour de maintenance prévu le {date}, toujours au garage"
-    }
+    },
+    "newRequests": "{count, plural, one {# nouvelle demande de réservation en ligne} other {# nouvelles demandes de réservation en ligne}}"
   },
   "billing": {
     "title": "Abonnement",
-    "comingSoon": "Les forfaits et le paiement arrivent bientôt. Pour activer votre agence dès maintenant, contactez l'équipe Parcolia."
+    "subtitle": "Votre forfait, votre utilisation et vos factures.",
+    "close": "Fermer",
+    "period": "Durée",
+    "monthly": "Mensuel",
+    "yearly": "Annuel",
+    "yearlyHint": "2 mois offerts",
+    "current": "Votre forfait",
+    "popular": "Le plus choisi",
+    "perMonth": "/ mois",
+    "perYear": "/ an",
+    "features": {
+      "cars": "{count, plural, one {# voiture} other {# voitures}}",
+      "carsUnlimited": "Voitures illimitées",
+      "users": "{count, plural, one {# utilisateur} other {# utilisateurs}}",
+      "usersUnlimited": "Utilisateurs illimités",
+      "contracts": "Contrats PDF, planning, alertes",
+      "ai": "Assistant IA ({count} questions / mois)"
+    },
+    "choose": "Choisir {plan}",
+    "renew": "Renouveler",
+    "payTitle": "Forfait {plan}",
+    "payMonth": "1 mois",
+    "payYear": "1 an",
+    "howPay": "Comment voulez-vous payer ?",
+    "methods": {
+      "virement": "Virement",
+      "especes": "Espèces",
+      "cheque": "Chèque",
+      "carte": "Carte"
+    },
+    "payHint": "Vous recevrez une référence à indiquer avec votre paiement. Votre forfait est activé dès que Parcolia reçoit l'argent.",
+    "confirmRequest": "Valider ma demande",
+    "requested": "Demande enregistrée. Suivez les instructions de paiement.",
+    "pendingTitle": "Paiement en attente",
+    "pendingBody": "Forfait {plan} :",
+    "reference": "Référence à indiquer",
+    "beneficiary": "Bénéficiaire",
+    "bank": "Banque",
+    "rib": "RIB",
+    "phone": "Téléphone",
+    "pendingHint": "Indiquez la référence dans le motif du virement. Le forfait est activé dès réception (en général sous 24 h ouvrées).",
+    "currentPlan": "Forfait {plan}",
+    "statusBadge": {
+      "trial": "Essai",
+      "active": "Actif",
+      "past_due": "Paiement en retard",
+      "suspended": "Suspendu",
+      "cancelled": "Résilié"
+    },
+    "status": {
+      "trial": "Essai gratuit en cours.",
+      "trialUntil": "Essai gratuit jusqu'au {date}.",
+      "active": "Abonnement actif.",
+      "activeUntil": "Abonnement payé jusqu'au {date}.",
+      "past_due": "Le paiement est en retard : l'application reste ouverte quelques jours.",
+      "suspended": "L'agence est suspendue : l'application est en lecture seule.",
+      "cancelled": "L'abonnement est résilié : l'application est en lecture seule."
+    },
+    "readOnly": "Votre agence est en lecture seule : vous pouvez tout consulter, mais plus rien modifier. Choisissez un forfait pour continuer.",
+    "usage": {
+      "cars": "Voitures actives",
+      "users": "Membres",
+      "ai": "Questions IA ce mois-ci"
+    },
+    "plansTitle": "Choisir un forfait",
+    "pricesTtc": "Prix en MAD, TVA comprise. Sans engagement : vous payez au mois ou à l'année.",
+    "historyTitle": "Paiements et factures",
+    "historyEmpty": "Aucun paiement pour l'instant.",
+    "invoice": "Facture",
+    "payStatus": {
+      "pending": "En attente",
+      "paid": "Payé",
+      "cancelled": "Annulé"
+    }
   },
   "account": {
     "title": "Mon compte",
@@ -811,7 +885,8 @@
       "amount": "Montant",
       "kind": "Type",
       "savePayment": "Enregistrer le paiement"
-    }
+    },
+    "onlineRequests": "Demandes en ligne"
   },
   "contracts": {
     "title": "Contrats",
@@ -1140,7 +1215,8 @@
       "alerts": "Alertes",
       "assistant": "Assistant IA",
       "display": "Affichage",
-      "data": "Données"
+      "data": "Données",
+      "booking": "Réservation en ligne"
     },
     "descriptions": {
       "agency": "Nom, logo, couleur et coordonnées : affichés dans l'application et sur les contrats.",
@@ -1149,7 +1225,8 @@
       "alerts": "Quand prévenir pour l'assurance, la visite technique et la vidange, et qui reçoit les e-mails.",
       "assistant": "Autoriser ou non l'assistant IA dans votre agence.",
       "display": "Langue et thème, pour vous seulement.",
-      "data": "Télécharger toutes vos données ou supprimer l'agence."
+      "data": "Télécharger toutes vos données ou supprimer l'agence.",
+      "booking": "Une page publique avec vos voitures et vos prix, où les clients envoient une demande."
     },
     "agency": {
       "name": "Nom de l'agence",
@@ -1214,6 +1291,234 @@
       "typeName": "Pour confirmer, écrivez le nom de l'agence : {name}",
       "deleteForever": "Supprimer définitivement",
       "deleted": "L'agence a été supprimée."
+    },
+    "booking": {
+      "enabled": "Ouvrir la page de réservation en ligne ?",
+      "link": "Lien de votre page",
+      "linkHint": "Partagez-le sur WhatsApp, Instagram, Facebook ou Google. Les plaques ne sont jamais affichées.",
+      "message": "Message d'accueil (facultatif)",
+      "messageHint": "Par exemple vos horaires ou la livraison gratuite à l'aéroport."
     }
+  },
+  "platform": {
+    "title": "Espace Parcolia",
+    "subtitle": "Toutes les agences, leurs abonnements et les paiements à valider.",
+    "badge": "Équipe",
+    "role": "Équipe Parcolia",
+    "tiles": {
+      "agencies": "Agences",
+      "trial": "En essai",
+      "paying": "Payantes",
+      "readOnly": "En lecture seule"
+    },
+    "pendingTitle": "Paiements à valider",
+    "pendingNone": "Aucun paiement en attente.",
+    "month": "mois",
+    "year": "an",
+    "methods": {
+      "virement": "Virement",
+      "especes": "Espèces",
+      "cheque": "Chèque",
+      "carte": "Carte"
+    },
+    "confirmPayment": "Paiement reçu",
+    "cancelPayment": "Annuler",
+    "confirmTitle": "Confirmer ce paiement ?",
+    "confirmBody": "{label}. La facture est créée et le forfait activé.",
+    "confirmed": "Paiement validé. Facture {invoice}.",
+    "cancelled": "Demande annulée.",
+    "agenciesTitle": "Agences",
+    "search": "Nom, ville ou adresse /r/…",
+    "agency": "Agence",
+    "status": "Statut",
+    "plan": "Forfait",
+    "until": "Jusqu'au",
+    "cars": "Voitures",
+    "members": "Membres",
+    "reservations30": "Réservations (30 j)",
+    "readOnly": "lecture seule",
+    "statuses": {
+      "trial": "Essai",
+      "active": "Actif",
+      "past_due": "En retard",
+      "suspended": "Suspendu",
+      "cancelled": "Résilié"
+    },
+    "back": "Toutes les agences",
+    "since": "cliente depuis le {date}",
+    "subscription": "Abonnement",
+    "trialEnds": "Fin de l'essai",
+    "periodEnds": "Payé jusqu'au",
+    "save": "Enregistrer",
+    "usage": "Utilisation",
+    "membersTitle": "Membres",
+    "paymentsTitle": "Paiements",
+    "paymentsNone": "Aucun paiement.",
+    "invoice": "Facture",
+    "payStatus": {
+      "pending": "En attente",
+      "paid": "Payé",
+      "cancelled": "Annulé"
+    }
+  },
+  "marketing": {
+    "metaTitle": "Parcolia — logiciel de gestion pour agences de location de voitures au Maroc",
+    "metaDescription": "Réservations, contrats PDF, planning, vidange, assurance, charges et statistiques. En français et en arabe, sur téléphone et ordinateur. Essai gratuit 14 jours.",
+    "navLabel": "Menu",
+    "navPricing": "Tarifs",
+    "login": "Se connecter",
+    "tryFree": "Essai gratuit",
+    "badge": "Fait pour les agences de location au Maroc",
+    "heroTitle": "Votre agence de location, simplement.",
+    "heroBody": "Réservations, contrats, planning, vidange, assurance et argent : tout au même endroit, sur le téléphone comme sur l'ordinateur. En français et en arabe.",
+    "ctaTrial": "Essayer gratuitement 14 jours",
+    "ctaFeatures": "Voir les fonctions",
+    "noCard": "Sans carte bancaire. Vos données restent à vous.",
+    "featuresTitle": "Tout ce qu'il faut, rien de compliqué",
+    "featuresBody": "Pensé avec des loueurs : de grands boutons, des mots simples, et ce qui est urgent toujours en premier.",
+    "features": {
+      "contracts": {
+        "title": "Réservations et contrats",
+        "body": "Une réservation en quelques étapes, le contrat PDF à votre nom prêt à signer et à envoyer sur WhatsApp."
+      },
+      "planning": {
+        "title": "Planning",
+        "body": "Voyez d'un coup d'œil quelle voiture est libre, réservée ou en entretien. Fini les doubles réservations."
+      },
+      "fleet": {
+        "title": "Parc auto",
+        "body": "Chaque voiture avec son kilométrage, ses papiers et son historique. Import depuis Excel."
+      },
+      "alerts": {
+        "title": "Alertes vidange et assurance",
+        "body": "Un e-mail chaque matin pour l'assurance, la visite technique, la vidange et les retours en retard."
+      },
+      "money": {
+        "title": "Charges et statistiques",
+        "body": "Chiffre d'affaires, charges et bénéfice par voiture et par mois. Réservé aux administrateurs."
+      },
+      "team": {
+        "title": "Équipe",
+        "body": "Invitez vos employés. Ils travaillent sans voir l'argent ; vous gardez la main."
+      },
+      "assistant": {
+        "title": "Assistant IA",
+        "body": "« Qui avait la 12345-A-6 hier à 15h ? » Posez la question, l'assistant cherche pour vous."
+      },
+      "mobile": {
+        "title": "Sur le téléphone",
+        "body": "Utilisable au parking comme au bureau : tout tient sur un petit écran."
+      },
+      "languages": {
+        "title": "Français et arabe",
+        "body": "Chaque employé choisit sa langue. Les contrats peuvent être bilingues."
+      }
+    },
+    "stepsTitle": "Prêt en 10 minutes",
+    "steps": {
+      "1": {
+        "title": "Créez votre agence",
+        "body": "Nom, logo et couleur : l'application et les contrats sont à votre image."
+      },
+      "2": {
+        "title": "Ajoutez vos voitures",
+        "body": "Une par une ou d'un coup depuis un fichier Excel."
+      },
+      "3": {
+        "title": "Faites votre première réservation",
+        "body": "Le contrat PDF est prêt. Invitez ensuite votre équipe."
+      }
+    },
+    "pricingTitle": "Des prix simples",
+    "pricingBody": "Commencez gratuitement pendant 14 jours, puis choisissez le forfait qui suit la taille de votre parc.",
+    "perMonth": "/ mois",
+    "orYear": "ou à l'année :",
+    "plan": {
+      "cars": "{count, plural, one {Jusqu'à # voiture} other {Jusqu'à # voitures}}",
+      "carsUnlimited": "Voitures illimitées",
+      "users": "{count, plural, one {# utilisateur} other {# utilisateurs}}",
+      "usersUnlimited": "Utilisateurs illimités",
+      "contracts": "Contrats PDF, planning et alertes",
+      "ai": "Assistant IA ({count} questions / mois)"
+    },
+    "pricesTtc": "Prix en MAD, TVA comprise. Paiement par virement, espèces ou chèque.",
+    "faqTitle": "Questions fréquentes",
+    "faq": {
+      "1": {
+        "q": "Faut-il installer quelque chose ?",
+        "a": "Non. Parcolia s'ouvre dans le navigateur, sur téléphone, tablette ou ordinateur."
+      },
+      "2": {
+        "q": "Mes employés voient-ils mon chiffre d'affaires ?",
+        "a": "Non. Les employés font le travail quotidien (réservations, contrats, parc) mais ne voient ni l'argent ni les statistiques."
+      },
+      "3": {
+        "q": "Que se passe-t-il à la fin de l'essai ?",
+        "a": "Rien n'est perdu. Sans forfait, l'agence passe en lecture seule jusqu'au paiement."
+      },
+      "4": {
+        "q": "Mes données sont-elles protégées ?",
+        "a": "Chaque agence ne voit que ses propres données. Vous pouvez tout télécharger en Excel ou supprimer votre agence à tout moment."
+      },
+      "5": {
+        "q": "Puis-je recevoir des réservations en ligne ?",
+        "a": "Oui : activez votre page de réservation et partagez le lien. Les demandes arrivent dans l'application."
+      }
+    },
+    "finalTitle": "Essayez Parcolia avec votre agence dès aujourd'hui.",
+    "footer": "Logiciel de gestion pour agences de location de voitures"
+  },
+  "publicBooking": {
+    "title": "Réserver une voiture",
+    "metaDescription": "Location de voitures {name} {city} : choisissez votre voiture et envoyez votre demande en ligne.",
+    "carsTitle": "Nos voitures",
+    "conditions": "Conducteur de {age} ans minimum, permis et pièce d'identité demandés.",
+    "noCars": "Aucune voiture disponible en ligne pour le moment. Appelez-nous.",
+    "from": "À partir de",
+    "perDay": "/ jour",
+    "bookThis": "Demander cette voiture",
+    "formTitle": "Demande de réservation",
+    "start": "Date de départ",
+    "end": "Date de retour",
+    "car": "Voiture",
+    "anyCar": "Peu importe / à conseiller",
+    "name": "Nom complet",
+    "phone": "Téléphone",
+    "email": "E-mail (facultatif)",
+    "place": "Lieu de livraison (facultatif)",
+    "placeHint": "Ex. : aéroport, gare, hôtel",
+    "message": "Message (facultatif)",
+    "send": "Envoyer ma demande",
+    "privacy": "Vos coordonnées servent seulement à l'agence pour vous rappeler et confirmer la location.",
+    "doneTitle": "Demande envoyée",
+    "doneBody": "Merci ! L'agence vous appelle pour confirmer la disponibilité et le prix.",
+    "poweredBy": "Propulsé par",
+    "errors": {
+      "invalidForm": "Vérifiez les champs en rouge.",
+      "robot": "La vérification anti-robot a échoué. Rechargez la page et réessayez.",
+      "tooMany": "Trop de demandes. Réessayez dans une heure ou appelez l'agence.",
+      "notFound": "Cette page de réservation n'est plus disponible.",
+      "unknown": "La demande n'a pas pu être envoyée. Réessayez ou appelez l'agence."
+    }
+  },
+  "requests": {
+    "title": "Demandes en ligne",
+    "subtitle": "Les demandes envoyées depuis votre page de réservation. Rappelez le client, puis créez la réservation.",
+    "empty": "Aucune demande pour l'instant",
+    "emptyOpen": "Partagez le lien de votre page de réservation (Paramètres > Réservation en ligne).",
+    "emptyClosed": "La page de réservation en ligne n'est pas ouverte. Un administrateur peut l'ouvrir dans Paramètres.",
+    "emptyClosedAdmin": "Ouvrez votre page de réservation en ligne pour recevoir des demandes de clients.",
+    "open": "Ouvrir ma page",
+    "status": {
+      "new": "Nouvelle",
+      "handled": "Traitée",
+      "declined": "Refusée"
+    },
+    "anyCar": "Voiture au choix de l'agence",
+    "place": "Livraison : {place}",
+    "create": "Créer la réservation",
+    "handled": "Marquer traitée",
+    "decline": "Refuser",
+    "reopen": "Remettre en nouvelle"
   }
 }

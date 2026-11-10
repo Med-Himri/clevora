@@ -1,7 +1,7 @@
 -- SaaS: subscription requests/confirmation, invoices, public booking page and requests.
 begin;
 set local search_path = public, extensions, tests;
-select plan(17);
+select plan(19);
 
 select tests.create_fixture();
 
@@ -55,6 +55,12 @@ insert into public.booking_requests (agency_id, full_name, phone, start_date, en
 values (tests.id('a_agency'), 'Client Web', '+212600000009', current_date + 1, current_date + 3);
 select tests.authenticate_as(tests.id('b_staff'));
 select is((select count(*)::int from public.booking_requests where agency_id = tests.id('a_agency')), 0, 'other agencies never see the requests');
+
+-- Platform overview ------------------------------------------------------------------
+select tests.authenticate_as(tests.id('a_admin'));
+select throws_ok($$ select * from public.platform_overview() $$, '42501', null, 'agency admins cannot list all agencies');
+select tests.authenticate_as(tests.id('e_platform'));
+select ok((select count(*) >= 2 from public.platform_overview()), 'Parcolia sees every agency');
 
 select * from finish();
 rollback;

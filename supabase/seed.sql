@@ -15,6 +15,7 @@ declare
   c_agency   constant uuid := 'd0000000-0000-4000-8000-000000000001';
   c_admin    constant uuid := 'd0000000-0000-4000-8000-0000000000a1';
   c_staff    constant uuid := 'd0000000-0000-4000-8000-0000000000a2';
+  c_platform constant uuid := 'd0000000-0000-4000-8000-0000000000e1';
   v_doc      uuid;
   v_today    date := (now() at time zone 'Africa/Casablanca')::date;
   v_pro      uuid;
@@ -55,6 +56,11 @@ begin
      'staff@demo.parcolia.ma', extensions.crypt('Demo-Parcolia-2026', extensions.gen_salt('bf')), now(),
      '{"provider":"email","providers":["email"]}',
      '{"full_name":"Salma Idrissi (démo)","phone":"+212600000002"}',
+     now(), now(), '', '', '', ''),
+    ('00000000-0000-0000-0000-000000000000', c_platform, 'authenticated', 'authenticated',
+     'platform@demo.parcolia.ma', extensions.crypt('Demo-Parcolia-2026', extensions.gen_salt('bf')), now(),
+     '{"provider":"email","providers":["email"]}',
+     '{"full_name":"Équipe Parcolia (démo)"}',
      now(), now(), '', '', '', '');
 
   insert into auth.identities (id, user_id, provider_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
@@ -64,7 +70,12 @@ begin
      'email', now(), now(), now()),
     (gen_random_uuid(), c_staff, c_staff::text,
      jsonb_build_object('sub', c_staff::text, 'email', 'staff@demo.parcolia.ma', 'email_verified', true),
+     'email', now(), now(), now()),
+    (gen_random_uuid(), c_platform, c_platform::text,
+     jsonb_build_object('sub', c_platform::text, 'email', 'platform@demo.parcolia.ma', 'email_verified', true),
      'email', now(), now(), now());
+  -- Parcolia staff (local demo only): opens /platform
+  insert into public.platform_admins (user_id) values (c_platform);
   -- profiles are created by the on_auth_user_created trigger
 
   -- -------------------------------------------------------------------------

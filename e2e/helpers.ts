@@ -117,3 +117,14 @@ export async function addVehicle(agencyId: string, values: { plate: string; bran
   if (error || !data) throw error ?? new Error("insert vehicle failed");
   return data.id;
 }
+
+/** A Parcolia staff account (public.platform_admins), with no agency. */
+export async function createPlatformAdmin() {
+  const sb = admin();
+  const email = `parcolia-${uid()}@test.parcolia.ma`;
+  const { data, error } = await sb.auth.admin.createUser({ email, password: PASSWORD, email_confirm: true, user_metadata: { full_name: "Équipe Parcolia" } });
+  if (error || !data.user) throw error ?? new Error("createUser failed");
+  const { error: e2 } = await sb.from("platform_admins").insert({ user_id: data.user.id });
+  if (e2) throw e2;
+  return { email, password: PASSWORD, userId: data.user.id };
+}

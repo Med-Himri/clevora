@@ -7,6 +7,7 @@ import {
   CornerDownLeftIcon,
   DropletIcon,
   FileSignatureIcon,
+  GlobeIcon,
   LogOutIcon,
   PhoneIcon,
   PlusIcon,
@@ -43,7 +44,10 @@ export default async function DashboardPage() {
   const format = await getFormatter();
   const supabase = await createClient();
   const now = new Date();
-  const d = await getDashboard(supabase, agency.id, isAdmin, now);
+  const [d, { count: newRequests }] = await Promise.all([
+    getDashboard(supabase, agency.id, isAdmin, now),
+    supabase.from("booking_requests").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "new"),
+  ]);
 
   const row = (r: DashboardReservation, kind: "return" | "departure") => {
     const at = kind === "return" ? r.end_at : r.start_at;
@@ -132,6 +136,18 @@ export default async function DashboardPage() {
           </Button>
         }
       />
+
+      {newRequests ? (
+        <Link
+          href="/reservations/requests"
+          className="mb-4 flex min-h-12 items-center gap-3 rounded-xl border border-warning/40 bg-warning-soft px-4 py-2 font-semibold"
+          data-testid="dash-requests"
+        >
+          <GlobeIcon className="size-5 shrink-0 text-warning" aria-hidden />
+          <span className="flex-1">{t("newRequests", { count: newRequests })}</span>
+          <ArrowUpRightIcon className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden />
+        </Link>
+      ) : null}
 
       <ul className={cn("grid grid-cols-2 gap-3 md:grid-cols-3", isAdmin ? "2xl:grid-cols-6" : "2xl:grid-cols-5")}>
         <li><StatTile label={t("tiles.available")} value={d.stats.available} icon={CircleCheckIcon} tone="success" href="/fleet?tab=available" testId="stat-available" /></li>

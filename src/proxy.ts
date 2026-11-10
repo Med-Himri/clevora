@@ -7,7 +7,7 @@ import type { Database } from "@/types/database";
 const intl = createIntlMiddleware(routing);
 
 /** Pages anyone can open without being logged in. */
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/check-email", "/invite"];
+const PUBLIC_PATHS = ["/", "/r", "/login", "/signup", "/forgot-password", "/reset-password", "/check-email", "/invite"];
 /** Pages that make no sense once logged in. */
 const GUEST_ONLY_PATHS = ["/login", "/forgot-password", "/check-email"];
 

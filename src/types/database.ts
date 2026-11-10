@@ -1352,6 +1352,26 @@ export type Database = {
         }[];
       };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
+      platform_overview: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          city: string;
+          created_at: string;
+          current_period_end: string;
+          id: string;
+          members: number;
+          name: string;
+          pending_payments: number;
+          plan_code: string;
+          plan_name: string;
+          reservations_30d: number;
+          slug: string;
+          subscription_status: string;
+          trial_ends_at: string;
+          vehicles: number;
+          writable: boolean;
+        }[];
+      };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
       public_agency: { Args: { p_slug: string }; Returns: Json };
       rental_day_rows: {

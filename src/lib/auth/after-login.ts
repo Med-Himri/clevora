@@ -25,7 +25,9 @@ export async function redirectAfterLogin(supabase: ServerSupabase, userId: strin
     // Logging in to accept an invitation: go straight back to it.
     redirect({ href: target, locale });
   } else if (ids.length === 0) {
-    redirect({ href: "/signup", locale });
+    // Parcolia staff without an agency go to their own area.
+    const { data: platform } = await supabase.rpc("is_platform_admin");
+    redirect({ href: platform === true ? "/platform" : "/signup", locale });
   } else if (ids.length === 1) {
     cookieStore.set(ACTIVE_AGENCY_COOKIE, ids[0], ACTIVE_AGENCY_COOKIE_OPTIONS);
     redirect({ href: target, locale });

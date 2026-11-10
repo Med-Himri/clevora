@@ -295,11 +295,85 @@
       "oil": "Oil change of {car} in {km} km",
       "oilDue": "Oil change due: {car}",
       "maintenanceLate": "{car}: expected back from maintenance on {date}, still at the garage"
-    }
+    },
+    "newRequests": "{count, plural, one {# new online booking request} other {# new online booking requests}}"
   },
   "billing": {
     "title": "Subscription",
-    "comingSoon": "Plans and payment are coming soon. To activate your agency now, contact the Parcolia team."
+    "subtitle": "Your plan, your usage and your invoices.",
+    "close": "Close",
+    "period": "Duration",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "yearlyHint": "2 months free",
+    "current": "Your plan",
+    "popular": "Most chosen",
+    "perMonth": "/ month",
+    "perYear": "/ year",
+    "features": {
+      "cars": "{count, plural, one {# car} other {# cars}}",
+      "carsUnlimited": "Unlimited cars",
+      "users": "{count, plural, one {# user} other {# users}}",
+      "usersUnlimited": "Unlimited users",
+      "contracts": "PDF contracts, planning, alerts",
+      "ai": "AI assistant ({count} questions / month)"
+    },
+    "choose": "Choose {plan}",
+    "renew": "Renew",
+    "payTitle": "{plan} plan",
+    "payMonth": "1 month",
+    "payYear": "1 year",
+    "howPay": "How do you want to pay?",
+    "methods": {
+      "virement": "Bank transfer",
+      "especes": "Cash",
+      "cheque": "Cheque",
+      "carte": "Card"
+    },
+    "payHint": "You will get a reference to quote with your payment. Your plan is turned on as soon as Parcolia receives the money.",
+    "confirmRequest": "Confirm my request",
+    "requested": "Request saved. Follow the payment instructions.",
+    "pendingTitle": "Payment pending",
+    "pendingBody": "{plan} plan:",
+    "reference": "Reference to quote",
+    "beneficiary": "Beneficiary",
+    "bank": "Bank",
+    "rib": "RIB",
+    "phone": "Phone",
+    "pendingHint": "Write the reference in the transfer description. The plan is turned on when the money arrives (usually within 1 working day).",
+    "currentPlan": "{plan} plan",
+    "statusBadge": {
+      "trial": "Trial",
+      "active": "Active",
+      "past_due": "Payment late",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled"
+    },
+    "status": {
+      "trial": "Free trial running.",
+      "trialUntil": "Free trial until {date}.",
+      "active": "Subscription active.",
+      "activeUntil": "Subscription paid until {date}.",
+      "past_due": "The payment is late: the app stays open for a few days.",
+      "suspended": "The agency is suspended: the app is read-only.",
+      "cancelled": "The subscription is cancelled: the app is read-only."
+    },
+    "readOnly": "Your agency is read-only: you can see everything but change nothing. Choose a plan to continue.",
+    "usage": {
+      "cars": "Active cars",
+      "users": "Members",
+      "ai": "AI questions this month"
+    },
+    "plansTitle": "Choose a plan",
+    "pricesTtc": "Prices in MAD, VAT included. No commitment: pay monthly or yearly.",
+    "historyTitle": "Payments and invoices",
+    "historyEmpty": "No payments yet.",
+    "invoice": "Invoice",
+    "payStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    }
   },
   "account": {
     "title": "My account",
@@ -811,7 +885,8 @@
       "amount": "Amount",
       "kind": "Type",
       "savePayment": "Save payment"
-    }
+    },
+    "onlineRequests": "Online requests"
   },
   "contracts": {
     "title": "Contracts",
@@ -1140,7 +1215,8 @@
       "alerts": "Alerts",
       "assistant": "AI assistant",
       "display": "Display",
-      "data": "Data"
+      "data": "Data",
+      "booking": "Online booking"
     },
     "descriptions": {
       "agency": "Name, logo, colour and contact details: shown in the app and on contracts.",
@@ -1149,7 +1225,8 @@
       "alerts": "When to warn about insurance, technical inspection and oil changes, and who gets the emails.",
       "assistant": "Allow the AI assistant in your agency or not.",
       "display": "Language and theme, for you only.",
-      "data": "Download all your data or delete the agency."
+      "data": "Download all your data or delete the agency.",
+      "booking": "A public page with your cars and prices, where clients send a request."
     },
     "agency": {
       "name": "Agency name",
@@ -1214,6 +1291,234 @@
       "typeName": "To confirm, type the agency name: {name}",
       "deleteForever": "Delete for good",
       "deleted": "The agency was deleted."
+    },
+    "booking": {
+      "enabled": "Open the online booking page?",
+      "link": "Link to your page",
+      "linkHint": "Share it on WhatsApp, Instagram, Facebook or Google. Plates are never shown.",
+      "message": "Welcome message (optional)",
+      "messageHint": "For example your opening hours or free airport delivery."
     }
+  },
+  "platform": {
+    "title": "Parcolia area",
+    "subtitle": "Every agency, their subscriptions and the payments to confirm.",
+    "badge": "Team",
+    "role": "Parcolia team",
+    "tiles": {
+      "agencies": "Agencies",
+      "trial": "On trial",
+      "paying": "Paying",
+      "readOnly": "Read-only"
+    },
+    "pendingTitle": "Payments to confirm",
+    "pendingNone": "No pending payments.",
+    "month": "month",
+    "year": "year",
+    "methods": {
+      "virement": "Bank transfer",
+      "especes": "Cash",
+      "cheque": "Cheque",
+      "carte": "Card"
+    },
+    "confirmPayment": "Payment received",
+    "cancelPayment": "Cancel",
+    "confirmTitle": "Confirm this payment?",
+    "confirmBody": "{label}. The invoice is created and the plan turned on.",
+    "confirmed": "Payment confirmed. Invoice {invoice}.",
+    "cancelled": "Request cancelled.",
+    "agenciesTitle": "Agencies",
+    "search": "Name, city or /r/ address…",
+    "agency": "Agency",
+    "status": "Status",
+    "plan": "Plan",
+    "until": "Until",
+    "cars": "Cars",
+    "members": "Members",
+    "reservations30": "Bookings (30 d)",
+    "readOnly": "read-only",
+    "statuses": {
+      "trial": "Trial",
+      "active": "Active",
+      "past_due": "Late",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled"
+    },
+    "back": "All agencies",
+    "since": "customer since {date}",
+    "subscription": "Subscription",
+    "trialEnds": "Trial ends",
+    "periodEnds": "Paid until",
+    "save": "Save",
+    "usage": "Usage",
+    "membersTitle": "Members",
+    "paymentsTitle": "Payments",
+    "paymentsNone": "No payments.",
+    "invoice": "Invoice",
+    "payStatus": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    }
+  },
+  "marketing": {
+    "metaTitle": "Parcolia — management software for car rental agencies in Morocco",
+    "metaDescription": "Bookings, PDF contracts, planning, oil changes, insurance, expenses and statistics. In French and Arabic, on phone and computer. 14-day free trial.",
+    "navLabel": "Menu",
+    "navPricing": "Pricing",
+    "login": "Log in",
+    "tryFree": "Free trial",
+    "badge": "Made for rental agencies in Morocco",
+    "heroTitle": "Your rental agency, made simple.",
+    "heroBody": "Bookings, contracts, planning, oil changes, insurance and money: all in one place, on the phone as on the computer. In French and Arabic.",
+    "ctaTrial": "Try it free for 14 days",
+    "ctaFeatures": "See the features",
+    "noCard": "No credit card. Your data stays yours.",
+    "featuresTitle": "Everything you need, nothing complicated",
+    "featuresBody": "Built with rental agencies: big buttons, plain words, and what is urgent always first.",
+    "features": {
+      "contracts": {
+        "title": "Bookings and contracts",
+        "body": "A booking in a few steps, the PDF contract in your name ready to sign and send on WhatsApp."
+      },
+      "planning": {
+        "title": "Planning",
+        "body": "See at a glance which car is free, booked or in maintenance. No more double bookings."
+      },
+      "fleet": {
+        "title": "Fleet",
+        "body": "Every car with its mileage, papers and history. Import from Excel."
+      },
+      "alerts": {
+        "title": "Oil change and insurance alerts",
+        "body": "An email every morning for insurance, technical inspection, oil changes and late returns."
+      },
+      "money": {
+        "title": "Expenses and statistics",
+        "body": "Revenue, expenses and profit per car and per month. Admins only."
+      },
+      "team": {
+        "title": "Team",
+        "body": "Invite your staff. They work without seeing the money; you stay in control."
+      },
+      "assistant": {
+        "title": "AI assistant",
+        "body": "“Who had 12345-A-6 yesterday at 3 pm?” Ask, the assistant looks it up for you."
+      },
+      "mobile": {
+        "title": "On the phone",
+        "body": "Works in the parking lot as at the desk: everything fits on a small screen."
+      },
+      "languages": {
+        "title": "French and Arabic",
+        "body": "Each employee picks their language. Contracts can be bilingual."
+      }
+    },
+    "stepsTitle": "Ready in 10 minutes",
+    "steps": {
+      "1": {
+        "title": "Create your agency",
+        "body": "Name, logo and colour: the app and contracts look like you."
+      },
+      "2": {
+        "title": "Add your cars",
+        "body": "One by one or all at once from an Excel file."
+      },
+      "3": {
+        "title": "Make your first booking",
+        "body": "The PDF contract is ready. Then invite your team."
+      }
+    },
+    "pricingTitle": "Simple prices",
+    "pricingBody": "Start free for 14 days, then choose the plan that fits the size of your fleet.",
+    "perMonth": "/ month",
+    "orYear": "or yearly:",
+    "plan": {
+      "cars": "{count, plural, one {Up to # car} other {Up to # cars}}",
+      "carsUnlimited": "Unlimited cars",
+      "users": "{count, plural, one {# user} other {# users}}",
+      "usersUnlimited": "Unlimited users",
+      "contracts": "PDF contracts, planning and alerts",
+      "ai": "AI assistant ({count} questions / month)"
+    },
+    "pricesTtc": "Prices in MAD, VAT included. Pay by bank transfer, cash or cheque.",
+    "faqTitle": "Frequently asked questions",
+    "faq": {
+      "1": {
+        "q": "Do I need to install anything?",
+        "a": "No. Parcolia opens in the browser, on phone, tablet or computer."
+      },
+      "2": {
+        "q": "Can my staff see my revenue?",
+        "a": "No. Staff do the daily work (bookings, contracts, fleet) but see neither money nor statistics."
+      },
+      "3": {
+        "q": "What happens at the end of the trial?",
+        "a": "Nothing is lost. Without a plan, the agency becomes read-only until payment."
+      },
+      "4": {
+        "q": "Is my data protected?",
+        "a": "Each agency only sees its own data. You can download everything as Excel or delete your agency at any time."
+      },
+      "5": {
+        "q": "Can I get bookings online?",
+        "a": "Yes: turn on your booking page and share the link. Requests arrive in the app."
+      }
+    },
+    "finalTitle": "Try Parcolia with your agency today.",
+    "footer": "Management software for car rental agencies"
+  },
+  "publicBooking": {
+    "title": "Book a car",
+    "metaDescription": "Car rental {name} {city}: choose your car and send your request online.",
+    "carsTitle": "Our cars",
+    "conditions": "Driver aged {age} or more, licence and ID required.",
+    "noCars": "No cars available online right now. Call us.",
+    "from": "From",
+    "perDay": "/ day",
+    "bookThis": "Ask for this car",
+    "formTitle": "Booking request",
+    "start": "Pick-up date",
+    "end": "Return date",
+    "car": "Car",
+    "anyCar": "Any / please advise",
+    "name": "Full name",
+    "phone": "Phone",
+    "email": "Email (optional)",
+    "place": "Delivery place (optional)",
+    "placeHint": "E.g. airport, station, hotel",
+    "message": "Message (optional)",
+    "send": "Send my request",
+    "privacy": "Your details are only used by the agency to call you back and confirm the rental.",
+    "doneTitle": "Request sent",
+    "doneBody": "Thank you! The agency will call you to confirm availability and price.",
+    "poweredBy": "Powered by",
+    "errors": {
+      "invalidForm": "Check the fields in red.",
+      "robot": "The anti-robot check failed. Reload the page and try again.",
+      "tooMany": "Too many requests. Try again in an hour or call the agency.",
+      "notFound": "This booking page is no longer available.",
+      "unknown": "The request could not be sent. Try again or call the agency."
+    }
+  },
+  "requests": {
+    "title": "Online requests",
+    "subtitle": "Requests sent from your booking page. Call the client back, then create the booking.",
+    "empty": "No requests yet",
+    "emptyOpen": "Share the link to your booking page (Settings > Online booking).",
+    "emptyClosed": "The online booking page is not open. An admin can open it in Settings.",
+    "emptyClosedAdmin": "Open your online booking page to get requests from clients.",
+    "open": "Open my page",
+    "status": {
+      "new": "New",
+      "handled": "Handled",
+      "declined": "Declined"
+    },
+    "anyCar": "Car chosen by the agency",
+    "place": "Delivery: {place}",
+    "create": "Create the booking",
+    "handled": "Mark handled",
+    "decline": "Decline",
+    "reopen": "Mark as new"
   }
 }
