@@ -8,7 +8,7 @@ import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { ReservationRow } from "../reservations/components/reservation-row";
+import { ReservationTable } from "../reservations/components/reservation-table";
 import type { ListedReservation } from "../reservations/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -60,7 +60,7 @@ export default async function ContractsPage({ searchParams }: PageProps<"/[local
   return (
     <>
       <PageHeader title={t("title")} subtitle={t("subtitle")} />
-      <div className="mb-4 flex flex-col gap-3">
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <nav aria-label={t("tabsLabel")} className="flex flex-wrap gap-2">
           {TABS.map((k) => (
             <Link
@@ -77,14 +77,12 @@ export default async function ContractsPage({ searchParams }: PageProps<"/[local
             </Link>
           ))}
         </nav>
-        <SearchBar placeholder={t("search")} />
+        <div className="lg:w-80">
+          <SearchBar placeholder={t("search")} />
+        </div>
       </div>
       {rows.length ? (
-        <ul className="flex flex-col gap-2" data-testid="contract-list">
-          {rows.map((r) => (
-            <ReservationRow key={r.id} r={{ ...r, balance: balance.get(r.id) ?? 0 }} now={now} />
-          ))}
-        </ul>
+        <ReservationTable testId="contract-list" rows={rows.map((r) => ({ ...r, balance: balance.get(r.id) ?? 0 }))} now={now} />
       ) : q ? (
         <EmptyState icon={SearchXIcon} title={t("noResult")} />
       ) : (

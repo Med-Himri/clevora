@@ -24,7 +24,7 @@ test("insurance: grouped by urgency; +1 an only prefills, then saving moves the 
   await dialog.getByLabel("Assureur (facultatif)").fill("Wafa Assurance");
   await dialog.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText("Modifications enregistrées.")).toBeVisible();
-  await expect(page.locator("[data-group='later']:visible")).toContainText("Wafa Assurance");
+  await expect(page.locator("[data-group='later']:visible")).toContainText("Kia Rio");
 });
 
 test("a car with expired insurance is not offered for booking, and the wizard says why", async ({ page }) => {

@@ -245,18 +245,150 @@ export const TOOLS: AssistantTool[] = [
     },
   },
   {
-    name: "search_documents",
+    name: "find_client",
     description:
-      "Chercher dans les documents de l'agence (règlement, conditions, tarifs, procédures). À utiliser pour toute question sur les règles de l'agence (caution, franchise, âge, carburant, retard...). Les documents sont souvent en français : cherche avec des mots-clés français même si la question est en arabe ou en anglais. Cite le titre du document.",
-    schema: z.object({ query: z.string().min(2).max(200).describe("Mots-clés de la question") }),
+      "Chercher un client de l'agence par nom, téléphone ou numéro de CIN/passeport. Renvoie ses coordonnées, son nombre de locations et ses dernières locations.",
+    schema: z.object({ query: z.string().min(2).max(60).describe("Nom, téléphone ou CIN") }),
     async run({ supabase, agencyId }, input) {
-      const { data, error } = await supabase.rpc("search_chunks", { p_agency: agencyId, p_query: String(input.query), p_k: 5 });
+      // Only letters, digits, spaces and dashes reach the filter (no PostgREST syntax).
+      const q = String(input.query).replace(/[^\p{L}\p{N} -]/gu, " ").trim();
+      if (q.length < 2) return { data: [], sources: [] };
+      const digits = q.replace(/\D/g, "").replace(/^0/, "");
+      const ors = [`full_name.ilike.%${q}%`, `id_number.ilike.%${q}%`];
+      if (digits.length >= 4) ors.push(`phone.ilike.%${digits}%`);
+      const { data, error } = await supabase
+        .from("clients")
+        .select("id, full_name, phone, email, id_type, id_number, nationality, license_number")
+        .eq("agency_id", agencyId)
+        .or(ors.join(","))
+        .limit(8);
       if (error) throw error;
-      const rows = data ?? [];
-      const titles = [...new Map(rows.map((r) => [r.document_id, r.title])).entries()];
+      const clients = data ?? [];
+      if (!clients.length) return { data: { found: 0 }, sources: [] };
+      const { data: res } = await supabase
+        .from("reservations")
+        .select("id, client_id, contract_number, start_at, end_at, status, vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(plate, brand_model)")
+        .eq("agency_id", agencyId)
+        .in("client_id", clients.map((c) => c.id))
+        .order("start_at", { ascending: false });
+      const rows = (res ?? []) as unknown as Array<{ id: string; client_id: string; contract_number: string; start_at: string; end_at: string; status: string; vehicle: { plate: string; brand_model: string } | null }>;
       return {
-        data: rows.map((r) => ({ document: r.title, extrait: r.content })),
-        sources: titles.map(([id, title]) => ({ label: title, href: `/assistant?doc=${id}` })),
+        data: clients.map((c) => {
+          const mine = rows.filter((r) => r.client_id === c.id);
+          return {
+            nom: c.full_name,
+            telephone: c.phone,
+            email: c.email,
+            piece: `${c.id_type === "passport" ? "Passeport" : "CIN"} ${c.id_number}`,
+            permis: c.license_number,
+            nationalite: c.nationality,
+            nombre_locations: mine.length,
+            dernieres_locations: mine.slice(0, 5).map((r) => ({ contrat: r.contract_number, du: formatDateTime(r.start_at), au: formatDateTime(r.end_at), statut: r.status, voiture: r.vehicle ? `${r.vehicle.brand_model} ${r.vehicle.plate}` : null })),
+          };
+        }),
+        sources: rows.slice(0, 5).map((r) => ({ label: r.contract_number, href: `/contracts/${r.id}` })),
+      };
+    },
+  },
+  {
+    name: "vehicle_history",
+    description:
+      "Tout sur une voiture de l'agence (par matricule ou modèle) : fiche, locations passées et à venir, entretiens. Pour les administrateurs, aussi ses charges.",
+    schema: z.object({ car: z.string().min(2).max(40).describe("Matricule (ex. 12345-A-6) ou modèle (ex. Clio)") }),
+    async run({ supabase, agencyId, role }, input) {
+      const q = String(input.car);
+      const { data: cars } = await supabase
+        .from("vehicles")
+        .select("id, plate, plate_norm, brand_model, category, fuel, gearbox, daily_rate, current_km, status, insurance_expires_on, technical_visit_expires_on, insurer, oil_last_km, oil_last_date, oil_next_km, first_registration_date")
+        .eq("agency_id", agencyId);
+      const norm = q.toUpperCase().replace(/[\s\-./|]/g, "");
+      const found = (cars ?? []).filter((c) => c.plate_norm === norm || c.plate_norm?.includes(norm) || c.brand_model.toLowerCase().includes(q.toLowerCase())).slice(0, 3);
+      if (!found.length) return { data: { found: 0 }, sources: [] };
+      const ids = found.map((c) => c.id);
+      const [{ data: res }, { data: maint }, charges] = await Promise.all([
+        supabase
+          .from("reservations")
+          .select("id, vehicle_id, contract_number, start_at, end_at, actual_return_at, status, km_out, km_in, client:clients!reservations_agency_id_client_id_fkey(full_name, phone)")
+          .eq("agency_id", agencyId)
+          .in("vehicle_id", ids)
+          .order("start_at", { ascending: false })
+          .limit(30),
+        supabase.from("maintenance_periods").select("vehicle_id, reason, starts_on, expected_end_on, ended_on, note").eq("agency_id", agencyId).in("vehicle_id", ids).order("starts_on", { ascending: false }).limit(15),
+        role === "admin"
+          ? supabase.from("charges").select("vehicle_id, date, category, amount, note").eq("agency_id", agencyId).in("vehicle_id", ids).order("date", { ascending: false }).limit(20)
+          : Promise.resolve({ data: null }),
+      ]);
+      const reservations = (res ?? []) as unknown as Array<{ id: string; vehicle_id: string; contract_number: string; start_at: string; end_at: string; actual_return_at: string | null; status: string; km_out: number | null; km_in: number | null; client: { full_name: string; phone: string | null } | null }>;
+      return {
+        data: found.map((c) => ({
+          voiture: `${c.brand_model} ${c.plate}`,
+          fiche: { categorie: c.category, carburant: c.fuel, boite: c.gearbox, prix_jour: formatMoney(c.daily_rate), km: c.current_km, statut: c.status, mise_en_circulation: c.first_registration_date ? formatDate(c.first_registration_date) : null, assurance_jusquau: c.insurance_expires_on ? formatDate(c.insurance_expires_on) : null, assureur: c.insurer, visite_technique_jusquau: c.technical_visit_expires_on ? formatDate(c.technical_visit_expires_on) : null, derniere_vidange: c.oil_last_km !== null ? `${c.oil_last_km} km${c.oil_last_date ? ` le ${formatDate(c.oil_last_date)}` : ""}` : null, prochaine_vidange_km: c.oil_next_km },
+          locations: reservations.filter((r) => r.vehicle_id === c.id).map((r) => ({ contrat: r.contract_number, client: r.client?.full_name, telephone: r.client?.phone, du: formatDateTime(r.start_at), au: formatDateTime(r.actual_return_at ?? r.end_at), statut: r.status, km_depart: r.km_out, km_retour: r.km_in })),
+          entretiens: (maint ?? []).filter((m) => m.vehicle_id === c.id).map((m) => ({ raison: m.reason, du: formatDate(m.starts_on), fin: m.ended_on ? formatDate(m.ended_on) : m.expected_end_on ? `prévue ${formatDate(m.expected_end_on)}` : "en cours", note: m.note })),
+          ...(charges.data ? { charges: charges.data.filter((x) => x.vehicle_id === c.id).map((x) => ({ date: formatDate(x.date), categorie: x.category, montant: formatMoney(x.amount), note: x.note })) } : {}),
+        })),
+        sources: found.map((c) => ({ label: `${c.brand_model} ${c.plate}`, href: `/fleet/${c.id}` })),
+      };
+    },
+  },
+  {
+    name: "reservations_in_period",
+    description: "Toutes les réservations de l'agence qui touchent une période (départs, locations en cours, retours), avec client, voiture et statut.",
+    schema: z.object({ from: isoDate, to: isoDate }),
+    async run({ supabase, agencyId }, input) {
+      const { from, to } = input as { from: string; to: string };
+      const { data, error } = await supabase
+        .from("reservations")
+        .select(RES_SELECT)
+        .eq("agency_id", agencyId)
+        .neq("status", "cancelled")
+        .lte("start_at", casablancaToIso(to, "23:59"))
+        .gte("end_at", casablancaToIso(from, "00:00"))
+        .order("start_at")
+        .limit(100);
+      if (error) throw error;
+      const rows = (data ?? []) as unknown as ResRow[];
+      return {
+        data: { nombre: rows.length, reservations: rows.map((r) => ({ contrat: r.contract_number, client: r.client?.full_name, telephone: r.client?.phone, voiture: r.vehicle ? `${r.vehicle.brand_model} ${r.vehicle.plate}` : null, du: formatDateTime(r.start_at), au: formatDateTime(r.actual_return_at ?? r.end_at), statut: r.status })) },
+        sources: rows.slice(0, 8).map(resSource),
+      };
+    },
+  },
+  {
+    name: "unpaid_balances",
+    description: "Réservations dont le client doit encore de l'argent (reste à payer), les plus grosses d'abord.",
+    schema: z.object({}),
+    async run({ supabase, agencyId }) {
+      const { data: totals, error } = await supabase.from("reservation_totals").select("id, total, paid, balance").eq("agency_id", agencyId).gt("balance", 0).order("balance", { ascending: false }).limit(30);
+      if (error) throw error;
+      const ids = (totals ?? []).map((x) => x.id);
+      if (!ids.length) return { data: { nombre: 0 }, sources: [] };
+      const { data } = await supabase.from("reservations").select(RES_SELECT).eq("agency_id", agencyId).in("id", ids).neq("status", "cancelled");
+      const byId = new Map(((data ?? []) as unknown as ResRow[]).map((r) => [r.id, r]));
+      const rows = (totals ?? []).filter((x) => byId.has(x.id));
+      return {
+        data: rows.map((x) => {
+          const r = byId.get(x.id)!;
+          return { contrat: r.contract_number, client: r.client?.full_name, telephone: r.client?.phone, voiture: r.vehicle ? `${r.vehicle.brand_model} ${r.vehicle.plate}` : null, total: formatMoney(x.total), paye: formatMoney(x.paid), reste: formatMoney(x.balance), statut: r.status };
+        }),
+        sources: rows.slice(0, 8).map((x) => resSource(byId.get(x.id)!)),
+      };
+    },
+  },
+  {
+    name: "agency_rules",
+    description: "Les règles de l'agence enregistrées dans Paramètres : âge minimum, années de permis, caution et franchise par défaut, équipements, documents remis, conditions générales du contrat.",
+    schema: z.object({}),
+    async run({ supabase, agencyId }) {
+      const { data, error } = await supabase
+        .from("agencies")
+        .select("name, address, city, phone, email, min_driver_age, min_license_years, default_deposit, default_franchise, equipment_items, document_items, contract_terms")
+        .eq("id", agencyId)
+        .single();
+      if (error) throw error;
+      return {
+        data: { ...data, default_deposit: formatMoney(data.default_deposit), default_franchise: formatMoney(data.default_franchise), contract_terms: data.contract_terms?.slice(0, 4000) ?? null },
+        sources: [{ label: "Paramètres", href: "/settings?section=contract" }],
       };
     },
   },

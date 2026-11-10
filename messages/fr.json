@@ -705,7 +705,13 @@
       "emptyBody": "Créez la première réservation : elle apparaîtra ici, triée par urgence.",
       "returns": "Retours",
       "departures": "Départs à venir",
-      "finished": "Terminées et annulées (30 derniers jours)"
+      "finished": "Terminées et annulées (30 derniers jours)",
+      "contract": "Contrat",
+      "client": "Client",
+      "car": "Voiture",
+      "dates": "Dates",
+      "open": "Ouvrir le contrat",
+      "menu": "Actions pour {name}"
     },
     "status": {
       "late": "En retard",
@@ -1031,8 +1037,7 @@
       "later": "Plus tard"
     },
     "car": "Voiture",
-    "insurerColumn": "Assureur",
-    "search": "Matricule, modèle ou assureur",
+    "search": "Matricule ou modèle",
     "noResult": "Aucune voiture ne correspond à la recherche."
   },
   "oil": {
@@ -1148,7 +1153,7 @@
   },
   "assistant": {
     "title": "Assistant IA",
-    "subtitle": "Posez vos questions en mots simples : voitures, réservations, retours, vidange, assurance, règles de l'agence.",
+    "subtitle": "Posez vos questions en mots simples : l'assistant cherche la réponse dans les données de votre agence (voitures, clients, réservations, contrats, vidange, assurance).",
     "tryTitle": "Essayez une question",
     "conversation": "Conversation",
     "thinking": "Je réfléchis…",
@@ -1161,8 +1166,8 @@
     "remaining": "{count, plural, =0 {Plus de questions ce mois-ci} one {# question restante ce mois-ci} other {# questions restantes ce mois-ci}}",
     "privacyShort": "La conversation n'est pas enregistrée.",
     "privacyTitle": "Vie privée",
-    "privacyStaff": "La conversation n'est pas enregistrée : elle disparaît quand vous quittez la page. Pour répondre, l'assistant lit seulement les données de votre agence que vous avez le droit de voir, et les envoie au service d'IA le temps de la réponse.",
-    "privacyAdmin": "La conversation n'est pas enregistrée : elle disparaît quand vous quittez la page. Pour répondre, l'assistant lit seulement les données de votre agence, et les envoie au service d'IA le temps de la réponse. Le journal d'activité garde seulement le nombre de questions et les outils utilisés, jamais le texte.",
+    "privacyStaff": "La conversation n'est pas enregistrée : elle disparaît quand vous quittez la page. Pour répondre, l'assistant lit uniquement les données de votre agence que vous avez le droit de voir — jamais celles d'une autre agence — et les envoie au service d'IA le temps de la réponse.",
+    "privacyAdmin": "La conversation n'est pas enregistrée : elle disparaît quand vous quittez la page. Pour répondre, l'assistant lit uniquement les données de votre agence — jamais celles d'une autre agence — et les envoie au service d'IA le temps de la réponse. Le journal d'activité garde seulement le nombre de questions et les outils utilisés, jamais le texte.",
     "notInPlan": "L'assistant IA n'est pas inclus dans votre forfait",
     "notInPlanAdmin": "Passez au forfait Pro pour poser vos questions à l'assistant.",
     "notInPlanStaff": "Demandez à l'administrateur de l'agence de changer de forfait.",
@@ -1172,16 +1177,16 @@
     "disabledStaff": "L'administrateur de l'agence l'a désactivé.",
     "notConfigured": "L'assistant n'est pas encore branché (clé ANTHROPIC_API_KEY manquante). Contactez l'équipe Parcolia.",
     "quotaReached": "Vous avez utilisé toutes les questions de ce mois. Le compteur repart à zéro le 1er du mois.",
-    "closeDoc": "Fermer le document",
     "suggestions": {
       "whoHadCar": "Qui avait la voiture 12345-A-6 hier à 15h ?",
       "returns": "Quelles voitures reviennent aujourd'hui et demain ?",
       "free": "Quelles voitures sont libres ce week-end ?",
       "oil": "Quelles voitures ont besoin d'une vidange ?",
       "insurance": "Quelles assurances expirent bientôt ?",
-      "deposit": "Quel est le montant de la caution ?",
       "revenue": "Quel est mon chiffre d'affaires ce mois-ci ?",
-      "charges": "Combien j'ai dépensé en charges ce mois-ci ?"
+      "charges": "Combien j'ai dépensé en charges ce mois-ci ?",
+      "unpaid": "Quels clients nous doivent encore de l'argent ?",
+      "carHistory": "Montre-moi l'historique de la Dacia Logan"
     },
     "tools": {
       "who_had_car": "Je cherche qui avait la voiture…",
@@ -1191,9 +1196,13 @@
       "oil_due": "Je regarde les vidanges…",
       "insurance_due": "Je regarde les assurances…",
       "find_reservations": "Je cherche dans les réservations…",
-      "search_documents": "Je lis vos documents…",
       "revenue": "Je calcule le chiffre d'affaires…",
-      "charges": "Je regarde les charges…"
+      "charges": "Je regarde les charges…",
+      "find_client": "Je cherche le client…",
+      "vehicle_history": "Je regarde l'historique de la voiture…",
+      "reservations_in_period": "Je regarde les réservations…",
+      "unpaid_balances": "Je cherche les restes à payer…",
+      "agency_rules": "Je regarde les règles de l'agence…"
     },
     "errors": {
       "refused": "Je ne peux pas répondre à cette question. Essayez de la poser autrement.",
@@ -1207,25 +1216,6 @@
       "aiDisabled": "L'assistant est désactivé pour votre agence.",
       "aiQuota": "Plus de questions disponibles ce mois-ci.",
       "aiNotConfigured": "L'assistant n'est pas encore branché. Contactez l'équipe Parcolia."
-    },
-    "docs": {
-      "title": "Documents de l'agence",
-      "hint": "Ajoutez votre règlement, vos conditions ou vos tarifs : l'assistant s'en sert pour répondre.",
-      "empty": "Aucun document pour l'instant.",
-      "add": "Ajouter",
-      "addTitle": "Ajouter un document",
-      "addHint": "Collez le texte ou choisissez un fichier .txt. Tous les membres de l'agence pourront poser des questions dessus.",
-      "docTitle": "Titre",
-      "docTitlePlaceholder": "Ex. : Conditions de location",
-      "content": "Texte du document",
-      "contentPlaceholder": "Collez ici le texte…",
-      "fromFile": "Choisir un fichier .txt",
-      "onlyText": "Choisissez un fichier texte (.txt ou .md).",
-      "save": "Enregistrer",
-      "delete": "Supprimer « {title} »",
-      "deleteTitle": "Supprimer ce document ?",
-      "deleteBody": "L'assistant ne pourra plus s'en servir. Cette action est définitive.",
-      "deleteConfirm": "Supprimer"
     }
   },
   "settings": {

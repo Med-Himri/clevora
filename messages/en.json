@@ -705,7 +705,13 @@
       "emptyBody": "Create the first reservation: it will appear here, sorted by urgency.",
       "returns": "Returns",
       "departures": "Upcoming departures",
-      "finished": "Finished and cancelled (last 30 days)"
+      "finished": "Finished and cancelled (last 30 days)",
+      "contract": "Contract",
+      "client": "Client",
+      "car": "Car",
+      "dates": "Dates",
+      "open": "Open the contract",
+      "menu": "Actions for {name}"
     },
     "status": {
       "late": "Late",
@@ -1031,8 +1037,7 @@
       "later": "Later"
     },
     "car": "Car",
-    "insurerColumn": "Insurer",
-    "search": "Plate, model or insurer",
+    "search": "Plate or model",
     "noResult": "No car matches the search."
   },
   "oil": {
@@ -1148,7 +1153,7 @@
   },
   "assistant": {
     "title": "AI assistant",
-    "subtitle": "Ask in plain words: cars, bookings, returns, oil changes, insurance, agency rules.",
+    "subtitle": "Ask in plain words: the assistant finds the answer in your agency's data (cars, clients, bookings, contracts, oil changes, insurance).",
     "tryTitle": "Try a question",
     "conversation": "Conversation",
     "thinking": "Thinking…",
@@ -1161,8 +1166,8 @@
     "remaining": "{count, plural, =0 {No questions left this month} one {# question left this month} other {# questions left this month}}",
     "privacyShort": "This conversation is not saved.",
     "privacyTitle": "Privacy",
-    "privacyStaff": "This conversation is not saved: it disappears when you leave the page. To answer, the assistant only reads your agency's data that you are allowed to see, and sends it to the AI service for the time of the answer.",
-    "privacyAdmin": "This conversation is not saved: it disappears when you leave the page. To answer, the assistant only reads your agency's data, and sends it to the AI service for the time of the answer. The activity log only keeps the number of questions and the tools used, never the text.",
+    "privacyStaff": "This conversation is not saved: it disappears when you leave the page. To answer, the assistant only reads your agency's data that you are allowed to see — never another agency's — and sends it to the AI service for the time of the answer.",
+    "privacyAdmin": "This conversation is not saved: it disappears when you leave the page. To answer, the assistant only reads your agency's data — never another agency's — and sends it to the AI service for the time of the answer. The activity log only keeps the number of questions and the tools used, never the text.",
     "notInPlan": "The AI assistant is not included in your plan",
     "notInPlanAdmin": "Switch to the Pro plan to ask the assistant questions.",
     "notInPlanStaff": "Ask your agency admin to change the plan.",
@@ -1172,16 +1177,16 @@
     "disabledStaff": "Your agency admin turned it off.",
     "notConfigured": "The assistant is not connected yet (missing ANTHROPIC_API_KEY). Contact the Parcolia team.",
     "quotaReached": "You used all the questions for this month. The counter resets on the 1st.",
-    "closeDoc": "Close the document",
     "suggestions": {
       "whoHadCar": "Who had car 12345-A-6 yesterday at 3 pm?",
       "returns": "Which cars come back today and tomorrow?",
       "free": "Which cars are free this weekend?",
       "oil": "Which cars need an oil change?",
       "insurance": "Which insurances expire soon?",
-      "deposit": "How much is the deposit?",
       "revenue": "What is my revenue this month?",
-      "charges": "How much did I spend on expenses this month?"
+      "charges": "How much did I spend on expenses this month?",
+      "unpaid": "Which clients still owe us money?",
+      "carHistory": "Show me the history of the Dacia Logan"
     },
     "tools": {
       "who_had_car": "Looking for who had the car…",
@@ -1191,9 +1196,13 @@
       "oil_due": "Checking oil changes…",
       "insurance_due": "Checking insurance…",
       "find_reservations": "Searching bookings…",
-      "search_documents": "Reading your documents…",
       "revenue": "Computing revenue…",
-      "charges": "Checking expenses…"
+      "charges": "Checking expenses…",
+      "find_client": "Looking for the client…",
+      "vehicle_history": "Checking the car's history…",
+      "reservations_in_period": "Checking bookings…",
+      "unpaid_balances": "Looking for unpaid balances…",
+      "agency_rules": "Checking the agency rules…"
     },
     "errors": {
       "refused": "I can't answer that question. Try asking it another way.",
@@ -1207,25 +1216,6 @@
       "aiDisabled": "The assistant is turned off for your agency.",
       "aiQuota": "No questions left this month.",
       "aiNotConfigured": "The assistant is not connected yet. Contact the Parcolia team."
-    },
-    "docs": {
-      "title": "Agency documents",
-      "hint": "Add your rules, terms or prices: the assistant uses them to answer.",
-      "empty": "No documents yet.",
-      "add": "Add",
-      "addTitle": "Add a document",
-      "addHint": "Paste the text or choose a .txt file. Everyone in the agency can then ask questions about it.",
-      "docTitle": "Title",
-      "docTitlePlaceholder": "E.g. Rental terms",
-      "content": "Document text",
-      "contentPlaceholder": "Paste the text here…",
-      "fromFile": "Choose a .txt file",
-      "onlyText": "Choose a text file (.txt or .md).",
-      "save": "Save",
-      "delete": "Delete “{title}”",
-      "deleteTitle": "Delete this document?",
-      "deleteBody": "The assistant will no longer use it. This cannot be undone.",
-      "deleteConfirm": "Delete"
     }
   },
   "settings": {

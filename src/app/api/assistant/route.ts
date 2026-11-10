@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
+import { buildAgencyContext } from "@/lib/ai/context";
 import { buildSystemPrompt, buildUserMessage, MAX_QUESTION } from "@/lib/ai/prompt";
 import { getProvider, type AssistantEvent } from "@/lib/ai/provider";
 import { toolsFor } from "@/lib/ai/tools";
@@ -53,18 +54,21 @@ export async function POST(request: NextRequest) {
   const weekday = new Intl.DateTimeFormat("fr-FR", { weekday: "long", timeZone: TIME_ZONE }).format(now);
   const today = dayKey(now);
   const tools = toolsFor(agency.role);
+  const ctx = {
+    supabase,
+    agencyId: agency.id,
+    role: agency.role,
+    now,
+    alertDays: settings?.alert_days_before ?? 30,
+    alertKm: settings?.alert_km_before ?? 1500,
+  };
+  // Retrieval: a fresh picture of THIS agency's data (user's session + agency filter).
+  const agencyData = await buildAgencyContext(ctx, agency.name);
   const events = provider.answer({
     system: buildSystemPrompt({ agencyName: agency.name, role: agency.role, today, weekday, locale }),
-    user: buildUserMessage(history, question),
+    user: buildUserMessage(history, question, agencyData),
     tools,
-    ctx: {
-      supabase,
-      agencyId: agency.id,
-      role: agency.role,
-      now,
-      alertDays: settings?.alert_days_before ?? 30,
-      alertKm: settings?.alert_km_before ?? 1500,
-    },
+    ctx,
     signal: request.signal,
   });
 

@@ -39,43 +39,43 @@ test("staff: asks about vidange, gets an answer with sources; money questions ar
   expect(JSON.stringify(logs)).toContain("oil_due");
 });
 
-test("admin: adds a document, the assistant quotes it and links to it", async ({ page }) => {
+test("admin: answers come from the agency's own database (summary + tools), never from another agency", async ({ page }) => {
   const agency = await createTestAgency();
-  const amount = `${Math.floor(1000 + Math.random() * 8999)} MAD`;
+  const other = await createTestAgency();
+  // Letters only: a tag like "2S1" would look like a number plate to the offline stand-in.
+  const tag = uid().replace(/[^a-z]/g, "").slice(-5).toUpperCase().padEnd(5, "X");
+  const plate = `${uid().replace(/\D/g, "").slice(-5).padStart(5, "1")}-A-6`;
+  await addVehicle(agency.agencyId, { plate, brand_model: "Renault Megane" });
+  await admin().from("agencies").update({ default_deposit: 7777 }).eq("id", agency.agencyId);
+  // A client that exists ONLY in the other agency
+  await admin().from("clients").insert({ agency_id: other.agencyId, full_name: `Secret ${tag}`, id_type: "cin", id_number: `SC${tag}` });
+  await admin().from("clients").insert({ agency_id: agency.agencyId, full_name: `Mine ${tag}`, id_type: "cin", id_number: `MN${tag}`, phone: "+212611112222" });
+
   await login(page, agency.email, agency.password);
   await page.goto("/assistant");
-  const docs = page.getByTestId("assistant-docs");
-  await expect(docs).toContainText("Aucun document");
-  await docs.getByRole("button", { name: "Ajouter" }).click();
-  const dialog = page.getByRole("dialog");
-  await dialog.getByLabel("Titre").fill("Règlement intérieur");
-  await dialog.getByLabel("Texte du document").fill(`La caution est de ${amount} pour toutes les voitures.\n\nLe carburant est à rendre au même niveau.`);
-  await dialog.getByRole("button", { name: "Enregistrer" }).click();
-  await expect(page.getByText("Modifications enregistrées.")).toBeVisible();
-  await expect(docs).toContainText("Règlement intérieur");
-
-  await page.getByLabel("Votre question").fill("Quelle est la caution ?");
-  await page.keyboard.press("Enter");
-  const answer = page.getByTestId("assistant-answer").last();
-  await expect(answer).toContainText(amount);
-  await answer.getByRole("link", { name: "Règlement intérieur" }).click();
-  await expect(page.getByTestId("assistant-doc")).toContainText(`La caution est de ${amount}`);
+  await expect(page.getByTestId("assistant-docs")).toHaveCount(0); // no documents needed
   await expectNoHorizontalScroll(page);
+  const ask = async (q: string) => {
+    await page.getByLabel("Votre question").fill(q);
+    await page.keyboard.press("Enter");
+    const answer = page.getByTestId("assistant-answer").last();
+    await expect(answer).not.toContainText("Je réfléchis");
+    return answer;
+  };
 
-  // Revenue works for admins
-  await page.getByLabel("Votre question").fill("Mon chiffre d'affaires ?");
-  await page.getByRole("button", { name: "Envoyer" }).click();
-  await expect(page.getByTestId("assistant-answer").last()).toContainText("chiffre_affaires");
-
-  // Another agency never sees this document
-  const other = await createTestAgency();
-  const { data } = await admin().from("ai_chunks").select("agency_id").ilike("content", `%caution est de ${amount}%`);
-  expect(data?.every((c) => c.agency_id === agency.agencyId)).toBe(true);
-  expect(other.agencyId).not.toBe(agency.agencyId);
-
-  await docs.getByRole("button", { name: "Supprimer « Règlement intérieur »" }).click();
-  await page.getByRole("dialog").getByRole("button", { name: "Supprimer" }).click();
-  await expect(docs).toContainText("Aucun document");
+  // 1. The retrieved summary of this agency's data
+  await expect(await ask("Bonjour, combien de voitures ?")).toContainText("Parc : 1 voitures actives");
+  // 2. Agency rules come from Paramètres, not from a document
+  await expect(await ask("Quelle est la caution ?")).toContainText("7 777 MAD");
+  // 3. Clients: only this agency's
+  await expect(await ask(`client mine ${tag.toLowerCase()}`)).toContainText(`Mine ${tag}`);
+  const secret = await ask(`client secret ${tag.toLowerCase()}`);
+  await expect(secret).toContainText('"found":0');
+  await expect(secret).not.toContainText(`Secret ${tag}`);
+  // 4. A car's history
+  await expect(await ask(`historique de la ${plate}`)).toContainText("Renault Megane");
+  // 5. Revenue works for admins
+  await expect(await ask("Mon chiffre d'affaires ?")).toContainText("chiffre_affaires");
 });
 
 test("assistant switched off, or not in the plan", async ({ page }) => {

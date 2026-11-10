@@ -71,20 +71,6 @@ export default async function InsurancePage({ searchParams }: PageProps<"/[local
     },
     { key: "ins", header: t("insuranceEnd"), priority: "high", cell: (c) => paper(c.insurance_expires_on, c.ins) },
     { key: "vis", header: t("visitEnd"), priority: "high", cell: (c) => paper(c.technical_visit_expires_on, c.vis) },
-    {
-      key: "insurer",
-      header: t("insurerColumn"),
-      priority: "low",
-      cell: (c) =>
-        c.insurer || c.policy_number ? (
-          <span className="flex flex-col leading-tight">
-            <span>{c.insurer ?? "—"}</span>
-            {c.policy_number ? <Ltr className="text-xs text-muted-foreground">{c.policy_number}</Ltr> : null}
-          </span>
-        ) : (
-          <span className="text-muted-foreground">—</span>
-        ),
-    },
   ];
 
   return (

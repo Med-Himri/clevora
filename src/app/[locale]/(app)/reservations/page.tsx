@@ -5,17 +5,15 @@ import { EmptyState } from "@/components/app/empty-state";
 import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { SearchBar } from "@/components/app/search-bar";
-import { UrgencyGroups } from "@/components/app/urgency-groups";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { InfractionResults } from "./components/infraction-results";
-import { ReservationRow } from "./components/reservation-row";
-import { listReservations, type ListedReservation } from "./queries";
+import { ReservationTable } from "./components/reservation-table";
+import { listReservations } from "./queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -43,13 +41,6 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
     .filter((r) => r.status === "returned" || r.status === "cancelled")
     .sort((a, b) => (b.actual_return_at ?? b.end_at).localeCompare(a.actual_return_at ?? a.end_at));
 
-  const list = (items: ListedReservation[]) => (
-    <ul className="flex flex-col gap-2">
-      {items.map((r) => (
-        <ReservationRow key={r.id} r={r} now={now} />
-      ))}
-    </ul>
-  );
 
   return (
     <>
@@ -130,21 +121,19 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
           {returns.length ? (
             <section aria-labelledby="returns-title" data-testid="returns">
               <h2 id="returns-title" className="mb-3 text-xl font-bold">{t("list.returns")}</h2>
-              <UrgencyGroups items={returns} getDate={(r) => r.end_at} render={(items) => list(items)} />
+              <ReservationTable rows={returns} now={now} groupBy="end" />
             </section>
           ) : null}
           {departures.length ? (
             <section aria-labelledby="departures-title" data-testid="departures">
               <h2 id="departures-title" className="mb-3 text-xl font-bold">{t("list.departures")}</h2>
-              <UrgencyGroups items={departures} getDate={(r) => r.start_at} render={(items) => list(items)} />
+              <ReservationTable rows={departures} now={now} groupBy="start" />
             </section>
           ) : null}
           {finished.length ? (
             <section aria-labelledby="finished-title" data-testid="finished">
               <h2 id="finished-title" className="mb-3 text-xl font-bold">{t("list.finished")}</h2>
-              <Card>
-                <CardContent className="pt-4 sm:pt-6">{list(finished)}</CardContent>
-              </Card>
+              <ReservationTable rows={finished} now={now} />
             </section>
           ) : null}
         </div>
