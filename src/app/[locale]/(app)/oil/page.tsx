@@ -1,14 +1,15 @@
-import { DropletIcon } from "lucide-react";
+import { DropletIcon, SearchXIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
 import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "@/i18n/navigation";
+import { ResponsiveList, type Column } from "@/components/app/responsive-list";
+import { SearchBar } from "@/components/app/search-bar";
+import { StatusPill } from "@/components/app/status-pill";
 import { oilStatus } from "@/lib/alerts/compute";
 import { requireAgency } from "@/lib/auth/session";
-import { formatDate } from "@/lib/format";
+import { formatDate, plateNorm } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { OilActions } from "./oil-actions";
 
@@ -20,8 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
 const nf = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/ /g, " ");
 const GROUPS = ["due", "soon", "ok", "unknown"] as const;
 
-export default async function OilPage() {
+export default async function OilPage({ searchParams }: PageProps<"/[locale]/oil">) {
   const { agency } = await requireAgency();
+  const sp = await searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const t = await getTranslations("oil");
   const supabase = await createClient();
   const [{ data: cars }, { data: cfg }] = await Promise.all([
@@ -32,12 +35,53 @@ export default async function OilPage() {
   const rows = (cars ?? []).map((c) => ({ ...c, status: oilStatus(c.current_km, c.oil_next_km, alertKm) }));
   rows.sort((a, b) => (a.status.kmLeft ?? 1e12) - (b.status.kmLeft ?? 1e12));
 
-  const badge = (s: (typeof rows)[number]["status"]) => {
-    if (s.state === "due") return <Badge variant="danger">{t("due")}</Badge>;
-    if (s.state === "soon") return <Badge variant="warning">{t("soon")}</Badge>;
-    if (s.state === "ok") return <Badge variant="success">{t("ok")}</Badge>;
-    return <Badge variant="neutral">{t("unknown")}</Badge>;
+  const needle = q.toLowerCase();
+  const shown = q ? rows.filter((r) => plateNorm(r.plate).includes(plateNorm(q)) || r.brand_model.toLowerCase().includes(needle)) : rows;
+  type Row = (typeof rows)[number];
+
+  const state = (c: Row) => {
+    const s = c.status;
+    if (s.state === "unknown") return <StatusPill tone="neutral" label={t("unknown")} />;
+    const tone = s.state === "due" ? "danger" : s.state === "soon" ? "warning" : "success";
+    const left = s.kmLeft ?? 0;
+    return (
+      <StatusPill
+        tone={tone}
+        label={t(s.state)}
+        detail={<span data-testid="oil-km-left">{left <= 0 ? t("overBy", { km: nf(-left) }) : t("kmLeft", { km: nf(left) })}</span>}
+      />
+    );
   };
+
+  const columns: Column<Row>[] = [
+    {
+      key: "car",
+      header: t("car"),
+      priority: "primary",
+      className: "lg:min-w-44",
+      cell: (c) => (
+        <span className="flex flex-col">
+          <span>{c.brand_model}</span>
+          <Ltr className="text-xs font-normal tracking-wide text-muted-foreground">{c.plate}</Ltr>
+        </span>
+      ),
+    },
+    { key: "state", header: t("state"), priority: "high", hideLabelInCard: true, className: "w-48", cell: state },
+    { key: "current", header: t("currentKm"), priority: "low", align: "end", cell: (c) => <Ltr className="tabular-nums">{nf(c.current_km)} km</Ltr> },
+    {
+      key: "last",
+      header: t("lastChange"),
+      priority: "low",
+      align: "end",
+      cell: (c) => (
+        <span className="flex flex-col leading-tight">
+          {c.oil_last_km !== null ? <Ltr className="tabular-nums">{nf(c.oil_last_km)} km</Ltr> : "—"}
+          {c.oil_last_date ? <Ltr className="text-xs text-muted-foreground">{formatDate(c.oil_last_date)}</Ltr> : null}
+        </span>
+      ),
+    },
+    { key: "next", header: t("nextKm"), priority: "low", align: "end", cell: (c) => (c.oil_next_km !== null ? <Ltr className="font-semibold tabular-nums">{nf(c.oil_next_km)} km</Ltr> : "—") },
+  ];
 
   return (
     <>
@@ -45,46 +89,34 @@ export default async function OilPage() {
       {rows.length === 0 ? (
         <EmptyState icon={DropletIcon} title={t("empty")} />
       ) : (
-        <div className="flex flex-col gap-6" data-testid="oil-groups">
-          {GROUPS.map((g) => {
-            const items = rows.filter((r) => r.status.state === g);
-            if (!items.length) return null;
-            return (
-              <section key={g} aria-labelledby={`oil-${g}`} data-group={g}>
-                <h2 id={`oil-${g}`} className={`mb-2 flex items-center gap-2 font-semibold ${g === "due" ? "text-destructive" : ""}`}>
-                  {t(`groups.${g}`)}
-                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-2 text-xs font-bold">{items.length}</span>
-                </h2>
-                <ul className="grid gap-2 lg:grid-cols-2">
-                  {items.map((c) => (
-                    <li key={c.id} className="flex flex-col gap-3 rounded-xl border bg-card p-4" data-testid="oil-row">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <Link href={`/fleet/${c.id}`} className="min-w-0">
-                          <span className="block font-semibold">{c.brand_model}</span>
-                          <Ltr className="text-sm text-muted-foreground">{c.plate}</Ltr>
-                        </Link>
-                        <span className="flex flex-col items-end gap-1">
-                          {badge(c.status)}
-                          {c.status.kmLeft !== null ? (
-                            <span className={`text-sm font-semibold ${c.status.kmLeft <= 0 ? "text-destructive" : ""}`} data-testid="oil-km-left">
-                              {c.status.kmLeft <= 0 ? t("overBy", { km: nf(-c.status.kmLeft) }) : t("kmLeft", { km: nf(c.status.kmLeft) })}
-                            </span>
-                          ) : null}
-                        </span>
-                      </div>
-                      <dl className="grid grid-cols-3 gap-2 text-sm">
-                        <div><dt className="text-xs text-muted-foreground">{t("currentKm")}</dt><dd className="font-medium"><Ltr>{nf(c.current_km)} km</Ltr></dd></div>
-                        <div><dt className="text-xs text-muted-foreground">{t("lastChange")}</dt><dd className="font-medium">{c.oil_last_km !== null ? <Ltr>{nf(c.oil_last_km)} km</Ltr> : "—"}{c.oil_last_date ? <span className="block text-xs text-muted-foreground"><Ltr>{formatDate(c.oil_last_date)}</Ltr></span> : null}</dd></div>
-                        <div><dt className="text-xs text-muted-foreground">{t("nextKm")}</dt><dd className="font-medium">{c.oil_next_km !== null ? <Ltr>{nf(c.oil_next_km)} km</Ltr> : "—"}</dd></div>
-                      </dl>
-                      <OilActions vehicleId={c.id} label={`${c.brand_model} · ${c.plate}`} currentKm={c.current_km} lastInterval={c.oil_next_km !== null && c.oil_last_km !== null ? c.oil_next_km - c.oil_last_km : null} />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
-        </div>
+        <>
+          <div className="mb-4 lg:max-w-sm">
+            <SearchBar placeholder={t("search")} />
+          </div>
+          {shown.length === 0 ? (
+            <EmptyState icon={SearchXIcon} title={t("noResult")} />
+          ) : (
+            <ResponsiveList
+              testId="oil-groups"
+              rowTestId="oil-row"
+              caption={t("title")}
+              columns={columns}
+              rowKey={(c) => c.id}
+              rowHref={(c) => `/fleet/${c.id}`}
+              groups={GROUPS.map((g) => ({ key: g, label: t(`groups.${g}`), tone: g === "due" ? "danger" : g === "soon" ? "warning" : "default", rows: shown.filter((r) => r.status.state === g) }))}
+              actions={(c, mode) => (
+                <OilActions
+                  compact={mode === "table"}
+                  urgent={c.status.state === "due" || c.status.state === "soon"}
+                  vehicleId={c.id}
+                  label={`${c.brand_model} · ${c.plate}`}
+                  currentKm={c.current_km}
+                  lastInterval={c.oil_next_km !== null && c.oil_last_km !== null ? c.oil_next_km - c.oil_last_km : null}
+                />
+              )}
+            />
+          )}
+        </>
       )}
     </>
   );

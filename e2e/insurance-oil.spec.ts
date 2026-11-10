@@ -11,7 +11,7 @@ test("insurance: grouped by urgency; +1 an only prefills, then saving moves the 
 
   await login(page, staff.email, staff.password);
   await page.goto("/insurance");
-  const expired = page.locator("[data-group='expired']");
+  const expired = page.locator("[data-group='expired']:visible");
   await expect(expired).toContainText("Kia Rio");
   await expect(expired).toContainText("Expirée");
   await expectNoHorizontalScroll(page);
@@ -24,7 +24,7 @@ test("insurance: grouped by urgency; +1 an only prefills, then saving moves the 
   await dialog.getByLabel("Assureur (facultatif)").fill("Wafa Assurance");
   await dialog.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText("Modifications enregistrées.")).toBeVisible();
-  await expect(page.locator("[data-group='later']")).toContainText("Wafa Assurance");
+  await expect(page.locator("[data-group='later']:visible")).toContainText("Wafa Assurance");
 });
 
 test("a car with expired insurance is not offered for booking, and the wizard says why", async ({ page }) => {
@@ -42,8 +42,8 @@ test("vidange: the last interval is only a suggestion; saving updates km left", 
 
   await login(page, staff.email, staff.password);
   await page.goto("/oil");
-  const row = page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo" });
-  await expect(page.locator("[data-group='soon']")).toContainText("Fiat Tipo");
+  const row = page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo", visible: true });
+  await expect(page.locator("[data-group='soon']:visible")).toContainText("Fiat Tipo");
   await expect(row.getByTestId("oil-km-left")).toHaveText("Dans 500 km");
 
   await row.getByRole("button", { name: "Vidange faite" }).click();
@@ -54,8 +54,8 @@ test("vidange: the last interval is only a suggestion; saving updates km left", 
   await expect(dialog.getByLabel("Prochaine vidange (km)")).toHaveValue("50000");
   await dialog.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText("Vidange enregistrée.")).toBeVisible();
-  await expect(page.locator("[data-group='ok']")).toContainText("Fiat Tipo");
-  await expect(page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo" }).getByTestId("oil-km-left")).toHaveText("Dans 10 000 km");
+  await expect(page.locator("[data-group='ok']:visible")).toContainText("Fiat Tipo");
+  await expect(page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo", visible: true }).getByTestId("oil-km-left")).toHaveText("Dans 10 000 km");
 });
 
 test("daily alert email: protected by a secret, sent to admins, in their language", async ({ request }, testInfo) => {

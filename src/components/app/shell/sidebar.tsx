@@ -8,7 +8,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import { NavBadge } from "./nav-badge";
-import { isActive, navItemsFor, type NavBadges } from "./nav-config";
+import { isActive, NAV_SECTIONS, navItemsFor, type NavBadges, type NavItem } from "./nav-config";
 
 /**
  * Tablet (768–1279 px): icon rail; tap the top button to open it over the content.
@@ -76,39 +76,50 @@ export function Sidebar({
         </div>
 
         <nav className="flex-1 overflow-y-auto overscroll-contain p-2">
-          <ul className="flex flex-col gap-1">
-            {items.map((item) => {
-              const active = isActive(pathname, item.href);
-              const badge = badges[item.key];
-              const Icon = item.icon;
-              return (
-                <li key={item.key}>
-                  <Link
-                    href={item.href}
-                    aria-current={active ? "page" : undefined}
-                    title={open ? undefined : t(item.key)}
-                    className={cn(
-                      "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors",
-                      active
-                        ? "bg-primary/10 text-primary dark:bg-accent dark:text-foreground"
-                        : "text-muted-foreground hover:bg-accent hover:text-foreground",
-                      !open && "justify-center px-0 xl:justify-start xl:px-3",
-                    )}
-                  >
-                    <Icon className="size-5 shrink-0" aria-hidden />
-                    <span className={cn("flex-1 truncate", !open && "sr-only xl:not-sr-only")}>{t(item.key)}</span>
-                    {badge ? (
-                      <NavBadge
-                        count={badge.count}
-                        tone={badge.tone}
-                        className={cn(!open && "absolute -top-0.5 end-0.5 h-4 min-w-4 px-1 text-[10px] xl:static xl:h-5 xl:min-w-5 xl:px-1.5 xl:text-xs")}
-                      />
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+          {NAV_SECTIONS.map((section, si) => {
+            const list = section.items.map((k) => items.find((i) => i.key === k)).filter((i): i is NavItem => Boolean(i));
+            if (!list.length) return null;
+            return (
+              <div key={section.key} className={cn(si > 0 && "mt-3 border-t pt-3 xl:border-t-0 xl:pt-1", si > 0 && open && "border-t-0 pt-1")}>
+                <p className={cn("mb-1 px-3 text-[11px] font-semibold tracking-wider text-muted-foreground/80 uppercase", !open && "hidden xl:block")}>
+                  {t(`sections.${section.key}`)}
+                </p>
+                <ul className="flex flex-col gap-0.5">
+                  {list.map((item) => {
+                    const active = isActive(pathname, item.href);
+                    const badge = badges[item.key];
+                    const Icon = item.icon;
+                    return (
+                      <li key={item.key}>
+                        <Link
+                          href={item.href}
+                          aria-current={active ? "page" : undefined}
+                          title={open ? undefined : t(item.key)}
+                          className={cn(
+                            "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors",
+                            active
+                              ? "bg-primary/10 text-primary before:absolute before:inset-y-2 before:start-0 before:w-1 before:rounded-full before:bg-primary dark:bg-accent dark:text-foreground"
+                              : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                            !open && "justify-center px-0 xl:justify-start xl:px-3",
+                          )}
+                        >
+                          <Icon className="size-5 shrink-0" aria-hidden />
+                          <span className={cn("flex-1 truncate", !open && "sr-only xl:not-sr-only")}>{t(item.key)}</span>
+                          {badge ? (
+                            <NavBadge
+                              count={badge.count}
+                              tone={badge.tone}
+                              className={cn(!open && "absolute -top-0.5 end-0.5 h-4 min-w-4 px-1 text-[10px] xl:static xl:h-5 xl:min-w-5 xl:px-1.5 xl:text-xs")}
+                            />
+                          ) : null}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            );
+          })}
         </nav>
 
         <p className={cn("border-t px-3 py-3 text-xs text-muted-foreground", !open && "hidden xl:block")}>{t("poweredBy")}</p>

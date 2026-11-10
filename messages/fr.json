@@ -469,7 +469,13 @@
     "moreDescription": "Toutes les autres pages",
     "expand": "Ouvrir le menu",
     "collapse": "Fermer le menu",
-    "poweredBy": "Propulsé par Parcolia"
+    "poweredBy": "Propulsé par Parcolia",
+    "sections": {
+      "activity": "Activité",
+      "fleet": "Parc",
+      "management": "Gestion",
+      "agency": "Agence"
+    }
   },
   "urgency": {
     "late": "En retard",
@@ -560,7 +566,11 @@
       "reserved_today": "Réservée aujourd'hui",
       "maintenance": "Maintenance",
       "sold": "Vendue",
-      "until": "jusqu'au"
+      "until": "jusqu'au",
+      "blockedShort": "Bloquée",
+      "blockedDetail": "Assurance expirée",
+      "reservedShort": "Réservée",
+      "today": "aujourd'hui"
     },
     "form": {
       "car": "Voiture",
@@ -607,7 +617,9 @@
       "unsell": "Remettre dans le parc",
       "delete": "Supprimer",
       "deleteTitle": "Supprimer cette voiture ?",
-      "deleteBody": "Seules les voitures sans réservation ni charge peuvent être supprimées. Sinon, marquez-la comme vendue : l'historique est conservé."
+      "deleteBody": "Seules les voitures sans réservation ni charge peuvent être supprimées. Sinon, marquez-la comme vendue : l'historique est conservé.",
+      "view": "Voir la fiche",
+      "menu": "Actions pour {car}"
     },
     "detail": {
       "unknown": "Non renseigné",
@@ -1017,7 +1029,11 @@
       "week": "Cette semaine",
       "month": "Ce mois",
       "later": "Plus tard"
-    }
+    },
+    "car": "Voiture",
+    "insurerColumn": "Assureur",
+    "search": "Matricule, modèle ou assureur",
+    "noResult": "Aucune voiture ne correspond à la recherche."
   },
   "oil": {
     "title": "Vidange",
@@ -1049,7 +1065,12 @@
       "soon": "Bientôt",
       "ok": "À jour",
       "unknown": "Prochaine vidange non renseignée"
-    }
+    },
+    "car": "Voiture",
+    "state": "État",
+    "search": "Matricule ou modèle",
+    "noResult": "Aucune voiture ne correspond à la recherche.",
+    "menu": "Plus d'actions pour {car}"
   },
   "charges": {
     "title": "Charges",
@@ -1087,7 +1108,12 @@
       "cars": "Charges des voitures",
       "agency": "Charges de l'agence",
       "ads": "Publicité et campagnes"
-    }
+    },
+    "search": "Catégorie, note, voiture ou montant",
+    "noResult": "Aucune charge ne correspond à la recherche.",
+    "detail": "Détail",
+    "menu": "Actions pour cette charge",
+    "countLine": "{count, plural, one {# charge} other {# charges}}"
   },
   "statistics": {
     "title": "Statistiques",

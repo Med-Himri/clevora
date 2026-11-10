@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Can, useAgency } from "@/components/app/agency-context";
+import { RowMenu } from "@/components/app/row-menu";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
@@ -21,12 +22,18 @@ export function OilActions({
   label,
   currentKm,
   lastInterval,
+  compact = false,
+  urgent = true,
 }: {
   vehicleId: string;
   label: string;
   currentKm: number;
   /** km between the last two oil changes of this car (a suggestion, never applied automatically) */
   lastInterval: number | null;
+  /** Table row: "Vidange faite" + a "⋯" menu for the km. */
+  compact?: boolean;
+  /** Due or soon: the main button is filled, otherwise outlined. */
+  urgent?: boolean;
 }) {
   const t = useTranslations("oil");
   const tc = useTranslations("common");
@@ -61,15 +68,19 @@ export function OilActions({
     });
 
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button size="sm" onClick={() => setOpen("oil")} disabled={!writable}>
+    <div className={compact ? "flex items-center gap-1" : "flex flex-wrap items-center gap-2"}>
+      <Button size="sm" variant={urgent ? "default" : "outline"} onClick={() => setOpen("oil")} disabled={!writable}>
         <DropletIcon aria-hidden />
         {t("done_button")}
       </Button>
-      <Button size="sm" variant="outline" onClick={() => setOpen("km")} disabled={!writable}>
-        <GaugeIcon aria-hidden />
-        {t("updateKm")}
-      </Button>
+      {compact ? (
+        <RowMenu label={t("menu", { car: label })} items={[{ label: t("updateKm"), icon: GaugeIcon, onSelect: () => setOpen("km"), disabled: !writable }]} />
+      ) : (
+        <Button size="sm" variant="outline" onClick={() => setOpen("km")} disabled={!writable}>
+          <GaugeIcon aria-hidden />
+          {t("updateKm")}
+        </Button>
+      )}
 
       <Dialog open={open === "oil"} onOpenChange={(o) => setOpen(o ? "oil" : null)}>
         <DialogContent closeLabel={tc("close")}>

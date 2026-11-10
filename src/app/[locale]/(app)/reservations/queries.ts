@@ -5,7 +5,7 @@ export const RESERVATION_SELECT = `
   id, contract_number, status, start_at, end_at, actual_return_at, signed_at, cancelled_at, cancel_reason,
   delivery, delivery_place, return_place, delivery_fee, daily_price, advance_paid, franchise,
   deposit_taken, deposit_amount, km_out, km_in, fuel_out, fuel_in, equipment, documents_given, notes, extended_days,
-  vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(id, plate, brand_model, current_km, daily_rate),
+  vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(id, plate, brand_model, current_km, daily_rate, category, fuel, gearbox),
   client:clients!reservations_agency_id_client_id_fkey(id, full_name, phone, id_type, id_number, address, nationality, birth_date, birth_place, id_expires_on, license_number, license_issued_on, license_issued_place),
   driver2:clients!reservations_agency_id_second_driver_id_fkey(id, full_name, phone, id_type, id_number, address, nationality, birth_date, birth_place, id_expires_on, license_number, license_issued_on, license_issued_place)
 `;

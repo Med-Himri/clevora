@@ -1,56 +1,35 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Badge } from "@/components/ui/badge";
 import { Ltr } from "@/components/app/ltr";
+import { StatusPill } from "@/components/app/status-pill";
 import type { VehicleStatus } from "@/lib/fleet/status";
 import { formatDate, formatTime } from "@/lib/format";
 
+/** Short status word with a coloured dot; the detail goes on a small second line. */
 export function VehicleStatusBadge({ status }: { status: VehicleStatus }) {
   const t = useTranslations("fleet.status");
   const tr = useTranslations("fleet.reasons");
+  const day = (iso: string) => <Ltr>{formatDate(iso).slice(0, 5)}</Ltr>;
   switch (status.kind) {
     case "maintenance":
       return (
-        <Badge variant="warning" data-testid="vehicle-status">
-          {t("maintenance")} · {tr(status.reason)}
-          {status.until ? (
-            <>
-              {" · "}
-              {t("until")} <Ltr>{formatDate(status.until).slice(0, 5)}</Ltr>
-            </>
-          ) : null}
-        </Badge>
+        <StatusPill
+          tone="warning"
+          label={t("maintenance")}
+          detail={<>{tr(status.reason)}{status.until ? <> · {t("until")} {day(status.until)}</> : null}</>}
+          testId="vehicle-status"
+        />
       );
     case "on_rental":
-      return (
-        <Badge variant="info" data-testid="vehicle-status">
-          {t("on_rental")} · {t("until")} <Ltr>{formatDate(status.until).slice(0, 5)}</Ltr>
-        </Badge>
-      );
+      return <StatusPill tone="info" label={t("on_rental")} detail={<>{t("until")} {day(status.until)}</>} testId="vehicle-status" />;
     case "blocked":
-      return (
-        <Badge variant="danger" data-testid="vehicle-status">
-          {t("blocked")}
-        </Badge>
-      );
+      return <StatusPill tone="danger" label={t("blockedShort")} detail={t("blockedDetail")} testId="vehicle-status" />;
     case "reserved_today":
-      return (
-        <Badge variant="neutral" data-testid="vehicle-status">
-          {t("reserved_today")} · <Ltr>{formatTime(status.at)}</Ltr>
-        </Badge>
-      );
+      return <StatusPill tone="neutral" label={t("reservedShort")} detail={<>{t("today")} <Ltr>{formatTime(status.at)}</Ltr></>} testId="vehicle-status" />;
     case "sold":
-      return (
-        <Badge variant="neutral" data-testid="vehicle-status">
-          {t("sold")}
-        </Badge>
-      );
+      return <StatusPill tone="neutral" label={t("sold")} testId="vehicle-status" />;
     default:
-      return (
-        <Badge variant="success" data-testid="vehicle-status">
-          {t("available")}
-        </Badge>
-      );
+      return <StatusPill tone="success" label={t("available")} testId="vehicle-status" />;
   }
 }

@@ -5,11 +5,11 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 const TONES = {
-  neutral: "text-muted-foreground",
-  success: "text-success",
-  warning: "text-warning",
-  danger: "text-destructive",
-  info: "text-info",
+  neutral: "bg-muted text-muted-foreground",
+  success: "bg-success-soft text-success",
+  warning: "bg-warning-soft text-warning",
+  danger: "bg-danger-soft text-destructive",
+  info: "bg-info-soft text-info",
 } as const;
 
 /** A number with a label (and an optional link to where it comes from). */
@@ -31,9 +31,13 @@ export function StatTile({
   testId?: string;
 }) {
   const body = (
-    <Card className={cn("h-full", href && "transition-colors hover:bg-accent")}>
+    <Card className={cn("h-full shadow-xs", href && "transition-all hover:shadow-md motion-safe:hover:-translate-y-0.5")}>
       <CardContent className="flex flex-col gap-1 pt-4 sm:pt-5">
-        {Icon ? <Icon className={cn("size-5", TONES[tone])} aria-hidden /> : null}
+        {Icon ? (
+          <span className={cn("mb-1 inline-flex size-9 items-center justify-center rounded-lg", TONES[tone])} aria-hidden>
+            <Icon className="size-5" />
+          </span>
+        ) : null}
         <span className="min-w-0 break-words text-2xl font-bold tabular-nums sm:text-3xl [&_bdi]:whitespace-normal" data-testid={testId}>
           {value}
         </span>

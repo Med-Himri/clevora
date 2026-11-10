@@ -7,7 +7,6 @@ import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
 import { SearchBar } from "@/components/app/search-bar";
 import { Alert } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
@@ -52,15 +51,21 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
     !q || plateNorm(v.plate).includes(plateNorm(q)) || v.brand_model.toLowerCase().includes(needle);
   const rows = [...active.filter((v) => inTab(v, tab)), ...(tab === "all" ? sold : [])].filter(matches);
 
+  const nf = new Intl.NumberFormat("fr-FR");
   const columns: Column<FleetVehicle>[] = [
     {
       key: "car",
       header: t("columns.car"),
       priority: "primary",
       cell: (v) => (
-        <span className="flex flex-col">
-          <span>{v.brand_model}</span>
-          <Ltr className="text-sm font-normal text-muted-foreground">{v.plate}</Ltr>
+        <span className="flex items-center gap-3">
+          <span className="hidden size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground lg:inline-flex" aria-hidden>
+            <CarIcon className="size-5" />
+          </span>
+          <span className="flex min-w-0 flex-col">
+            <span className="truncate">{v.brand_model}</span>
+            <Ltr className="text-xs font-normal tracking-wide text-muted-foreground">{v.plate}</Ltr>
+          </span>
         </span>
       ),
     },
@@ -69,6 +74,7 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
       header: t("columns.status"),
       priority: "high",
       hideLabelInCard: true,
+      className: "w-44",
       cell: (v) => <VehicleStatusBadge status={v.computed} />,
     },
     {
@@ -76,8 +82,11 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
       header: t("columns.type"),
       priority: "high",
       cell: (v) => (
-        <span className="text-muted-foreground">
-          {t(`categories.${v.category}`)} · {t(`fuels.${v.fuel}`)} · {t(`gearboxes.${v.gearbox}`)}
+        <span className="flex flex-col leading-tight">
+          <span>{t(`categories.${v.category}`)}</span>
+          <span className="text-xs text-muted-foreground">
+            {t(`fuels.${v.fuel}`)} · {t(`gearboxes.${v.gearbox}`)}
+          </span>
         </span>
       ),
     },
@@ -86,17 +95,18 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
       header: t("columns.km"),
       priority: "low",
       align: "end",
-      cell: (v) => <Ltr>{new Intl.NumberFormat("fr-FR").format(v.current_km).replace(/ /g, " ")} km</Ltr>,
+      cell: (v) => <Ltr className="tabular-nums">{nf.format(v.current_km).replace(/\s/g, " ")} km</Ltr>,
     },
-    { key: "rate", header: t("columns.rate"), priority: "low", align: "end", cell: (v) => <Ltr>{formatMoney(v.daily_rate)}</Ltr> },
+    { key: "rate", header: t("columns.rate"), priority: "low", align: "end", cell: (v) => <Ltr className="font-semibold tabular-nums">{formatMoney(v.daily_rate)}</Ltr> },
     {
       key: "age",
       header: t("columns.age"),
       priority: "low",
+      align: "end",
       cell: (v) => {
         const age = vehicleAgeYears(v.first_registration_date);
         if (age === null) return <span className="text-muted-foreground">—</span>;
-        return <Badge variant={age >= AGE_WARNING_YEARS ? "warning" : "neutral"}>{t("age", { years: age })}</Badge>;
+        return <span className={cn(age >= AGE_WARNING_YEARS && "font-semibold text-warning")}>{t("age", { years: age })}</span>;
       },
     },
   ];
@@ -138,7 +148,7 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
         </Alert>
       ) : null}
 
-      <div className="mb-4 flex flex-col gap-3">
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <nav aria-label={t("filters")} className="flex flex-wrap gap-2">
           {TABS.map((k) => (
             <Link
@@ -155,7 +165,9 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
             </Link>
           ))}
         </nav>
-        <SearchBar placeholder={t("search")} />
+        <div className="lg:w-80">
+          <SearchBar placeholder={t("search")} />
+        </div>
       </div>
 
       {all.length === 0 ? (
@@ -184,8 +196,9 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
           rowHref={(v) => `/fleet/${v.id}`}
           caption={t("title")}
           testId="fleet-list"
-          actions={(v) => (
+          actions={(v, mode) => (
             <VehicleActions
+              compact={mode === "table"}
               vehicleId={v.id}
               vehicleLabel={`${v.brand_model} · ${v.plate}`}
               openMaintenanceId={v.openMaintenanceId}

@@ -83,7 +83,7 @@ export default async function EditReservationPage({ params, searchParams }: Page
     notes: r.notes ?? "",
   };
   const car = r.vehicle
-    ? { id: r.vehicle.id, plate: r.vehicle.plate, brand_model: r.vehicle.brand_model, category: "", fuel: "", gearbox: "", daily_rate: Number(r.vehicle.daily_rate), current_km: r.vehicle.current_km }
+    ? { id: r.vehicle.id, plate: r.vehicle.plate, brand_model: r.vehicle.brand_model, category: r.vehicle.category, fuel: r.vehicle.fuel, gearbox: r.vehicle.gearbox, daily_rate: Number(r.vehicle.daily_rate), current_km: r.vehicle.current_km }
     : null;
   return (
     <>

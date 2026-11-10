@@ -469,7 +469,13 @@
     "moreDescription": "All other pages",
     "expand": "Open menu",
     "collapse": "Close menu",
-    "poweredBy": "Powered by Parcolia"
+    "poweredBy": "Powered by Parcolia",
+    "sections": {
+      "activity": "Activity",
+      "fleet": "Fleet",
+      "management": "Management",
+      "agency": "Agency"
+    }
   },
   "urgency": {
     "late": "Late",
@@ -560,7 +566,11 @@
       "reserved_today": "Leaves today",
       "maintenance": "Maintenance",
       "sold": "Sold",
-      "until": "until"
+      "until": "until",
+      "blockedShort": "Blocked",
+      "blockedDetail": "Insurance expired",
+      "reservedShort": "Booked",
+      "today": "today"
     },
     "form": {
       "car": "Car",
@@ -607,7 +617,9 @@
       "unsell": "Back in the fleet",
       "delete": "Delete",
       "deleteTitle": "Delete this car?",
-      "deleteBody": "Only cars without reservations or expenses can be deleted. Otherwise mark it as sold: its history is kept."
+      "deleteBody": "Only cars without reservations or expenses can be deleted. Otherwise mark it as sold: its history is kept.",
+      "view": "Open",
+      "menu": "Actions for {car}"
     },
     "detail": {
       "unknown": "Not set",
@@ -1017,7 +1029,11 @@
       "week": "This week",
       "month": "This month",
       "later": "Later"
-    }
+    },
+    "car": "Car",
+    "insurerColumn": "Insurer",
+    "search": "Plate, model or insurer",
+    "noResult": "No car matches the search."
   },
   "oil": {
     "title": "Oil change",
@@ -1049,7 +1065,12 @@
       "soon": "Soon",
       "ok": "Up to date",
       "unknown": "Next oil change not set"
-    }
+    },
+    "car": "Car",
+    "state": "Status",
+    "search": "Plate or model",
+    "noResult": "No car matches the search.",
+    "menu": "More actions for {car}"
   },
   "charges": {
     "title": "Expenses",
@@ -1087,7 +1108,12 @@
       "cars": "Car expenses",
       "agency": "Agency expenses",
       "ads": "Advertising and campaigns"
-    }
+    },
+    "search": "Category, note, car or amount",
+    "noResult": "No expense matches the search.",
+    "detail": "Details",
+    "menu": "Actions for this expense",
+    "countLine": "{count, plural, one {# expense} other {# expenses}}"
   },
   "statistics": {
     "title": "Statistics",

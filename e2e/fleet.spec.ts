@@ -43,7 +43,17 @@ test("staff put a car in maintenance, see the reason and date, then put it back 
   await login(page, staff.email, staff.password);
   await page.goto("/fleet");
   const card = page.getByTestId("fleet-list").locator("li:visible, tr:visible").filter({ hasText: plate }).first();
-  await card.getByRole("button", { name: "Maintenance" }).click();
+  // Table rows keep their actions in a "⋯" menu; cards show the buttons.
+  const rowAction = async (row: typeof card, name: string) => {
+    const menu = row.getByTestId("vehicle-menu");
+    if (await menu.isVisible()) {
+      await menu.click();
+      await page.getByRole("menuitem", { name }).click();
+    } else {
+      await row.getByRole("button", { name }).click();
+    }
+  };
+  await rowAction(card, "Maintenance");
 
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("radio", { name: "Pneus" }).click();
@@ -53,12 +63,13 @@ test("staff put a car in maintenance, see the reason and date, then put it back 
   await expect(page.getByText("Voiture mise en maintenance.")).toBeVisible();
 
   const [y, m, d] = until.split("-");
-  await expect(card.getByTestId("vehicle-status")).toHaveText(`Maintenance · Pneus · jusqu'au ${d}/${m}`);
+  await expect(card.getByTestId("vehicle-status")).toContainText("Maintenance");
+  await expect(card.getByTestId("vehicle-status")).toContainText(`Pneus · jusqu'au ${d}/${m}`);
   await page.goto("/fleet?tab=maintenance");
   await expect(page.getByTestId("fleet-list")).toContainText(plate);
   expect(y).toBeTruthy();
 
-  await page.getByTestId("fleet-list").locator("li:visible, tr:visible").filter({ hasText: plate }).first().getByRole("button", { name: "Remettre en service" }).click();
+  await rowAction(page.getByTestId("fleet-list").locator("li:visible, tr:visible").filter({ hasText: plate }).first(), "Remettre en service");
   await expect(page.getByText("La voiture est de nouveau disponible.")).toBeVisible();
   await page.goto("/fleet?tab=available");
   await expect(page.getByTestId("fleet-list")).toContainText(plate);

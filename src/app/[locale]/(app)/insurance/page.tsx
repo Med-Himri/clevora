@@ -1,14 +1,15 @@
-import { ShieldCheckIcon } from "lucide-react";
+import { SearchXIcon, ShieldCheckIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
 import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
-import { Badge } from "@/components/ui/badge";
-import { Link } from "@/i18n/navigation";
+import { ResponsiveList, type Column } from "@/components/app/responsive-list";
+import { SearchBar } from "@/components/app/search-bar";
+import { StatusPill } from "@/components/app/status-pill";
 import { dateStatus, paperGroup, type DateStatus, type PaperGroup } from "@/lib/alerts/compute";
 import { requireAgency } from "@/lib/auth/session";
-import { dayKey, formatDate } from "@/lib/format";
+import { dayKey, formatDate, plateNorm } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { PapersSheet } from "./papers-sheet";
 
@@ -19,8 +20,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const GROUPS: PaperGroup[] = ["expired", "week", "month", "later"];
 
-export default async function InsurancePage() {
+export default async function InsurancePage({ searchParams }: PageProps<"/[locale]/insurance">) {
   const { agency } = await requireAgency();
+  const sp = await searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const t = await getTranslations("insurance");
   const supabase = await createClient();
   const [{ data: cars }, { data: cfg }] = await Promise.all([
@@ -42,13 +45,47 @@ export default async function InsurancePage() {
   });
   rows.sort((a, b) => (a.min ?? 1e9) - (b.min ?? 1e9));
 
-  const badge = (s: DateStatus) => {
-    if (s.state === "unknown") return <Badge variant="neutral">{t("unknown")}</Badge>;
-    const days = t("inDays", { days: s.daysLeft ?? 0 });
-    if (s.state === "expired") return <Badge variant="danger">{t("expired")}</Badge>;
-    if (s.state === "soon") return <Badge variant="warning">{t("soon")} · {days}</Badge>;
-    return <Badge variant="success">{t("ok")} · {days}</Badge>;
+  const needle = q.toLowerCase();
+  const shown = q ? rows.filter((r) => plateNorm(r.plate).includes(plateNorm(q)) || r.brand_model.toLowerCase().includes(needle) || (r.insurer ?? "").toLowerCase().includes(needle)) : rows;
+  type Row = (typeof rows)[number];
+
+  /** Date with a coloured dot, and how long is left underneath. */
+  const paper = (date: string | null, s: DateStatus) => {
+    if (s.state === "unknown") return <StatusPill tone="neutral" label={t("unknown")} />;
+    const tone = s.state === "expired" ? "danger" : s.state === "soon" ? "warning" : "success";
+    return <StatusPill tone={tone} label={<Ltr>{formatDate(date)}</Ltr>} detail={s.state === "expired" ? t("expired") : t("inDays", { days: s.daysLeft ?? 0 })} />;
   };
+
+  const columns: Column<Row>[] = [
+    {
+      key: "car",
+      header: t("car"),
+      priority: "primary",
+      className: "lg:min-w-44",
+      cell: (c) => (
+        <span className="flex flex-col">
+          <span>{c.brand_model}</span>
+          <Ltr className="text-xs font-normal tracking-wide text-muted-foreground">{c.plate}</Ltr>
+        </span>
+      ),
+    },
+    { key: "ins", header: t("insuranceEnd"), priority: "high", cell: (c) => paper(c.insurance_expires_on, c.ins) },
+    { key: "vis", header: t("visitEnd"), priority: "high", cell: (c) => paper(c.technical_visit_expires_on, c.vis) },
+    {
+      key: "insurer",
+      header: t("insurerColumn"),
+      priority: "low",
+      cell: (c) =>
+        c.insurer || c.policy_number ? (
+          <span className="flex flex-col leading-tight">
+            <span>{c.insurer ?? "—"}</span>
+            {c.policy_number ? <Ltr className="text-xs text-muted-foreground">{c.policy_number}</Ltr> : null}
+          </span>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+  ];
 
   return (
     <>
@@ -56,55 +93,27 @@ export default async function InsurancePage() {
       {rows.length === 0 ? (
         <EmptyState icon={ShieldCheckIcon} title={t("empty")} />
       ) : (
-        <div className="flex flex-col gap-6" data-testid="insurance-groups">
-          {GROUPS.map((g) => {
-            const items = rows.filter((r) => r.group === g);
-            if (!items.length) return null;
-            return (
-              <section key={g} aria-labelledby={`ins-${g}`} data-group={g}>
-                <h2 id={`ins-${g}`} className={`mb-2 flex items-center gap-2 font-semibold ${g === "expired" ? "text-destructive" : ""}`}>
-                  {t(`groups.${g}`)}
-                  <span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-muted px-2 text-xs font-bold">{items.length}</span>
-                </h2>
-                <ul className="grid gap-2 lg:grid-cols-2">
-                  {items.map((c) => (
-                    <li key={c.id} className="flex flex-col gap-3 rounded-xl border bg-card p-4" data-testid="insurance-row">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <Link href={`/fleet/${c.id}`} className="min-w-0">
-                          <span className="block font-semibold">{c.brand_model}</span>
-                          <Ltr className="text-sm text-muted-foreground">{c.plate}</Ltr>
-                        </Link>
-                        <PapersSheet vehicleId={c.id} label={`${c.brand_model} · ${c.plate}`} insurance={c.insurance_expires_on} visit={c.technical_visit_expires_on} insurer={c.insurer} policy={c.policy_number} />
-                      </div>
-                      <dl className="grid gap-2 text-sm sm:grid-cols-2">
-                        <div className="flex flex-col gap-1">
-                          <dt className="text-muted-foreground">{t("insuranceEnd")}</dt>
-                          <dd className="flex flex-wrap items-center gap-2">
-                            {c.insurance_expires_on ? <Ltr className="font-medium">{formatDate(c.insurance_expires_on)}</Ltr> : null}
-                            {badge(c.ins)}
-                          </dd>
-                          {c.insurer || c.policy_number ? (
-                            <dd className="text-xs text-muted-foreground">
-                              {c.insurer}
-                              {c.policy_number ? <> · <Ltr>{c.policy_number}</Ltr></> : null}
-                            </dd>
-                          ) : null}
-                        </div>
-                        <div className="flex flex-col gap-1">
-                          <dt className="text-muted-foreground">{t("visitEnd")}</dt>
-                          <dd className="flex flex-wrap items-center gap-2">
-                            {c.technical_visit_expires_on ? <Ltr className="font-medium">{formatDate(c.technical_visit_expires_on)}</Ltr> : null}
-                            {badge(c.vis)}
-                          </dd>
-                        </div>
-                      </dl>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
-        </div>
+        <>
+          <div className="mb-4 lg:max-w-sm">
+            <SearchBar placeholder={t("search")} />
+          </div>
+          {shown.length === 0 ? (
+            <EmptyState icon={SearchXIcon} title={t("noResult")} />
+          ) : (
+            <ResponsiveList
+              testId="insurance-groups"
+              rowTestId="insurance-row"
+              caption={t("title")}
+              columns={columns}
+              rowKey={(c) => c.id}
+              rowHref={(c) => `/fleet/${c.id}`}
+              groups={GROUPS.map((g) => ({ key: g, label: t(`groups.${g}`), tone: g === "expired" ? "danger" : g === "week" ? "warning" : "default", rows: shown.filter((r) => r.group === g) }))}
+              actions={(c) => (
+                <PapersSheet vehicleId={c.id} label={`${c.brand_model} · ${c.plate}`} insurance={c.insurance_expires_on} visit={c.technical_visit_expires_on} insurer={c.insurer} policy={c.policy_number} />
+              )}
+            />
+          )}
+        </>
       )}
     </>
   );

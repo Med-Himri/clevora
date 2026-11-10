@@ -28,7 +28,20 @@ export type ChargeRow = {
   is_recurring: boolean;
 };
 
-export function ChargeSheet({ charge, cars, defaultDate }: { charge?: ChargeRow; cars: Array<{ id: string; label: string }>; defaultDate?: string }) {
+export function ChargeSheet({
+  charge,
+  cars,
+  defaultDate,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  charge?: ChargeRow;
+  cars: Array<{ id: string; label: string }>;
+  defaultDate?: string;
+  /** Controlled from outside (e.g. a row menu): no trigger button is rendered. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const t = useTranslations("charges");
   const tf = useTranslations("fleet");
   const tc = useTranslations("common");
@@ -36,7 +49,10 @@ export function ChargeSheet({ charge, cars, defaultDate }: { charge?: ChargeRow;
   const tv = useTranslations("validation");
   const tn = useTranslations("notices");
   const { writable } = useAgency();
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const controlled = controlledOpen !== undefined;
+  const open = controlled ? controlledOpen : ownOpen;
+  const setOpen = (o: boolean) => (controlled ? onOpenChange?.(o) : setOwnOpen(o));
   const [pending, startTransition] = useTransition();
   const [category, setCategory] = useState<ChargeRow["category"] | undefined>(charge?.category);
   const [date, setDate] = useState(charge?.date ?? defaultDate ?? dayKey(new Date()));
@@ -82,7 +98,7 @@ export function ChargeSheet({ charge, cars, defaultDate }: { charge?: ChargeRow;
 
   return (
     <>
-      {charge ? (
+      {controlled ? null : charge ? (
         <Button variant="ghost" size="sm" onClick={() => setOpen(true)} disabled={!writable}>
           <PencilIcon aria-hidden />
           {t("edit")}

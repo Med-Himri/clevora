@@ -57,6 +57,14 @@ export const NAV_ITEMS: NavItem[] = [
 export const BOTTOM_KEYS: NavKey[] = ["dashboard", "reservations", "fleet"];
 export const NEW_RESERVATION_HREF = "/reservations/new";
 
+/** Sidebar sections, in order. */
+export const NAV_SECTIONS: Array<{ key: "activity" | "fleet" | "management" | "agency"; items: NavKey[] }> = [
+  { key: "activity", items: ["dashboard", "reservations", "contracts", "planning"] },
+  { key: "fleet", items: ["fleet", "insurance", "oil"] },
+  { key: "management", items: ["charges", "statistics", "assistant"] },
+  { key: "agency", items: ["team", "settings"] },
+];
+
 export function navItemsFor(role: Role): NavItem[] {
   return NAV_ITEMS.filter((item) => !item.roles || item.roles.includes(role));
 }
