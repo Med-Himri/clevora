@@ -76,3 +76,17 @@ test("no page scrolls sideways (fr and ar)", async ({ page }) => {
     }
   }
 });
+
+test("light / dark switch in the header is saved in the profile", async ({ page }) => {
+  const { createTestAgency, login, admin } = await import("./helpers");
+  const agency = await createTestAgency();
+  await login(page, agency.email, agency.password);
+  await page.getByTestId("mode-toggle").click();
+  await page.getByRole("menuitem", { name: "Sombre" }).click();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect
+    .poll(async () => (await admin().from("profiles").select("preferred_theme").eq("id", agency.userId).single()).data?.preferred_theme)
+    .toBe("dark");
+  await page.reload();
+  await expect(page.locator("html")).toHaveClass(/dark/);
+});

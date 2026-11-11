@@ -80,8 +80,8 @@ export function Sidebar({
             const list = section.items.map((k) => items.find((i) => i.key === k)).filter((i): i is NavItem => Boolean(i));
             if (!list.length) return null;
             return (
-              <div key={section.key} className={cn(si > 0 && "mt-2 border-t pt-2 xl:mt-2.5 xl:border-t-0 xl:pt-0", si > 0 && open && "border-t-0 pt-0")}>
-                <p className={cn("mb-0.5 px-3 text-[11px] leading-5 font-semibold tracking-wider text-muted-foreground/80 uppercase", !open && "hidden xl:block")}>
+              <div key={section.key} className={cn(si > 0 && "mt-2 border-t pt-2 xl:mt-1.5 xl:border-t-0 xl:pt-0", si > 0 && open && "border-t-0 pt-0")}>
+                <p className={cn("mb-0.5 px-3 text-[10px] leading-5 font-semibold tracking-wider text-muted-foreground/80 uppercase", !open && "hidden xl:block")}>
                   {t(`sections.${section.key}`)}
                 </p>
                 <ul className="flex flex-col gap-0.5">
@@ -96,14 +96,14 @@ export function Sidebar({
                           aria-current={active ? "page" : undefined}
                           title={open ? undefined : t(item.key)}
                           className={cn(
-                            "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors xl:min-h-10",
+                            "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors xl:min-h-9 xl:gap-2.5 xl:text-sm",
                             active
                               ? "bg-primary/10 text-primary before:absolute before:inset-y-2 before:start-0 before:w-1 before:rounded-full before:bg-primary dark:bg-accent dark:text-foreground"
                               : "text-muted-foreground hover:bg-accent hover:text-foreground",
                             !open && "justify-center px-0 xl:justify-start xl:px-3",
                           )}
                         >
-                          <Icon className="size-5 shrink-0" aria-hidden />
+                          <Icon className="size-5 shrink-0 xl:size-[18px]" aria-hidden />
                           <span className={cn("flex-1 truncate", !open && "sr-only xl:not-sr-only")}>{t(item.key)}</span>
                           {badge ? (
                             <NavBadge
@@ -122,7 +122,7 @@ export function Sidebar({
           })}
         </nav>
 
-        <p className={cn("border-t px-3 py-3 text-xs text-muted-foreground", !open && "hidden xl:block")}>{t("poweredBy")}</p>
+        <p className={cn("border-t px-3 py-2.5 text-xs text-muted-foreground", !open && "hidden xl:block")}>{t("poweredBy")}</p>
       </aside>
     </>
   );

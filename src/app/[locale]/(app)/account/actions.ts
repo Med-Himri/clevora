@@ -72,3 +72,14 @@ export async function updatePreferencesAction(input: PreferencesInput): Promise<
   revalidatePath("/", "layout");
   return ok();
 }
+
+/** Theme from the header switch: saved in the profile so every device follows. */
+export async function updateThemeAction(theme: "light" | "dark" | "system"): Promise<ActionResult> {
+  if (!["light", "dark", "system"].includes(theme)) return fail("invalidForm");
+  const user = await getUser();
+  if (!user) return fail("notLoggedIn");
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update({ preferred_theme: theme }).eq("id", user.id);
+  if (error) return fail("unknown");
+  return ok();
+}

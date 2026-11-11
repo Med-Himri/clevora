@@ -31,7 +31,7 @@ test("signup in 3 steps creates an agency and lands on Aujourd'hui with the tria
 
   await page.waitForURL(/\/dashboard/);
   await expect(page.getByTestId("header-agency-name")).toHaveText(agencyName);
-  await expect(page.getByTestId("trial-banner")).toContainText("14 jours");
+  await expect(page.getByTestId("trial-banner")).toHaveCount(0); // the trial is not announced on every page
   // the agency colour drives --brand
   const brand = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--brand").trim());
   expect(brand.toUpperCase()).toBe("#0F766E");

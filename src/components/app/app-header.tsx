@@ -1,10 +1,11 @@
 import { AgencyLogo } from "@/components/app/agency-logo";
+import { ModeToggle } from "@/components/app/mode-toggle";
 import { UserMenu } from "@/components/app/user-menu";
 import { Link } from "@/i18n/navigation";
 
 /**
  * Sticky header: agency logo + name (in the sidebar on laptops), and on the
- * right the user's name with the role under it and the account menu.
+ * right the light/dark switch, the user's name with the role under it and the account menu.
  */
 export function AppHeader({
   agencyName,
@@ -30,7 +31,10 @@ export function AppHeader({
             {agencyName}
           </span>
         </Link>
-        <UserMenu name={userName} email={userEmail} roleLabel={roleLabel} canSwitchAgency={canSwitchAgency} />
+        <div className="flex shrink-0 items-center gap-1">
+          <ModeToggle />
+          <UserMenu name={userName} email={userEmail} roleLabel={roleLabel} canSwitchAgency={canSwitchAgency} />
+        </div>
       </div>
     </header>
   );
