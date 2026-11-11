@@ -10,11 +10,18 @@ import { cn } from "@/lib/utils";
 
 type Base = Omit<React.ComponentProps<"input">, "value" | "onChange" | "type">;
 
+/**
+ * The browser's own calendar / clock button is made invisible and stretched
+ * over our icon, so there is one icon and tapping it opens the picker.
+ */
+const PICKER =
+  "relative pe-11 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-y-0 [&::-webkit-calendar-picker-indicator]:end-0 [&::-webkit-calendar-picker-indicator]:h-auto [&::-webkit-calendar-picker-indicator]:w-11 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0";
+
 /** Date (yyyy-mm-dd value). The phone's own date picker; shown as dd/mm/yyyy in French. */
 export function DateField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
   return (
     <div className="relative">
-      <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} className={cn("pe-10", className)} {...props} />
+      <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} className={cn(PICKER, className)} {...props} />
       <CalendarIcon className="pointer-events-none absolute end-3 top-3 size-5 text-muted-foreground" aria-hidden />
     </div>
   );
@@ -24,7 +31,7 @@ export function DateField({ value, onChange, className, ...props }: Base & { val
 export function TimeField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
   return (
     <div className="relative">
-      <Input type="time" step={300} value={value} onChange={(e) => onChange(e.target.value)} className={cn("pe-10", className)} {...props} />
+      <Input type="time" step={300} value={value} onChange={(e) => onChange(e.target.value)} className={cn(PICKER, className)} {...props} />
       <ClockIcon className="pointer-events-none absolute end-3 top-3 size-5 text-muted-foreground" aria-hidden />
     </div>
   );

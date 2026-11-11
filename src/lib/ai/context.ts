@@ -49,7 +49,7 @@ export async function buildAgencyContext(ctx: ToolContext, agencyName: string): 
     supabase.from("reservations").select(RES).eq("agency_id", agencyId).eq("status", "on_rental").lt("end_at", now.toISOString()).order("end_at"),
     supabase
       .from("agencies")
-      .select("min_driver_age, min_license_years, default_deposit, default_franchise, equipment_items, document_items, city, phone, public_booking_enabled")
+      .select("min_driver_age, min_license_years, default_deposit, default_franchise, equipment_items, document_items, city, phone")
       .eq("id", agencyId)
       .single(),
     supabase.from("clients").select("id", { count: "exact", head: true }).eq("agency_id", agencyId),

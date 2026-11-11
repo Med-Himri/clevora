@@ -24,7 +24,6 @@ import {
   agencySettingsSchema,
   alertSettingsSchema,
   assistantSettingsSchema,
-  bookingSettingsSchema,
   contractSettingsSchema,
   legalSettingsSchema,
   type SettingsInput,
@@ -322,33 +321,6 @@ export function AssistantForm({ values, inPlan }: { values: SettingsInput<"assis
       {!inPlan ? <p className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">{t("notInPlan")}</p> : null}
       <Controller control={form.control} name="ai_enabled" render={({ field }) => <YesNo id="s-ai" label={t("enabled")} value={field.value} onChange={field.onChange} />} />
       <p className="text-sm text-muted-foreground">{t("hint")}</p>
-    </SectionForm>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Réservation en ligne (public page /r/{slug})
-// ---------------------------------------------------------------------------
-export function BookingForm({ values, url }: { values: SettingsInput<"booking">; url: string }) {
-  const t = useTranslations("settings.booking");
-  const form = useForm<z.input<typeof bookingSettingsSchema>, unknown, z.output<typeof bookingSettingsSchema>>({ resolver: zodResolver(bookingSettingsSchema), defaultValues: values });
-  const f = form as unknown as UseFormReturn<FieldValues>;
-  const enabled = useWatch({ control: form.control, name: "public_booking_enabled" });
-  return (
-    <SectionForm section="booking" form={form}>
-      <Controller control={form.control} name="public_booking_enabled" render={({ field }) => <YesNo id="s-booking" label={t("enabled")} value={field.value} onChange={field.onChange} />} />
-      <div className="flex flex-col gap-1 rounded-lg bg-muted/60 p-3 text-sm">
-        <span className="text-muted-foreground">{t("link")}</span>
-        {enabled ? (
-          <a href={url} target="_blank" rel="noopener" className="font-semibold break-all underline underline-offset-4" dir="ltr" data-testid="public-link">{url}</a>
-        ) : (
-          <span className="font-semibold break-all text-muted-foreground" dir="ltr">{url}</span>
-        )}
-        <span className="text-muted-foreground">{t("linkHint")}</span>
-      </div>
-      <Field id="s-booking-message" label={t("message")} error={err(f, "public_booking_message")} hint={t("messageHint")}>
-        <Textarea id="s-booking-message" rows={3} dir="auto" maxLength={500} {...form.register("public_booking_message")} />
-      </Field>
     </SectionForm>
   );
 }

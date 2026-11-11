@@ -1,4 +1,4 @@
-import { BellIcon, GlobeIcon, BuildingIcon, DatabaseIcon, FileTextIcon, MonitorIcon, ScaleIcon, SparklesIcon, type LucideIcon } from "lucide-react";
+import { BellIcon, BuildingIcon, DatabaseIcon, FileTextIcon, MonitorIcon, ScaleIcon, SparklesIcon, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/app/page-header";
@@ -11,8 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { PreferencesForm } from "../account/account-forms";
 import { DataSection } from "./components/data-section";
-import { AgencyForm, AlertsForm, AssistantForm, BookingForm, ContractForm, LegalForm } from "./components/settings-forms";
-import { siteUrl } from "@/lib/env";
+import { AgencyForm, AlertsForm, AssistantForm, ContractForm, LegalForm } from "./components/settings-forms";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -25,7 +24,6 @@ const SECTIONS = [
   { key: "contract", icon: FileTextIcon, admin: true },
   { key: "alerts", icon: BellIcon, admin: true },
   { key: "assistant", icon: SparklesIcon, admin: true },
-  { key: "booking", icon: GlobeIcon, admin: true },
   { key: "display", icon: MonitorIcon, admin: false },
   { key: "data", icon: DatabaseIcon, admin: true },
 ] as const satisfies ReadonlyArray<{ key: string; icon: LucideIcon; admin: boolean }>;
@@ -78,7 +76,6 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
       ),
       alerts: <AlertsForm values={{ alert_days_before: a.alert_days_before, alert_km_before: a.alert_km_before, alert_roles: a.alert_roles as Array<"admin" | "staff"> }} />,
       assistant: <AssistantForm values={{ ai_enabled: a.ai_enabled }} inPlan={Boolean(quota?.[0]?.plan_allows)} />,
-      booking: <BookingForm values={{ public_booking_enabled: a.public_booking_enabled, public_booking_message: text(a.public_booking_message) }} url={siteUrl(`/r/${a.slug}`)} />,
       data: <DataSection agencyName={a.name} />,
     }[section];
   }

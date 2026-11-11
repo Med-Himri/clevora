@@ -56,10 +56,14 @@ test("admin: answers come from the agency's own database (summary + tools), neve
   await expect(page.getByTestId("assistant-docs")).toHaveCount(0); // no documents needed
   await expectNoHorizontalScroll(page);
   const ask = async (q: string) => {
+    const answers = page.getByTestId("assistant-answer");
+    const before = await answers.count();
     await page.getByLabel("Votre question").fill(q);
     await page.keyboard.press("Enter");
-    const answer = page.getByTestId("assistant-answer").last();
-    await expect(answer).not.toContainText("Je réfléchis");
+    // Wait for THIS question's answer to exist and finish streaming.
+    await expect(answers).toHaveCount(before + 1);
+    const answer = answers.nth(before);
+    await expect(answer.getByRole("status")).toHaveCount(0);
     return answer;
   };
 

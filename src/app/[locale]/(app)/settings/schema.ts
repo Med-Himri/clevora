@@ -54,18 +54,12 @@ export const alertSettingsSchema = z.object({
 
 export const assistantSettingsSchema = z.object({ ai_enabled: z.boolean() });
 
-export const bookingSettingsSchema = z.object({
-  public_booking_enabled: z.boolean(),
-  public_booking_message: optionalText(500),
-});
-
 export const SETTINGS_SCHEMAS = {
   agency: agencySettingsSchema,
   legal: legalSettingsSchema,
   contract: contractSettingsSchema,
   alerts: alertSettingsSchema,
   assistant: assistantSettingsSchema,
-  booking: bookingSettingsSchema,
 } as const;
 
 export type SettingsSection = keyof typeof SETTINGS_SCHEMAS;

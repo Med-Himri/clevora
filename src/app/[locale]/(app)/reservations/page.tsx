@@ -1,8 +1,7 @@
-import { CalendarCheckIcon, GlobeIcon, PlusIcon, SearchIcon, SearchXIcon, SirenIcon } from "lucide-react";
+import { CalendarCheckIcon, PlusIcon, SearchIcon, SearchXIcon, SirenIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
-import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { SearchBar } from "@/components/app/search-bar";
 import { Button } from "@/components/ui/button";
@@ -29,10 +28,7 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
   const time = typeof sp.time === "string" ? sp.time : "";
   const t = await getTranslations("reservations");
   const supabase = await createClient();
-  const [rows, { count: newRequests }] = await Promise.all([
-    listReservations(supabase, agency.id, q),
-    supabase.from("booking_requests").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "new"),
-  ]);
+  const rows = await listReservations(supabase, agency.id, q);
   const now = new Date();
 
   const returns = rows.filter((r) => r.status === "on_rental");
@@ -47,21 +43,12 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
       <PageHeader
         title={t("title")}
         action={
-          <>
-            <Button size="lg" variant="outline" asChild>
-              <Link href="/reservations/requests" data-testid="requests-link">
-                <GlobeIcon aria-hidden />
-                {t("onlineRequests")}
-                {newRequests ? <span className="ms-1 rounded-full bg-warning-soft px-2 text-xs font-bold text-foreground"><Ltr>{newRequests}</Ltr></span> : null}
-              </Link>
-            </Button>
-            <Button size="lg" asChild>
-              <Link href="/reservations/new">
-                <PlusIcon aria-hidden />
-                {t("new")}
-              </Link>
-            </Button>
-          </>
+          <Button size="lg" asChild>
+            <Link href="/reservations/new">
+              <PlusIcon aria-hidden />
+              {t("new")}
+            </Link>
+          </Button>
         }
       />
 

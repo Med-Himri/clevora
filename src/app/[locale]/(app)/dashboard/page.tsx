@@ -7,12 +7,9 @@ import {
   CornerDownLeftIcon,
   DropletIcon,
   FileSignatureIcon,
-  GlobeIcon,
   LogOutIcon,
-  PhoneIcon,
   PlusIcon,
   ShieldAlertIcon,
-  TruckIcon,
   WalletIcon,
   WrenchIcon,
 } from "lucide-react";
@@ -21,15 +18,15 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { StatTile } from "@/components/app/stat-tile";
-import { UrgencyGroups } from "@/components/app/urgency-groups";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
-import { formatDate, formatMoney, formatTime } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { getDashboard, type DashboardAlert, type DashboardReservation } from "./queries";
+import { MovementList } from "./components/movement-list";
+import { getDashboard, type DashboardAlert } from "./queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("dashboard");
@@ -44,58 +41,7 @@ export default async function DashboardPage() {
   const format = await getFormatter();
   const supabase = await createClient();
   const now = new Date();
-  const [d, { count: newRequests }] = await Promise.all([
-    getDashboard(supabase, agency.id, isAdmin, now),
-    supabase.from("booking_requests").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "new"),
-  ]);
-
-  const row = (r: DashboardReservation, kind: "return" | "departure") => {
-    const at = kind === "return" ? r.end_at : r.start_at;
-    const late = kind === "return" && new Date(r.end_at) < now;
-    return (
-      <li key={r.id} className="flex flex-col gap-2 rounded-xl border bg-card p-3" data-testid={`dash-${kind}`}>
-        <Link href={`/contracts/${r.id}`} className="flex min-w-0 flex-1 flex-col gap-0.5 rounded-md">
-          <span className="flex flex-wrap items-center gap-2">
-            <span className={cn("font-bold tabular-nums", late && "text-destructive")}>
-              <Ltr>{formatTime(at)}</Ltr>
-            </span>
-            <span className="font-semibold">{r.client.full_name}</span>
-          </span>
-          <span className="text-sm text-muted-foreground">
-            {r.vehicle.brand_model} · <Ltr>{r.vehicle.plate}</Ltr> · <Ltr>{r.contract_number}</Ltr>
-          </span>
-          {kind === "departure" && r.delivery && r.delivery_place ? (
-            <span className="flex items-center gap-1 text-sm">
-              <TruckIcon className="size-4 text-muted-foreground" aria-hidden />
-              {t("deliveryAt", { place: r.delivery_place })}
-            </span>
-          ) : null}
-          {kind === "return" && r.return_place ? (
-            <span className="flex items-center gap-1 text-sm">
-              <TruckIcon className="size-4 text-muted-foreground" aria-hidden />
-              {t("returnAt", { place: r.return_place })}
-            </span>
-          ) : null}
-        </Link>
-        <div className="flex flex-wrap gap-2">
-          {r.client.phone ? (
-            <Button variant="outline" size="sm" asChild>
-              <a href={`tel:${r.client.phone}`} aria-label={t("call", { name: r.client.full_name })}>
-                <PhoneIcon aria-hidden />
-                {t("callShort")}
-              </a>
-            </Button>
-          ) : null}
-          <Button size="sm" variant={kind === "return" ? "default" : "outline"} asChild>
-            <Link href={`/contracts/${r.id}${kind === "return" ? "?do=return" : ""}`}>
-              {kind === "return" ? <CornerDownLeftIcon aria-hidden /> : <FileSignatureIcon aria-hidden />}
-              {kind === "return" ? t("return") : r.signed_at ? t("open") : t("sign")}
-            </Link>
-          </Button>
-        </div>
-      </li>
-    );
-  };
+  const d = await getDashboard(supabase, agency.id, isAdmin, now);
 
   const alertItem = (a: DashboardAlert, i: number) => {
     const map = {
@@ -137,17 +83,6 @@ export default async function DashboardPage() {
         }
       />
 
-      {newRequests ? (
-        <Link
-          href="/reservations/requests"
-          className="mb-4 flex min-h-12 items-center gap-3 rounded-xl border border-warning/40 bg-warning-soft px-4 py-2 font-semibold"
-          data-testid="dash-requests"
-        >
-          <GlobeIcon className="size-5 shrink-0 text-warning" aria-hidden />
-          <span className="flex-1">{t("newRequests", { count: newRequests })}</span>
-          <ArrowUpRightIcon className="size-4 shrink-0 rtl:-scale-x-100" aria-hidden />
-        </Link>
-      ) : null}
 
       <ul className={cn("grid grid-cols-2 gap-3 md:grid-cols-3", isAdmin ? "2xl:grid-cols-6" : "2xl:grid-cols-5")}>
         <li><StatTile label={t("tiles.available")} value={d.stats.available} icon={CircleCheckIcon} tone="success" href="/fleet?tab=available" testId="stat-available" /></li>
@@ -161,29 +96,8 @@ export default async function DashboardPage() {
       </ul>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_340px]">
-        <section aria-labelledby="returns-title" className="min-w-0">
-          <h2 id="returns-title" className="mb-3 flex items-center gap-2 text-xl font-bold">
-            <CornerDownLeftIcon className="size-5 text-muted-foreground" aria-hidden />
-            {t("returns")}
-          </h2>
-          {d.returns.length ? (
-            <UrgencyGroups items={d.returns} getDate={(r) => r.end_at} now={now} testId="dash-returns" render={(items) => <ul className="flex flex-col gap-2">{items.map((r) => row(r, "return"))}</ul>} />
-          ) : (
-            <p className="rounded-xl border border-dashed p-4 text-muted-foreground">{t("noReturns")}</p>
-          )}
-        </section>
-
-        <section aria-labelledby="departures-title" className="min-w-0">
-          <h2 id="departures-title" className="mb-3 flex items-center gap-2 text-xl font-bold">
-            <CalendarCheckIcon className="size-5 text-muted-foreground" aria-hidden />
-            {t("departures")}
-          </h2>
-          {d.departures.length ? (
-            <UrgencyGroups items={d.departures} getDate={(r) => r.start_at} now={now} testId="dash-departures" render={(items) => <ul className="flex flex-col gap-2">{items.map((r) => row(r, "departure"))}</ul>} />
-          ) : (
-            <p className="rounded-xl border border-dashed p-4 text-muted-foreground">{t("noDepartures")}</p>
-          )}
-        </section>
+        <MovementList kind="return" items={d.returns} now={now} title={t("returns")} icon={CornerDownLeftIcon} empty={t("noReturns")} />
+        <MovementList kind="departure" items={d.departures} now={now} title={t("departures")} icon={CalendarCheckIcon} empty={t("noDepartures")} />
 
         <Card className="order-first h-fit lg:col-span-2 2xl:order-none 2xl:col-span-1 2xl:sticky 2xl:top-20">
           <CardHeader>

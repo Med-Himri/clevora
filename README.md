@@ -87,10 +87,9 @@ npm run test:e2e
 - Nothing of the conversation is stored. One `activity_log` row per question keeps only the tools used and token counts.
 - Admins add agency documents (règlement, conditions, tarifs) as text; the assistant searches them (Postgres full-text search, `search_chunks`) and cites them.
 
-## Abonnement, espace Parcolia, réservation en ligne
+## Abonnement, espace Parcolia
 
 - `/billing` (admins): plan, usage, choose a plan → pending payment with a reference (works even in read-only mode). Payment provider interface in `src/lib/billing/provider.ts` (manual today). Bank details from `PARCOLIA_*` variables.
 - `/platform` (Parcolia staff, `public.platform_admins`; 404 for everyone else): all agencies, confirm payments (creates invoice `F-YYYY-NNNNN`, activates the plan), change plan/status/dates. Local demo: `platform@demo.parcolia.ma` / `Demo-Parcolia-2026`.
 - Invoices: `/api/invoices/{id}` PDF, generated on demand (TVA 20 % included in prices).
 - `/` marketing page with prices read from the `plans` table.
-- `/r/{slug}`: public booking page, opened in Paramètres › Réservation en ligne. Requests are written by the server only, after Cloudflare Turnstile (`TURNSTILE_SECRET_KEY`, required in production) and a 5-per-hour limit per address. They appear in Réservations › Demandes en ligne and on Aujourd'hui, and admins get an email.

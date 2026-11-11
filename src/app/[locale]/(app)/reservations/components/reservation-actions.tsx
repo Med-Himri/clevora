@@ -187,7 +187,7 @@ function ReturnDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent closeLabel={tc("close")}>
+      <DialogContent closeLabel={tc("close")} className="sm:max-w-2xl" data-testid="return-dialog">
         <DialogHeader>
           <DialogTitle>{t("returnTitle")}</DialogTitle>
           <DialogDescription>{t("returnSubtitle")}</DialogDescription>
@@ -213,13 +213,14 @@ function ReturnDialog({
               {t("extraDays", { count: extraDays, amount: formatMoney(extraAmount) })}
             </Alert>
           ) : null}
-          <div className="grid gap-3 border-t pt-4 sm:grid-cols-2">
-            <Field id="ret-amount" label={t("balanceToPay")} hint={t("balanceDue", { amount: formatMoney(due) })}>
+          {/* Amount, then the 4 ways of paying on their own full-width row (they never overflow) */}
+          <div className="flex flex-col gap-3 border-t pt-4">
+            <Field id="ret-amount" label={t("balanceToPay")} hint={t("balanceDue", { amount: formatMoney(due) })} className="sm:max-w-xs">
               <MoneyField id="ret-amount" value={amount ?? due} onChange={setAmount} />
             </Field>
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">{t("method")}</span>
-              <ChoiceChips name="ret-method" label={t("method")} value={method} onChange={setMethod} className="grid-cols-2" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
+              <ChoiceChips name="ret-method" label={t("method")} value={method} onChange={setMethod} className="grid-cols-2 sm:grid-cols-4" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
             </div>
           </div>
           {r.deposit_taken ? (
@@ -227,13 +228,13 @@ function ReturnDialog({
               <span className="font-semibold">{t("refundDeposit", { amount: formatMoney(r.deposit_amount) })}</span>
               <YesNo label={t("refundDeposit", { amount: formatMoney(r.deposit_amount) })} value={refund} onChange={setRefund} />
               {refund ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Field id="ret-refund" label={t("refundAmount")}>
+                <div className="flex flex-col gap-3">
+                  <Field id="ret-refund" label={t("refundAmount")} className="sm:max-w-xs">
                     <MoneyField id="ret-refund" value={refundAmount} onChange={setRefundAmount} />
                   </Field>
                   <div className="flex flex-col gap-2">
                     <span className="text-sm font-medium">{t("method")}</span>
-                    <ChoiceChips name="ret-refund-method" label={t("method")} value={refundMethod} onChange={setRefundMethod} className="grid-cols-2" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
+                    <ChoiceChips name="ret-refund-method" label={t("method")} value={refundMethod} onChange={setRefundMethod} className="grid-cols-2 sm:grid-cols-4" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
                   </div>
                 </div>
               ) : null}
@@ -348,7 +349,7 @@ function PaymentDialog({
         </div>
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium">{t("method")}</span>
-          <ChoiceChips name="pay-method" label={t("method")} value={method} onChange={setMethod} className="grid-cols-2" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
+          <ChoiceChips name="pay-method" label={t("method")} value={method} onChange={setMethod} className="grid-cols-2 sm:grid-cols-4" options={PAYMENT_METHODS.map((m) => ({ value: m, label: tp(m) }))} />
         </div>
         <DialogFooter>
           <Button size="lg" onClick={() => amount && onSubmit({ amount, method, kind, note: "" })} disabled={pending || !amount}>

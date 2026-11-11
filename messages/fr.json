@@ -296,7 +296,7 @@
       "oilDue": "Vidange à faire : {car}",
       "maintenanceLate": "{car} : retour de maintenance prévu le {date}, toujours au garage"
     },
-    "newRequests": "{count, plural, one {# nouvelle demande de réservation en ligne} other {# nouvelles demandes de réservation en ligne}}"
+    "seeAll": "Voir les {count} réservations"
   },
   "billing": {
     "title": "Abonnement",
@@ -903,8 +903,7 @@
       "amount": "Montant",
       "kind": "Type",
       "savePayment": "Enregistrer le paiement"
-    },
-    "onlineRequests": "Demandes en ligne"
+    }
   },
   "contracts": {
     "title": "Contrats",
@@ -1231,8 +1230,7 @@
       "alerts": "Alertes",
       "assistant": "Assistant IA",
       "display": "Affichage",
-      "data": "Données",
-      "booking": "Réservation en ligne"
+      "data": "Données"
     },
     "descriptions": {
       "agency": "Nom, logo, couleur et coordonnées : affichés dans l'application et sur les contrats.",
@@ -1241,8 +1239,7 @@
       "alerts": "Quand prévenir pour l'assurance, la visite technique et la vidange, et qui reçoit les e-mails.",
       "assistant": "Autoriser ou non l'assistant IA dans votre agence.",
       "display": "Langue et thème, pour vous seulement.",
-      "data": "Télécharger toutes vos données ou supprimer l'agence.",
-      "booking": "Une page publique avec vos voitures et vos prix, où les clients envoient une demande."
+      "data": "Télécharger toutes vos données ou supprimer l'agence."
     },
     "agency": {
       "name": "Nom de l'agence",
@@ -1307,13 +1304,6 @@
       "typeName": "Pour confirmer, écrivez le nom de l'agence : {name}",
       "deleteForever": "Supprimer définitivement",
       "deleted": "L'agence a été supprimée."
-    },
-    "booking": {
-      "enabled": "Ouvrir la page de réservation en ligne ?",
-      "link": "Lien de votre page",
-      "linkHint": "Partagez-le sur WhatsApp, Instagram, Facebook ou Google. Les plaques ne sont jamais affichées.",
-      "message": "Message d'accueil (facultatif)",
-      "messageHint": "Par exemple vos horaires ou la livraison gratuite à l'aéroport."
     }
   },
   "platform": {
@@ -1477,64 +1467,11 @@
         "a": "Chaque agence ne voit que ses propres données. Vous pouvez tout télécharger en Excel ou supprimer votre agence à tout moment."
       },
       "5": {
-        "q": "Puis-je recevoir des réservations en ligne ?",
-        "a": "Oui : activez votre page de réservation et partagez le lien. Les demandes arrivent dans l'application."
+        "q": "Puis-je imprimer et envoyer les contrats ?",
+        "a": "Oui : chaque contrat est prêt en PDF à votre nom, à imprimer ou à envoyer au client par WhatsApp."
       }
     },
     "finalTitle": "Essayez Parcolia avec votre agence dès aujourd'hui.",
     "footer": "Logiciel de gestion pour agences de location de voitures"
-  },
-  "publicBooking": {
-    "title": "Réserver une voiture",
-    "metaDescription": "Location de voitures {name} {city} : choisissez votre voiture et envoyez votre demande en ligne.",
-    "carsTitle": "Nos voitures",
-    "conditions": "Conducteur de {age} ans minimum, permis et pièce d'identité demandés.",
-    "noCars": "Aucune voiture disponible en ligne pour le moment. Appelez-nous.",
-    "from": "À partir de",
-    "perDay": "/ jour",
-    "bookThis": "Demander cette voiture",
-    "formTitle": "Demande de réservation",
-    "start": "Date de départ",
-    "end": "Date de retour",
-    "car": "Voiture",
-    "anyCar": "Peu importe / à conseiller",
-    "name": "Nom complet",
-    "phone": "Téléphone",
-    "email": "E-mail (facultatif)",
-    "place": "Lieu de livraison (facultatif)",
-    "placeHint": "Ex. : aéroport, gare, hôtel",
-    "message": "Message (facultatif)",
-    "send": "Envoyer ma demande",
-    "privacy": "Vos coordonnées servent seulement à l'agence pour vous rappeler et confirmer la location.",
-    "doneTitle": "Demande envoyée",
-    "doneBody": "Merci ! L'agence vous appelle pour confirmer la disponibilité et le prix.",
-    "poweredBy": "Propulsé par",
-    "errors": {
-      "invalidForm": "Vérifiez les champs en rouge.",
-      "robot": "La vérification anti-robot a échoué. Rechargez la page et réessayez.",
-      "tooMany": "Trop de demandes. Réessayez dans une heure ou appelez l'agence.",
-      "notFound": "Cette page de réservation n'est plus disponible.",
-      "unknown": "La demande n'a pas pu être envoyée. Réessayez ou appelez l'agence."
-    }
-  },
-  "requests": {
-    "title": "Demandes en ligne",
-    "subtitle": "Les demandes envoyées depuis votre page de réservation. Rappelez le client, puis créez la réservation.",
-    "empty": "Aucune demande pour l'instant",
-    "emptyOpen": "Partagez le lien de votre page de réservation (Paramètres > Réservation en ligne).",
-    "emptyClosed": "La page de réservation en ligne n'est pas ouverte. Un administrateur peut l'ouvrir dans Paramètres.",
-    "emptyClosedAdmin": "Ouvrez votre page de réservation en ligne pour recevoir des demandes de clients.",
-    "open": "Ouvrir ma page",
-    "status": {
-      "new": "Nouvelle",
-      "handled": "Traitée",
-      "declined": "Refusée"
-    },
-    "anyCar": "Voiture au choix de l'agence",
-    "place": "Livraison : {place}",
-    "create": "Créer la réservation",
-    "handled": "Marquer traitée",
-    "decline": "Refuser",
-    "reopen": "Remettre en nouvelle"
   }
 }

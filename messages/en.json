@@ -296,7 +296,7 @@
       "oilDue": "Oil change due: {car}",
       "maintenanceLate": "{car}: expected back from maintenance on {date}, still at the garage"
     },
-    "newRequests": "{count, plural, one {# new online booking request} other {# new online booking requests}}"
+    "seeAll": "See all {count} bookings"
   },
   "billing": {
     "title": "Subscription",
@@ -903,8 +903,7 @@
       "amount": "Amount",
       "kind": "Type",
       "savePayment": "Save payment"
-    },
-    "onlineRequests": "Online requests"
+    }
   },
   "contracts": {
     "title": "Contracts",
@@ -1231,8 +1230,7 @@
       "alerts": "Alerts",
       "assistant": "AI assistant",
       "display": "Display",
-      "data": "Data",
-      "booking": "Online booking"
+      "data": "Data"
     },
     "descriptions": {
       "agency": "Name, logo, colour and contact details: shown in the app and on contracts.",
@@ -1241,8 +1239,7 @@
       "alerts": "When to warn about insurance, technical inspection and oil changes, and who gets the emails.",
       "assistant": "Allow the AI assistant in your agency or not.",
       "display": "Language and theme, for you only.",
-      "data": "Download all your data or delete the agency.",
-      "booking": "A public page with your cars and prices, where clients send a request."
+      "data": "Download all your data or delete the agency."
     },
     "agency": {
       "name": "Agency name",
@@ -1307,13 +1304,6 @@
       "typeName": "To confirm, type the agency name: {name}",
       "deleteForever": "Delete for good",
       "deleted": "The agency was deleted."
-    },
-    "booking": {
-      "enabled": "Open the online booking page?",
-      "link": "Link to your page",
-      "linkHint": "Share it on WhatsApp, Instagram, Facebook or Google. Plates are never shown.",
-      "message": "Welcome message (optional)",
-      "messageHint": "For example your opening hours or free airport delivery."
     }
   },
   "platform": {
@@ -1477,64 +1467,11 @@
         "a": "Each agency only sees its own data. You can download everything as Excel or delete your agency at any time."
       },
       "5": {
-        "q": "Can I get bookings online?",
-        "a": "Yes: turn on your booking page and share the link. Requests arrive in the app."
+        "q": "Can I print and send contracts?",
+        "a": "Yes: every contract is ready as a PDF in your name, to print or send to the client on WhatsApp."
       }
     },
     "finalTitle": "Try Parcolia with your agency today.",
     "footer": "Management software for car rental agencies"
-  },
-  "publicBooking": {
-    "title": "Book a car",
-    "metaDescription": "Car rental {name} {city}: choose your car and send your request online.",
-    "carsTitle": "Our cars",
-    "conditions": "Driver aged {age} or more, licence and ID required.",
-    "noCars": "No cars available online right now. Call us.",
-    "from": "From",
-    "perDay": "/ day",
-    "bookThis": "Ask for this car",
-    "formTitle": "Booking request",
-    "start": "Pick-up date",
-    "end": "Return date",
-    "car": "Car",
-    "anyCar": "Any / please advise",
-    "name": "Full name",
-    "phone": "Phone",
-    "email": "Email (optional)",
-    "place": "Delivery place (optional)",
-    "placeHint": "E.g. airport, station, hotel",
-    "message": "Message (optional)",
-    "send": "Send my request",
-    "privacy": "Your details are only used by the agency to call you back and confirm the rental.",
-    "doneTitle": "Request sent",
-    "doneBody": "Thank you! The agency will call you to confirm availability and price.",
-    "poweredBy": "Powered by",
-    "errors": {
-      "invalidForm": "Check the fields in red.",
-      "robot": "The anti-robot check failed. Reload the page and try again.",
-      "tooMany": "Too many requests. Try again in an hour or call the agency.",
-      "notFound": "This booking page is no longer available.",
-      "unknown": "The request could not be sent. Try again or call the agency."
-    }
-  },
-  "requests": {
-    "title": "Online requests",
-    "subtitle": "Requests sent from your booking page. Call the client back, then create the booking.",
-    "empty": "No requests yet",
-    "emptyOpen": "Share the link to your booking page (Settings > Online booking).",
-    "emptyClosed": "The online booking page is not open. An admin can open it in Settings.",
-    "emptyClosedAdmin": "Open your online booking page to get requests from clients.",
-    "open": "Open my page",
-    "status": {
-      "new": "New",
-      "handled": "Handled",
-      "declined": "Declined"
-    },
-    "anyCar": "Car chosen by the agency",
-    "place": "Delivery: {place}",
-    "create": "Create the booking",
-    "handled": "Mark handled",
-    "decline": "Decline",
-    "reopen": "Mark as new"
   }
 }

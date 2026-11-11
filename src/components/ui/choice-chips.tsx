@@ -33,7 +33,7 @@ export function ChoiceChips<T extends string>({
             name={name}
             onClick={() => onChange(o.value)}
             className={cn(
-              "flex min-h-14 items-start gap-3 rounded-xl border-2 bg-card p-3 text-start transition-colors hover:bg-accent",
+              "flex min-h-14 min-w-0 items-start gap-3 rounded-xl border-2 bg-card p-3 text-start transition-colors hover:bg-accent",
               checked ? "border-primary bg-primary/5 dark:border-ring dark:bg-accent" : "border-border",
             )}
           >
@@ -47,7 +47,7 @@ export function ChoiceChips<T extends string>({
               {checked ? <CheckIcon className="size-3.5" /> : null}
             </span>
             <span className="flex min-w-0 flex-col gap-0.5">
-              <span className="flex items-center gap-2 font-semibold">
+              <span className="flex min-w-0 items-center gap-2 font-semibold [overflow-wrap:anywhere]">
                 {o.icon}
                 {o.label}
               </span>
