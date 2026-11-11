@@ -11,6 +11,7 @@ import { Field, fieldAria } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "@/i18n/navigation";
 import { deleteAgencyAction } from "../actions";
+import { PrivacyTools } from "./privacy-tools";
 
 /** Données: download everything, or delete the agency (admins). */
 export function DataSection({ agencyName }: { agencyName: string }) {
@@ -48,6 +49,8 @@ export function DataSection({ agencyName }: { agencyName: string }) {
           </a>
         </Button>
       </section>
+
+      <PrivacyTools />
 
       <section aria-labelledby="delete-title" className="flex flex-col gap-2 rounded-xl border border-destructive/40 p-4">
         <h3 id="delete-title" className="font-semibold text-destructive">{t("deleteTitle")}</h3>

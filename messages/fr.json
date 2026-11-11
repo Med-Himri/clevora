@@ -1,6 +1,7 @@
 {
   "brand": {
-    "tagline": "Votre agence de location, simplement."
+    "tagline": "Votre agence de location, simplement.",
+    "privacy": "Confidentialité"
   },
   "common": {
     "showPassword": "Afficher le mot de passe",
@@ -58,12 +59,14 @@
     "ice": "L'ICE contient 15 chiffres.",
     "minAge": "18 ans minimum.",
     "tooMany": "30 éléments maximum.",
-    "confirmName": "Le nom ne correspond pas."
+    "confirmName": "Le nom ne correspond pas.",
+    "mfaCode": "Tapez les 6 chiffres du code.",
+    "mfaWrong": "Code incorrect ou expiré. Tapez le nouveau code affiché."
   },
   "errors": {
     "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
     "emailNotConfirmed": "Confirmez d'abord votre adresse e-mail : ouvrez le lien reçu par e-mail.",
-    "tooManyRequests": "Trop d'essais. Attendez une minute puis réessayez.",
+    "tooManyRequests": "Trop d'essais. Attendez quelques minutes puis réessayez.",
     "passwordWeak": "Mot de passe trop faible : utilisez au moins 8 caractères avec des lettres et des chiffres.",
     "samePassword": "Choisissez un mot de passe différent de l'ancien.",
     "invalidForm": "Corrigez les champs indiqués en rouge.",
@@ -93,7 +96,9 @@
     "reservationNotEditable": "Cette réservation a déjà commencé : elle ne peut plus être modifiée.",
     "reservationNotOnRental": "Cette location n'est pas en cours.",
     "signFirst": "Faites d'abord signer le contrat.",
-    "reservationStateChanged": "La réservation a changé entre-temps. Actualisez la page."
+    "reservationStateChanged": "La réservation a changé entre-temps. Actualisez la page.",
+    "mfaReauth": "Déconnectez-vous puis reconnectez-vous avec votre code, puis réessayez.",
+    "clientActive": "Ce client a une location en cours ou à venir : attendez qu'elle soit terminée."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
@@ -225,6 +230,14 @@
       "createAndJoin": "Créer mon accès et rejoindre",
       "haveAccount": "Vous avez déjà un compte Parcolia ?",
       "loginInstead": "Se connecter"
+    },
+    "mfa": {
+      "title": "Code de connexion",
+      "subtitle": "Ouvrez votre application d'authentification (Google Authenticator, Microsoft Authenticator…) et tapez le code à 6 chiffres de Parcolia.",
+      "code": "Code à 6 chiffres",
+      "codeHint": "Le code change toutes les 30 secondes.",
+      "verify": "Valider",
+      "logout": "Se déconnecter"
     }
   },
   "selectAgency": {
@@ -399,6 +412,26 @@
       "new": "Nouveau mot de passe",
       "confirm": "Confirmer le nouveau mot de passe",
       "save": "Changer le mot de passe"
+    },
+    "mfa": {
+      "title": "Double authentification",
+      "subtitle": "Un code de votre téléphone en plus du mot de passe. Conseillé pour les administrateurs.",
+      "explain": "Même si quelqu'un connaît votre mot de passe, il ne pourra pas entrer sans votre téléphone.",
+      "enable": "Activer",
+      "on": "Activée : un code vous est demandé à chaque connexion.",
+      "disable": "Désactiver",
+      "disableTitle": "Désactiver la double authentification ?",
+      "disableBody": "Votre mot de passe suffira de nouveau pour vous connecter.",
+      "step1": "Installez une application d'authentification sur votre téléphone (Google Authenticator, Microsoft Authenticator…).",
+      "step2": "Dans l'application, scannez ce code QR (ou tapez la clé en dessous).",
+      "step3": "Tapez le code à 6 chiffres affiché par l'application.",
+      "qrAlt": "Code QR à scanner avec l'application",
+      "secret": "Clé :",
+      "code": "Code à 6 chiffres",
+      "confirm": "Confirmer",
+      "cancel": "Annuler",
+      "enabledToast": "Double authentification activée.",
+      "disabledToast": "Double authentification désactivée."
     }
   },
   "team": {
@@ -475,7 +508,8 @@
       "fleet": "Parc",
       "management": "Gestion",
       "agency": "Agence"
-    }
+    },
+    "activity": "Journal d'activité"
   },
   "urgency": {
     "late": "En retard",
@@ -1304,6 +1338,31 @@
       "typeName": "Pour confirmer, écrivez le nom de l'agence : {name}",
       "deleteForever": "Supprimer définitivement",
       "deleted": "L'agence a été supprimée."
+    },
+    "privacy": {
+      "title": "Clients et vie privée (loi 09-08)",
+      "intro": "Un client vous demande ses données ou leur suppression ? Cherchez-le ici.",
+      "policyLink": "Politique de confidentialité",
+      "search": "Nom, CIN ou téléphone du client",
+      "find": "Chercher",
+      "noClient": "Aucun client trouvé.",
+      "rentals": "{count, plural, =0 {aucune location} one {# location} other {# locations}}",
+      "isAnonymized": "Anonymisé",
+      "export": "Ses données",
+      "anonymize": "Anonymiser",
+      "anonymized": "Client anonymisé.",
+      "confirmTitle": "Anonymiser ce client ?",
+      "confirmBody": "Le nom, la pièce d'identité, le permis et les coordonnées de {name} seront effacés. Ses locations et paiements restent (comptabilité). C'est définitif.",
+      "retentionTitle": "Anciens clients",
+      "retentionBody": "Anonymisez les clients qui n'ont pas loué depuis longtemps : vous ne gardez que ce qui est nécessaire.",
+      "years": "Sans location depuis",
+      "yearsValue": "{count} ans",
+      "countOld": "Compter",
+      "noOld": "Aucun client concerné.",
+      "anonymizeOld": "Anonymiser {count, plural, one {# client} other {# clients}}",
+      "confirmOldTitle": "Anonymiser {count, plural, one {# client} other {# clients}} ?",
+      "confirmOldBody": "Leurs noms, pièces d'identité et coordonnées seront effacés. Les locations et paiements restent. C'est définitif.",
+      "retentionDone": "{count, plural, =0 {Aucun client anonymisé.} one {# client anonymisé.} other {# clients anonymisés.}}"
     }
   },
   "platform": {
@@ -1472,6 +1531,123 @@
       }
     },
     "finalTitle": "Essayez Parcolia avec votre agence dès aujourd'hui.",
-    "footer": "Logiciel de gestion pour agences de location de voitures"
+    "footer": "Logiciel de gestion pour agences de location de voitures",
+    "privacy": "Confidentialité"
+  },
+  "activity": {
+    "title": "Journal d'activité",
+    "subtitle": "Qui a fait quoi, et quand. Réservé aux administrateurs.",
+    "someone": "Un membre",
+    "system": "Parcolia",
+    "empty": "Rien à afficher pour ces filtres.",
+    "filterType": "Filtrer par type",
+    "filterWho": "Filtrer par personne",
+    "everyone": "Tout le monde",
+    "pages": "Pages",
+    "previous": "Page précédente",
+    "next": "Page suivante",
+    "pageOf": "Page {page} sur {pages}",
+    "changed": "Modifié : {fields}",
+    "types": {
+      "all": "Tout",
+      "reservations": "Réservations",
+      "fleet": "Parc auto",
+      "charges": "Charges",
+      "team": "Équipe",
+      "agency": "Agence",
+      "assistant": "Assistant IA"
+    },
+    "actions": {
+      "reservation_created": "a créé la réservation {what}",
+      "reservation_updated": "a modifié la réservation {what}",
+      "reservation_deleted": "a supprimé la réservation {what}",
+      "reservation_on_rental": "a remis la voiture au client ({what})",
+      "reservation_returned": "a enregistré le retour ({what})",
+      "reservation_cancelled": "a annulé la réservation {what}",
+      "reservation_reserved": "a remis la réservation {what} en attente",
+      "contract_signed": "a fait signer le contrat {what}",
+      "vehicle_created": "a ajouté la voiture {what}",
+      "vehicle_updated": "a modifié la voiture {what}",
+      "vehicle_deleted": "a supprimé la voiture {what}",
+      "charge_created": "a ajouté une charge de {what}",
+      "charge_updated": "a modifié une charge de {what}",
+      "charge_deleted": "a supprimé une charge de {what}",
+      "member_created": "a ajouté {what} à l'équipe",
+      "member_updated": "a modifié l'accès de {what}",
+      "member_deleted": "a retiré {what} de l'équipe",
+      "settings_update": "a modifié les paramètres ({what})",
+      "data_export": "a téléchargé les données de l'agence",
+      "billing_request": "a demandé un forfait",
+      "assistant_question": "a posé une question à l'assistant",
+      "client_anonymized": "a anonymisé un client",
+      "clients_retention": "a anonymisé les anciens clients",
+      "client_exported": "a exporté les données d'un client"
+    },
+    "fields": {
+      "status": "statut",
+      "current_km": "kilométrage",
+      "oil_next_km": "prochaine vidange",
+      "oil_last_km": "dernière vidange",
+      "insurance_expires_on": "assurance",
+      "technical_visit_expires_on": "visite technique",
+      "daily_rate": "prix/jour",
+      "end_at": "retour prévu",
+      "start_at": "départ",
+      "signed_at": "signature",
+      "km_in": "km retour",
+      "km_out": "km départ",
+      "amount": "montant",
+      "role": "rôle",
+      "advance_paid": "avance",
+      "actual_return_at": "retour réel",
+      "fuel_in": "carburant retour",
+      "fuel_out": "carburant départ",
+      "notes": "notes",
+      "plate": "matricule",
+      "brand_model": "modèle"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Politique de confidentialité",
+    "intro": "Comment Parcolia protège les données des agences de location et de leurs clients, conformément à la loi n° 09-08 relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel.",
+    "who": {
+      "title": "Qui est responsable ?",
+      "body": "Chaque agence est responsable des données de ses clients (elle les collecte pour louer ses voitures). Parcolia est son sous-traitant : nous hébergeons et traitons ces données uniquement pour faire fonctionner l'application, sur instruction de l'agence.\nContact : {contact}"
+    },
+    "data": {
+      "title": "Quelles données ?",
+      "body": "Comptes : nom, e-mail, téléphone des membres de l'agence.\nClients des agences : identité, CIN ou passeport, permis, coordonnées, adresse, locations, paiements.\nVoitures : matricule, papiers, kilométrage, entretiens.\nJournal technique : actions faites dans l'application (qui, quoi, quand), sans le contenu des conversations avec l'assistant."
+    },
+    "why": {
+      "title": "Pourquoi ?",
+      "body": "Gérer les réservations et contrats de location, retrouver le conducteur d'une voiture (infractions, accidents), suivre l'entretien et les assurances, tenir la comptabilité de l'agence, envoyer les alertes demandées par l'agence."
+    },
+    "ai": {
+      "title": "Assistant IA",
+      "body": "Quand un membre pose une question à l'assistant, les données de son agence nécessaires à la réponse sont envoyées au service d'IA (Anthropic) le temps de la réponse. Elles ne servent pas à entraîner des modèles. La conversation n'est pas enregistrée par Parcolia. Une agence peut désactiver l'assistant dans Paramètres."
+    },
+    "where": {
+      "title": "Où sont les données ?",
+      "body": "Dans une base de données hébergée par Supabase, ({region}), avec chiffrement des connexions. Chaque agence ne voit que ses propres données : ce cloisonnement est appliqué par la base de données elle-même."
+    },
+    "keep": {
+      "title": "Combien de temps ?",
+      "body": "Tant que l'agence utilise Parcolia. L'agence peut anonymiser à tout moment un client, ou tous les clients sans location depuis plusieurs années (Paramètres > Données). Si l'agence est supprimée, toutes ses données et ses fichiers sont effacés. Les sauvegardes chiffrées sont conservées 30 jours."
+    },
+    "rights": {
+      "title": "Vos droits",
+      "body": "Toute personne peut demander l'accès à ses données, leur rectification ou leur suppression, et s'opposer à leur traitement pour un motif légitime. Clients d'une agence : adressez-vous à l'agence, qui peut exporter ou anonymiser vos données depuis Parcolia. Membres d'une agence ou autre demande : écrivez à {contact}. Vous pouvez aussi saisir la CNDP (www.cndp.ma)."
+    },
+    "security": {
+      "title": "Sécurité",
+      "body": "Mots de passe jamais stockés en clair, double authentification possible, limitation des essais de connexion, accès séparés administrateurs / employés, journal d'activité, en-têtes de sécurité, sauvegardes quotidiennes chiffrées."
+    },
+    "cndp": {
+      "title": "Déclaration à la CNDP",
+      "body": "Traitement déclaré à la Commission nationale de contrôle de la protection des données à caractère personnel sous le n° {number}.",
+      "pending": "La déclaration du traitement auprès de la CNDP est en cours."
+    },
+    "updated": "Dernière mise à jour : novembre 2026.",
+    "defaultRegion": "région du projet Supabase"
   }
 }

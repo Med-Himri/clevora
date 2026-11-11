@@ -1,5 +1,6 @@
 "use server";
 
+import { rateLimit } from "@/lib/rate-limit";
 import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { localizedPath, type Locale } from "@/i18n/routing";
@@ -56,6 +57,7 @@ export async function inviteMemberAction(input: InviteInput): Promise<InviteResu
   if (!guard.ok) return guard;
   const { ctx } = guard;
   const { supabase, agency, user } = ctx;
+  if (!(await rateLimit("invite", agency.id))) return fail("tooManyRequests");
   const locale = (await getLocale()) as Locale;
   const v = parsed.data;
 

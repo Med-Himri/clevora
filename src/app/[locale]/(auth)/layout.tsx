@@ -20,7 +20,12 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
         <Suspense>
           <LocaleLinks />
         </Suspense>
-        <p>© {new Date().getFullYear()} Parcolia</p>
+        <p>
+          © {new Date().getFullYear()} Parcolia ·{" "}
+          <Link href="/privacy" className="underline underline-offset-4">
+            {t("privacy")}
+          </Link>
+        </p>
       </footer>
     </div>
   );

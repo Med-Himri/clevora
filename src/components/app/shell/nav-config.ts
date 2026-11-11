@@ -5,6 +5,7 @@ import {
   CarIcon,
   DropletIcon,
   FileSignatureIcon,
+  HistoryIcon,
   HomeIcon,
   SettingsIcon,
   ShieldCheckIcon,
@@ -27,6 +28,7 @@ export type NavKey =
   | "statistics"
   | "assistant"
   | "team"
+  | "activity"
   | "settings";
 
 export type NavItem = {
@@ -50,6 +52,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "statistics", href: "/statistics", icon: BarChart3Icon, roles: ["admin"] },
   { key: "assistant", href: "/assistant", icon: SparklesIcon },
   { key: "team", href: "/team", icon: UsersIcon, roles: ["admin"] },
+  { key: "activity", href: "/activity", icon: HistoryIcon, roles: ["admin"] },
   { key: "settings", href: "/settings", icon: SettingsIcon },
 ];
 
@@ -62,7 +65,7 @@ export const NAV_SECTIONS: Array<{ key: "activity" | "fleet" | "management" | "a
   { key: "activity", items: ["dashboard", "reservations", "contracts", "planning"] },
   { key: "fleet", items: ["fleet", "insurance", "oil"] },
   { key: "management", items: ["charges", "statistics", "assistant"] },
-  { key: "agency", items: ["team", "settings"] },
+  { key: "agency", items: ["team", "activity", "settings"] },
 ];
 
 export function navItemsFor(role: Role): NavItem[] {

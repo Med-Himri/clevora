@@ -29,7 +29,7 @@ export default defineConfig({
   webServer: {
     command: "npm run start",
     // also serve the /dev/ui component page in the production build used by the tests
-    env: { PARCOLIA_DEV_UI: "1", AI_PROVIDER: "mock" },
+    env: { PARCOLIA_DEV_UI: "1", AI_PROVIDER: "mock", RATE_LIMIT_EXEMPT_IPS: "127.0.0.1,::1,::ffff:127.0.0.1,unknown" },
     url: "http://localhost:3000/login",
     reuseExistingServer: true,
     timeout: 120_000,

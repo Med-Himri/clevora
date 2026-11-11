@@ -1,0 +1,32 @@
+import type { ErrorEvent } from "@sentry/nextjs";
+
+/**
+ * Error monitoring (Sentry) — off unless NEXT_PUBLIC_SENTRY_DSN is set.
+ * Personal data never leaves: no IP, no cookies, no request bodies, no user
+ * e-mail; only the error, the page path and the anonymous user id.
+ */
+export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || "";
+
+export function scrubEvent(event: ErrorEvent): ErrorEvent {
+  if (event.request) {
+    delete event.request.cookies;
+    delete event.request.data;
+    delete event.request.query_string;
+    if (event.request.headers) {
+      const keep: Record<string, string> = {};
+      for (const k of ["user-agent", "referer"]) if (event.request.headers[k]) keep[k] = event.request.headers[k];
+      event.request.headers = keep;
+    }
+  }
+  if (event.user) event.user = event.user.id ? { id: event.user.id } : undefined;
+  return event;
+}
+
+export const SENTRY_OPTIONS = {
+  dsn: SENTRY_DSN,
+  enabled: Boolean(SENTRY_DSN),
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV,
+  sendDefaultPii: false,
+  tracesSampleRate: 0.05,
+  beforeSend: scrubEvent,
+};

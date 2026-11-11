@@ -185,7 +185,12 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <Suspense>
           <LocaleLinks />
         </Suspense>
-        <p>© {new Date().getFullYear()} Parcolia · {t("footer")}</p>
+        <p>
+          © {new Date().getFullYear()} Parcolia · {t("footer")} ·{" "}
+          <Link href="/privacy" className="underline underline-offset-4">
+            {t("privacy")}
+          </Link>
+        </p>
       </footer>
     </div>
   );

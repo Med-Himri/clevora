@@ -1,6 +1,7 @@
 {
   "brand": {
-    "tagline": "Your rental agency, made simple."
+    "tagline": "Your rental agency, made simple.",
+    "privacy": "Privacy"
   },
   "common": {
     "showPassword": "Show password",
@@ -58,12 +59,14 @@
     "ice": "The ICE has 15 digits.",
     "minAge": "18 years minimum.",
     "tooMany": "30 items maximum.",
-    "confirmName": "The name does not match."
+    "confirmName": "The name does not match.",
+    "mfaCode": "Type the 6 digits of the code.",
+    "mfaWrong": "Wrong or expired code. Type the new code shown."
   },
   "errors": {
     "invalidCredentials": "Wrong email or password. Check and try again.",
     "emailNotConfirmed": "Confirm your email first: open the link we sent you.",
-    "tooManyRequests": "Too many attempts. Wait a minute and try again.",
+    "tooManyRequests": "Too many attempts. Wait a few minutes and try again.",
     "passwordWeak": "Password too weak: use at least 8 characters with letters and digits.",
     "samePassword": "Choose a password different from the old one.",
     "invalidForm": "Fix the fields marked in red.",
@@ -93,7 +96,9 @@
     "reservationNotEditable": "This reservation has started: it can no longer be edited.",
     "reservationNotOnRental": "This rental is not in progress.",
     "signFirst": "Have the contract signed first.",
-    "reservationStateChanged": "The reservation changed meanwhile. Refresh the page."
+    "reservationStateChanged": "The reservation changed meanwhile. Refresh the page.",
+    "mfaReauth": "Log out, log in again with your code, then try again.",
+    "clientActive": "This client has a running or upcoming rental: wait until it is over."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
@@ -225,6 +230,14 @@
       "createAndJoin": "Create my access and join",
       "haveAccount": "Already have a Parcolia account?",
       "loginInstead": "Log in"
+    },
+    "mfa": {
+      "title": "Login code",
+      "subtitle": "Open your authenticator app (Google Authenticator, Microsoft Authenticator…) and type Parcolia's 6-digit code.",
+      "code": "6-digit code",
+      "codeHint": "The code changes every 30 seconds.",
+      "verify": "Verify",
+      "logout": "Log out"
     }
   },
   "selectAgency": {
@@ -399,6 +412,26 @@
       "new": "New password",
       "confirm": "Confirm new password",
       "save": "Change password"
+    },
+    "mfa": {
+      "title": "Two-step login",
+      "subtitle": "A code from your phone on top of the password. Recommended for admins.",
+      "explain": "Even if someone knows your password, they cannot get in without your phone.",
+      "enable": "Turn on",
+      "on": "On: a code is asked at every login.",
+      "disable": "Turn off",
+      "disableTitle": "Turn off two-step login?",
+      "disableBody": "Your password alone will be enough to log in again.",
+      "step1": "Install an authenticator app on your phone (Google Authenticator, Microsoft Authenticator…).",
+      "step2": "In the app, scan this QR code (or type the key below).",
+      "step3": "Type the 6-digit code shown by the app.",
+      "qrAlt": "QR code to scan with the app",
+      "secret": "Key:",
+      "code": "6-digit code",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "enabledToast": "Two-step login turned on.",
+      "disabledToast": "Two-step login turned off."
     }
   },
   "team": {
@@ -475,7 +508,8 @@
       "fleet": "Fleet",
       "management": "Management",
       "agency": "Agency"
-    }
+    },
+    "activity": "Activity log"
   },
   "urgency": {
     "late": "Late",
@@ -1304,6 +1338,31 @@
       "typeName": "To confirm, type the agency name: {name}",
       "deleteForever": "Delete for good",
       "deleted": "The agency was deleted."
+    },
+    "privacy": {
+      "title": "Clients and privacy (law 09-08)",
+      "intro": "A client asks for their data or its deletion? Find them here.",
+      "policyLink": "Privacy policy",
+      "search": "Client's name, ID card or phone",
+      "find": "Search",
+      "noClient": "No client found.",
+      "rentals": "{count, plural, =0 {no rentals} one {# rental} other {# rentals}}",
+      "isAnonymized": "Anonymized",
+      "export": "Their data",
+      "anonymize": "Anonymize",
+      "anonymized": "Client anonymized.",
+      "confirmTitle": "Anonymize this client?",
+      "confirmBody": "{name}'s name, ID, licence and contact details will be erased. Their rentals and payments stay (accounting). This cannot be undone.",
+      "retentionTitle": "Old clients",
+      "retentionBody": "Anonymize clients who have not rented for a long time: keep only what you need.",
+      "years": "No rental for",
+      "yearsValue": "{count} years",
+      "countOld": "Count",
+      "noOld": "No client concerned.",
+      "anonymizeOld": "Anonymize {count, plural, one {# client} other {# clients}}",
+      "confirmOldTitle": "Anonymize {count, plural, one {# client} other {# clients}}?",
+      "confirmOldBody": "Their names, IDs and contact details will be erased. Rentals and payments stay. This cannot be undone.",
+      "retentionDone": "{count, plural, =0 {No client anonymized.} one {# client anonymized.} other {# clients anonymized.}}"
     }
   },
   "platform": {
@@ -1472,6 +1531,123 @@
       }
     },
     "finalTitle": "Try Parcolia with your agency today.",
-    "footer": "Management software for car rental agencies"
+    "footer": "Management software for car rental agencies",
+    "privacy": "Privacy"
+  },
+  "activity": {
+    "title": "Activity log",
+    "subtitle": "Who did what, and when. Admins only.",
+    "someone": "A member",
+    "system": "Parcolia",
+    "empty": "Nothing to show for these filters.",
+    "filterType": "Filter by type",
+    "filterWho": "Filter by person",
+    "everyone": "Everyone",
+    "pages": "Pages",
+    "previous": "Previous page",
+    "next": "Next page",
+    "pageOf": "Page {page} of {pages}",
+    "changed": "Changed: {fields}",
+    "types": {
+      "all": "All",
+      "reservations": "Bookings",
+      "fleet": "Fleet",
+      "charges": "Expenses",
+      "team": "Team",
+      "agency": "Agency",
+      "assistant": "AI assistant"
+    },
+    "actions": {
+      "reservation_created": "created booking {what}",
+      "reservation_updated": "edited booking {what}",
+      "reservation_deleted": "deleted booking {what}",
+      "reservation_on_rental": "handed the car to the client ({what})",
+      "reservation_returned": "recorded the return ({what})",
+      "reservation_cancelled": "cancelled booking {what}",
+      "reservation_reserved": "put booking {what} back to booked",
+      "contract_signed": "had contract {what} signed",
+      "vehicle_created": "added car {what}",
+      "vehicle_updated": "edited car {what}",
+      "vehicle_deleted": "deleted car {what}",
+      "charge_created": "added an expense of {what}",
+      "charge_updated": "edited an expense of {what}",
+      "charge_deleted": "deleted an expense of {what}",
+      "member_created": "added {what} to the team",
+      "member_updated": "changed {what}'s access",
+      "member_deleted": "removed {what} from the team",
+      "settings_update": "changed the settings ({what})",
+      "data_export": "downloaded the agency data",
+      "billing_request": "asked for a plan",
+      "assistant_question": "asked the assistant a question",
+      "client_anonymized": "anonymized a client",
+      "clients_retention": "anonymized old clients",
+      "client_exported": "exported a client's data"
+    },
+    "fields": {
+      "status": "status",
+      "current_km": "mileage",
+      "oil_next_km": "next oil change",
+      "oil_last_km": "last oil change",
+      "insurance_expires_on": "insurance",
+      "technical_visit_expires_on": "inspection",
+      "daily_rate": "daily price",
+      "end_at": "planned return",
+      "start_at": "departure",
+      "signed_at": "signature",
+      "km_in": "km in",
+      "km_out": "km out",
+      "amount": "amount",
+      "role": "role",
+      "advance_paid": "advance",
+      "actual_return_at": "actual return",
+      "fuel_in": "fuel in",
+      "fuel_out": "fuel out",
+      "notes": "notes",
+      "plate": "plate",
+      "brand_model": "model"
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy policy",
+    "intro": "How Parcolia protects the data of rental agencies and their clients, in line with Moroccan law 09-08 on the protection of individuals with regard to the processing of personal data.",
+    "who": {
+      "title": "Who is responsible?",
+      "body": "Each agency is responsible for its clients' data (it collects it to rent its cars). Parcolia is its processor: we host and process this data only to run the app, on the agency's instructions.\nContact: {contact}"
+    },
+    "data": {
+      "title": "Which data?",
+      "body": "Accounts: name, email, phone of the agency's members.\nAgencies' clients: identity, ID card or passport, licence, contact details, address, rentals, payments.\nCars: plate, papers, mileage, maintenance.\nTechnical log: actions made in the app (who, what, when), without the content of conversations with the assistant."
+    },
+    "why": {
+      "title": "Why?",
+      "body": "Manage bookings and rental contracts, find who drove a car (fines, accidents), follow maintenance and insurance, keep the agency's accounts, send the alerts the agency asked for."
+    },
+    "ai": {
+      "title": "AI assistant",
+      "body": "When a member asks the assistant a question, the agency data needed for the answer is sent to the AI service (Anthropic) for the time of the answer. It is not used to train models. The conversation is not saved by Parcolia. An agency can turn the assistant off in Settings."
+    },
+    "where": {
+      "title": "Where is the data?",
+      "body": "In a database hosted by Supabase, ({region}), with encrypted connections. Each agency only sees its own data: this separation is enforced by the database itself."
+    },
+    "keep": {
+      "title": "How long?",
+      "body": "As long as the agency uses Parcolia. The agency can anonymize a client at any time, or all clients without a rental for several years (Settings > Data). If the agency is deleted, all its data and files are erased. Encrypted backups are kept for 30 days."
+    },
+    "rights": {
+      "title": "Your rights",
+      "body": "Anyone can ask to access, correct or delete their data, and object to its processing for a legitimate reason. An agency's clients: contact the agency, which can export or anonymize your data from Parcolia. Agency members or any other request: write to {contact}. You can also contact the CNDP (www.cndp.ma)."
+    },
+    "security": {
+      "title": "Security",
+      "body": "Passwords never stored in clear, optional two-step login, limited login attempts, separate admin / staff access, activity log, security headers, encrypted daily backups."
+    },
+    "cndp": {
+      "title": "CNDP declaration",
+      "body": "Processing declared to the CNDP under number {number}.",
+      "pending": "The declaration of the processing to the CNDP is in progress."
+    },
+    "updated": "Last updated: November 2026.",
+    "defaultRegion": "region of the Supabase project"
   }
 }

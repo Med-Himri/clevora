@@ -1,5 +1,6 @@
 "use server";
 
+import { clientIp, rateLimitAll } from "@/lib/rate-limit";
 import { getLocale } from "next-intl/server";
 import { localizedPath } from "@/i18n/routing";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
@@ -38,9 +39,18 @@ export async function loginAction(input: LoginInput, next?: string | null): Prom
   const parsed = loginSchema.safeParse(input);
   if (!parsed.success) return fail("invalidForm", zodFieldErrors(parsed.error.issues));
 
+  if (!(await rateLimitAll([["loginIp", await clientIp()], ["loginEmail", parsed.data.email]]))) return fail("tooManyRequests");
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error || !data.user) return fail(authErrorKey(error ?? {}));
+
+  // Two-step login turned on: the 6-digit code comes before anything else.
+  const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2") {
+    const locale = await getLocale();
+    const safe = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
+    redirect({ href: safe ? `/mfa?next=${encodeURIComponent(safe)}` : "/mfa", locale });
+  }
 
   return redirectAfterLogin(supabase, data.user.id, next);
 }
@@ -49,6 +59,7 @@ export async function loginAction(input: LoginInput, next?: string | null): Prom
 export async function magicLinkAction(input: EmailOnlyInput): Promise<ActionResult> {
   const parsed = emailOnlySchema.safeParse(input);
   if (!parsed.success) return fail("invalidForm", zodFieldErrors(parsed.error.issues));
+  if (!(await rateLimitAll([["emailLinkIp", await clientIp()], ["emailLinkEmail", parsed.data.email]]))) return fail("tooManyRequests");
   const supabase = await createClient();
   const locale = await getLocale();
   const { error } = await supabase.auth.signInWithOtp({
@@ -63,6 +74,7 @@ export async function magicLinkAction(input: EmailOnlyInput): Promise<ActionResu
 export async function forgotPasswordAction(input: EmailOnlyInput): Promise<ActionResult> {
   const parsed = emailOnlySchema.safeParse(input);
   if (!parsed.success) return fail("invalidForm", zodFieldErrors(parsed.error.issues));
+  if (!(await rateLimitAll([["emailLinkIp", await clientIp()], ["emailLinkEmail", parsed.data.email]]))) return fail("tooManyRequests");
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
     redirectTo: siteUrl("/reset-password"),

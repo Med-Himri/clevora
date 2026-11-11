@@ -503,6 +503,7 @@ export type Database = {
         Row: {
           address: string | null;
           agency_id: string;
+          anonymized_at: string | null;
           birth_date: string | null;
           birth_place: string | null;
           created_at: string;
@@ -527,6 +528,7 @@ export type Database = {
         Insert: {
           address?: string | null;
           agency_id: string;
+          anonymized_at?: string | null;
           birth_date?: string | null;
           birth_place?: string | null;
           created_at?: string;
@@ -550,6 +552,7 @@ export type Database = {
         Update: {
           address?: string | null;
           agency_id?: string;
+          anonymized_at?: string | null;
           birth_date?: string | null;
           birth_place?: string | null;
           created_at?: string;
@@ -820,6 +823,31 @@ export type Database = {
           preferred_locale?: string;
           preferred_theme?: string;
           updated_at?: string;
+        };
+        Relationships: [];
+      };
+      rate_limits: {
+        Row: {
+          created_at: string;
+          hits: number;
+          key: string;
+          updated_at: string;
+          window_start: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          hits?: number;
+          key: string;
+          updated_at?: string;
+          window_start?: string;
+        };
+        Update: {
+          created_at?: string;
+          hits?: number;
+          key?: string;
+          updated_at?: string;
+          window_start?: string;
         };
         Relationships: [];
       };
@@ -1270,6 +1298,7 @@ export type Database = {
       };
     };
     Functions: {
+      _anonymize_client_row: { Args: { p_client: string }; Returns: undefined };
       _assert_admin: { Args: { p_agency: string }; Returns: undefined };
       _create_agency: {
         Args: {
@@ -1294,6 +1323,8 @@ export type Database = {
           used: number;
         }[];
       };
+      anonymize_client: { Args: { p_agency: string; p_client: string }; Returns: undefined };
+      anonymize_old_clients: { Args: { p_agency: string; p_years: number }; Returns: number };
       confirm_subscription_payment: {
         Args: { p_payment: string; p_provider_ref?: string };
         Returns: string;
@@ -1351,7 +1382,9 @@ export type Database = {
           similarity: number;
         }[];
       };
+      mfa_satisfied: { Args: Record<PropertyKey, never>; Returns: boolean };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
+      old_clients: { Args: { p_agency: string; p_years: number }; Returns: string[] };
       platform_overview: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1374,6 +1407,11 @@ export type Database = {
       };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };
       public_agency: { Args: { p_slug: string }; Returns: Json };
+      rate_limit_cleanup: { Args: Record<PropertyKey, never>; Returns: number };
+      rate_limit_hit: {
+        Args: { p_key: string; p_limit: number; p_window_seconds: number };
+        Returns: boolean;
+      };
       rental_day_rows: {
         Args: { p_agency: string; p_from: string; p_to: string };
         Returns: {

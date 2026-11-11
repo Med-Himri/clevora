@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { formatPhone } from "@/lib/phone";
 import { getProfile, requireUser } from "@/lib/auth/session";
 import { PasswordForm, PreferencesForm, ProfileForm } from "./account-forms";
+import { TwoFactorCard } from "./two-factor";
+import { createClient } from "@/lib/supabase/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");
@@ -15,6 +17,9 @@ export default async function AccountPage() {
   const user = await requireUser();
   const profile = await getProfile();
   const t = await getTranslations("account");
+  const supabase = await createClient();
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const mfaOn = Boolean(factors?.totp.some((f) => f.status === "verified"));
   return (
     <>
       <PageHeader title={t("title")} subtitle={user.email} />
@@ -42,6 +47,15 @@ export default async function AccountPage() {
           </CardHeader>
           <CardContent>
             <PasswordForm />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("mfa.title")}</CardTitle>
+            <CardDescription>{t("mfa.subtitle")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <TwoFactorCard enabled={mfaOn} />
           </CardContent>
         </Card>
       </div>

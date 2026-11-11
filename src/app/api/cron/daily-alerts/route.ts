@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
   const force = request.nextUrl.searchParams.get("force") === "1";
   const onlyAgency = request.nextUrl.searchParams.get("agency");
   const sb = createAdminClient(); // the job runs without a user: service role, server only
+  await sb.rpc("rate_limit_cleanup"); // forget old rate-limit windows
   const now = new Date();
   const today = dayKey(now);
 

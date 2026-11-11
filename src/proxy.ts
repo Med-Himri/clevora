@@ -7,7 +7,7 @@ import type { Database } from "@/types/database";
 const intl = createIntlMiddleware(routing);
 
 /** Pages anyone can open without being logged in. */
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/forgot-password", "/reset-password", "/check-email", "/invite"];
+const PUBLIC_PATHS = ["/", "/privacy", "/login", "/signup", "/forgot-password", "/reset-password", "/check-email", "/invite"];
 /** Pages that make no sense once logged in. */
 const GUEST_ONLY_PATHS = ["/login", "/forgot-password", "/check-email"];
 
@@ -66,6 +66,15 @@ export async function proxy(request: NextRequest) {
 
   if (!loggedIn && !matches(path, PUBLIC_PATHS)) {
     return redirectTo(`/login?next=${encodeURIComponent(path + request.nextUrl.search)}`);
+  }
+  // Two-step login: password done (aal1) but the code is still missing.
+  if (loggedIn && data?.claims?.aal !== "aal2") {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    const needsCode = aal?.nextLevel === "aal2" && aal.currentLevel !== "aal2";
+    if (needsCode && path !== "/mfa" && path !== "/") return redirectTo(`/mfa?next=${encodeURIComponent(path + request.nextUrl.search)}`);
+    if (!needsCode && path === "/mfa") return redirectTo("/dashboard");
+  } else if (loggedIn && path === "/mfa") {
+    return redirectTo("/dashboard");
   }
   if (loggedIn && matches(path, GUEST_ONLY_PATHS)) {
     return redirectTo("/dashboard");

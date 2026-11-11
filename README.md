@@ -93,3 +93,7 @@ npm run test:e2e
 - `/platform` (Parcolia staff, `public.platform_admins`; 404 for everyone else): all agencies, confirm payments (creates invoice `F-YYYY-NNNNN`, activates the plan), change plan/status/dates. Local demo: `platform@demo.parcolia.ma` / `Demo-Parcolia-2026`.
 - Invoices: `/api/invoices/{id}` PDF, generated on demand (TVA 20 % included in prices).
 - `/` marketing page with prices read from the `plans` table.
+
+## Security
+
+See `docs/SECURITY.md` (isolation, roles, two-step login, rate limiting, headers, privacy, backups, monitoring) and `docs/RESTORE.md` (backups and restore).

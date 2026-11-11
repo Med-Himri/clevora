@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { buildAgencyContext } from "@/lib/ai/context";
+import { rateLimit } from "@/lib/rate-limit";
 import { buildSystemPrompt, buildUserMessage, MAX_QUESTION } from "@/lib/ai/prompt";
 import { getProvider, type AssistantEvent } from "@/lib/ai/provider";
 import { toolsFor } from "@/lib/ai/tools";
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
   if (!user) return json("notLoggedIn", 401);
   const agency = await getActiveAgency();
   if (!agency) return json("noAgency", 403);
+  if (!(await rateLimit("assistant", user.id))) return json("busy", 429);
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return json("invalidForm", 400);
 

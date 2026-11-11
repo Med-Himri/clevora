@@ -120,7 +120,9 @@ test("filters, search and staff limits on the demo fleet", async ({ page }) => {
   await expect(page.getByTestId("fleet-list")).not.toContainText("Dacia Logan");
 
   await page.goto("/fleet");
+  await page.waitForLoadState("networkidle"); // typing before the page is ready would be lost
   await page.getByRole("searchbox").fill("12345 a");
+  await expect(page).toHaveURL(/q=12345/);
   await expect(page.getByTestId("fleet-list")).toContainText("Dacia Logan");
   await expect(page.getByTestId("fleet-list")).not.toContainText("Peugeot 3008");
   await expectNoHorizontalScroll(page);

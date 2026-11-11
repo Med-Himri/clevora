@@ -1,5 +1,6 @@
 "use server";
 
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { cookies } from "next/headers";
 import { redirect } from "@/i18n/navigation";
 import { localizedPath, type Locale } from "@/i18n/routing";
@@ -80,6 +81,7 @@ export async function signupAction(formData: FormData): Promise<ActionResult> {
   const raw = readForm(formData);
   const logo = readLogo(formData);
   const existingUser = await getUser();
+  if (!(await rateLimit("signupIp", await clientIp()))) return fail("tooManyRequests");
 
   // ---------------------------------------------------------------------
   // A logged-in user creating (another) agency: no account step
