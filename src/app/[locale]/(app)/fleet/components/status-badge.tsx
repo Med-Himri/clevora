@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Ltr } from "@/components/app/ltr";
 import { StatusPill } from "@/components/app/status-pill";
 import type { VehicleStatus } from "@/lib/fleet/status";
-import { formatDate, formatTime } from "@/lib/format";
+import { formatDate } from "@/lib/format";
 
 /** Short status word with a coloured dot; the detail goes on a small second line. */
 export function VehicleStatusBadge({ status }: { status: VehicleStatus }) {
@@ -22,11 +22,11 @@ export function VehicleStatusBadge({ status }: { status: VehicleStatus }) {
         />
       );
     case "on_rental":
-      return <StatusPill tone="info" label={t("on_rental")} detail={<>{t("until")} {day(status.until)}</>} testId="vehicle-status" />;
+      return <StatusPill tone="info" label={t("on_rental")} detail={<>{t("until")} <Ltr>{status.untilDay}</Ltr></>} testId="vehicle-status" />;
     case "blocked":
       return <StatusPill tone="danger" label={t("blockedShort")} detail={t("blockedDetail")} testId="vehicle-status" />;
     case "reserved_today":
-      return <StatusPill tone="neutral" label={t("reservedShort")} detail={<>{t("today")} <Ltr>{formatTime(status.at)}</Ltr></>} testId="vehicle-status" />;
+      return <StatusPill tone="neutral" label={t("reservedShort")} detail={<>{t("today")} <Ltr>{status.time}</Ltr></>} testId="vehicle-status" />;
     case "sold":
       return <StatusPill tone="neutral" label={t("sold")} testId="vehicle-status" />;
     default:

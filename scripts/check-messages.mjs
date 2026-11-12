@@ -11,5 +11,19 @@ for (const l of ["ar", "en"]) {
     console.error(`${l}: missing ${JSON.stringify(missing)} extra ${JSON.stringify(extra)}`);
   }
 }
-console.log(bad ? "✖ translation keys differ" : `✔ ${sets.fr.size} keys in fr, ar and en`);
+// Client components may only use the text groups sent to the browser.
+import { readdirSync, statSync } from "node:fs";
+const walk = (d) => readdirSync(d).flatMap((f) => (statSync(`${d}/${f}`).isDirectory() ? walk(`${d}/${f}`) : [`${d}/${f}`]));
+const allowed = new Set([...readFileSync("src/i18n/client-namespaces.ts", "utf8").matchAll(/^\s+"([a-zA-Z]+)",$/gm)].map((m) => m[1]));
+for (const file of walk("src").filter((f) => /\.tsx?$/.test(f))) {
+  const src = readFileSync(file, "utf8");
+  if (!src.startsWith('"use client"')) continue;
+  for (const m of src.matchAll(/useTranslations\("([^".]+)/g)) {
+    if (!allowed.has(m[1])) {
+      bad = true;
+      console.error(`${file}: client component uses "${m[1]}", add it to src/i18n/client-namespaces.ts`);
+    }
+  }
+}
+console.log(bad ? "✖ translation problems" : `✔ ${sets.fr.size} keys in fr, ar and en; client text groups OK`);
 process.exit(bad ? 1 : 0);

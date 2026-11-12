@@ -97,3 +97,7 @@ npm run test:e2e
 ## Security
 
 See `docs/SECURITY.md` (isolation, roles, two-step login, rate limiting, headers, privacy, backups, monitoring) and `docs/RESTORE.md` (backups and restore).
+
+## Usability
+
+See `docs/UX.md` (taps per task, checks, installable app).

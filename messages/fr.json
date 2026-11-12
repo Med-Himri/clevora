@@ -852,7 +852,10 @@
         "total": "Total",
         "advance": "Avance",
         "balance": "Reste à payer"
-      }
+      },
+      "draftFound": "Un brouillon de réservation commencé le {date} a été gardé sur cet appareil.",
+      "draftResume": "Reprendre",
+      "draftDiscard": "Effacer"
     },
     "payment": {
       "cash": "Espèces",

@@ -17,7 +17,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { YesNo } from "@/components/ui/yes-no";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { ActionResult } from "@/lib/action-result";
-import { casablancaToIso, formatMoney, isoToCasablanca } from "@/lib/format";
+import { formatMoney } from "@/lib/format";
 import { rentalDays } from "@/lib/revenue";
 import {
   addPaymentAction,
@@ -42,7 +42,12 @@ type R = {
   deposit_amount: number;
   balance: number;
   planned_days: number;
+  /** Casablanca local date/time computed on the server (browsers can have outdated time-zone data). */
+  local: { start: { date: string; time: string }; end: { date: string; time: string }; now: { date: string; time: string } };
 };
+
+/** "yyyy-mm-dd" + "HH:mm" as a naive instant: only differences between two of them are used. */
+const naive = (date: string, time: string) => `${date}T${time || "00:00"}:00Z`;
 
 type Dialogs = "return" | "extend" | "cancel" | "payment" | null;
 
@@ -149,13 +154,13 @@ function ReturnDialog({
   onSubmit: (input: Parameters<typeof returnReservationAction>[1]) => void;
 }) {
   const { t, tp, tc } = useDialogTexts();
-  const now = isoToCasablanca(new Date().toISOString());
-  const [date, setDate] = useState(now.date);
-  const [time, setTime] = useState(now.time);
+  const [date, setDate] = useState(r.local.now.date);
+  const [time, setTime] = useState(r.local.now.time);
   const [km, setKm] = useState<string>("");
   const [fuel, setFuel] = useState<number | null>(null);
-  const actualIso = date && time ? casablancaToIso(date, time) : r.end_at;
-  const extraDays = Math.max(0, rentalDays(r.start_at, actualIso) - r.planned_days);
+  const start = naive(r.local.start.date, r.local.start.time);
+  const actual = date && time ? naive(date, time) : naive(r.local.end.date, r.local.end.time);
+  const extraDays = Math.max(0, rentalDays(start, actual) - r.planned_days);
   const extraAmount = extraDays * r.daily_price;
   const due = Math.max(0, r.balance + extraAmount);
   const [amount, setAmount] = useState<number | null>(null);
@@ -258,11 +263,12 @@ function ReturnDialog({
 
 function ExtendDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolean; onClose: () => void; onSubmit: (date: string, time: string) => void }) {
   const { t, tc } = useDialogTexts();
-  const current = isoToCasablanca(r.end_at);
-  const [date, setDate] = useState(current.date);
-  const [time, setTime] = useState(current.time);
-  const newEnd = date && time ? casablancaToIso(date, time) : r.end_at;
-  const added = Math.max(0, rentalDays(r.start_at, newEnd) - rentalDays(r.start_at, r.end_at));
+  const [date, setDate] = useState(r.local.end.date);
+  const [time, setTime] = useState(r.local.end.time);
+  const start = naive(r.local.start.date, r.local.start.time);
+  const oldEnd = naive(r.local.end.date, r.local.end.time);
+  const newEnd = date && time ? naive(date, time) : oldEnd;
+  const added = Math.max(0, rentalDays(start, newEnd) - rentalDays(start, oldEnd));
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent closeLabel={tc("close")}>
@@ -272,7 +278,7 @@ function ExtendDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolea
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3">
           <Field id="ext-date" label={t("newEndDate")}>
-            <DateField id="ext-date" value={date} onChange={setDate} min={current.date} />
+            <DateField id="ext-date" value={date} onChange={setDate} min={r.local.end.date} />
           </Field>
           <Field id="ext-time" label={t("returnTime")}>
             <TimeField id="ext-time" value={time} onChange={setTime} />

@@ -112,7 +112,7 @@ export function AgencyForm({ values, logoUrl, userName }: { values: SettingsInpu
         <span className="text-sm font-medium">{ts("logo")}</span>
         <div className="flex flex-wrap items-center gap-3">
           <AgencyLogo name={name || "?"} url={logoUrl} size={64} />
-          <input ref={logoInput} id="settings-logo" type="file" accept={Object.keys(LOGO_TYPES).join(",")} className="sr-only" onChange={(e) => upload(e.target.files?.[0])} aria-describedby="settings-logo-hint" />
+          <input ref={logoInput} id="settings-logo" aria-label={ts("logo")} type="file" accept={Object.keys(LOGO_TYPES).join(",")} className="sr-only" onChange={(e) => upload(e.target.files?.[0])} aria-describedby="settings-logo-hint" />
           <Button type="button" variant="outline" onClick={() => logoInput.current?.click()} disabled={pending || !writable}>
             <ImageUpIcon aria-hidden />
             {logoUrl ? ts("changeLogo") : ts("addLogo")}

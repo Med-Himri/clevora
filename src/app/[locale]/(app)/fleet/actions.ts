@@ -1,11 +1,12 @@
 "use server";
 
+
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
 import { importedVehicleSchema, type ImportedVehicle } from "@/lib/fleet/import";
-import { dayKey, plateNorm } from "@/lib/format";
+import { dayKey, formatDateTime, plateNorm } from "@/lib/format";
 import { maintenanceSchema, vehicleSchema, type MaintenanceInput, type VehicleInput } from "./schema";
 
 function refresh(id?: string) {
@@ -76,7 +77,7 @@ export async function setVehicleSoldAction(id: string, sold: boolean): Promise<A
   return ok();
 }
 
-export type OverlappingReservation = { id: string; contract_number: string; client: string; start_at: string; end_at: string };
+export type OverlappingReservation = { id: string; contract_number: string; client: string; start_at: string; end_at: string; startLabel: string; endLabel: string };
 
 /** Reservations of this car that fall inside a planned maintenance (to warn before saving). */
 export async function maintenanceOverlapsAction(
@@ -108,6 +109,8 @@ export async function maintenanceOverlapsAction(
       contract_number: r.contract_number,
       client: r.client?.full_name ?? "",
       start_at: r.start_at,
+      startLabel: formatDateTime(r.start_at),
+      endLabel: formatDateTime(r.end_at),
       end_at: r.end_at,
     })),
   );

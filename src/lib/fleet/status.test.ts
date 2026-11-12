@@ -22,7 +22,7 @@ describe("computeVehicleStatus — priority Maintenance > En location > Bloquée
   });
   it("on rental beats insurance", () => {
     const v = { ...base, insurance_expires_on: "2026-11-01", reservations: [{ status: "on_rental", start_at: "2026-11-05T10:00:00Z", end_at: "2026-11-10T10:00:00Z" }] };
-    expect(computeVehicleStatus(v, now)).toEqual({ kind: "on_rental", until: "2026-11-10T10:00:00Z" });
+    expect(computeVehicleStatus(v, now)).toEqual({ kind: "on_rental", until: "2026-11-10T10:00:00Z", untilDay: "10/11" });
   });
   it("maintenance beats everything and shows reason and date", () => {
     const v = {

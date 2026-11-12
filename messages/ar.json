@@ -852,7 +852,10 @@
         "total": "المجموع",
         "advance": "التسبيق",
         "balance": "الباقي للأداء"
-      }
+      },
+      "draftFound": "تم الاحتفاظ على هذا الجهاز بمسودة حجز بدأت في {date}.",
+      "draftResume": "متابعة",
+      "draftDiscard": "حذف"
     },
     "payment": {
       "cash": "نقدًا",

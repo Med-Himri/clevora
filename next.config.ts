@@ -28,11 +28,14 @@ const csp = [
   "font-src 'self' data:",
   `connect-src 'self' ${supabaseUrl.origin}${sentryOrigin ? ` ${sentryOrigin}` : ""}${isDev ? " ws: http://localhost:*" : ""}`,
   "frame-src 'self' blob:",
+  "worker-src 'self'",
+  "manifest-src 'self'",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",
-  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+  // Only when the API itself is https (a local http Supabase would be broken by it)
+  ...(isDev || supabaseUrl.protocol !== "https:" ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
 const SECURITY_HEADERS = [
@@ -48,7 +51,11 @@ const SECURITY_HEADERS = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: SECURITY_HEADERS }];
+    return [
+      { source: "/:path*", headers: SECURITY_HEADERS },
+      // The service worker must always be fresh so updates reach installed apps.
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }, { key: "Service-Worker-Allowed", value: "/" }] },
+    ];
   },
   // Almost every Parcolia page depends on the logged-in user and the active
   // agency, so we use classic dynamic rendering instead of Cache Components.

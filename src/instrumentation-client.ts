@@ -1,7 +1,9 @@
-import * as Sentry from "@sentry/nextjs";
 import { SENTRY_DSN, SENTRY_OPTIONS } from "@/lib/monitoring";
 
-/** Browser error monitoring (only when a Sentry DSN is configured). */
-if (SENTRY_DSN) Sentry.init(SENTRY_OPTIONS);
-
-export const onRouterTransitionStart = SENTRY_DSN ? Sentry.captureRouterTransitionStart : undefined;
+/**
+ * Browser error monitoring. The Sentry library is only downloaded when a DSN
+ * is configured, so the app stays light when monitoring is off.
+ */
+if (SENTRY_DSN) {
+  void import("@sentry/nextjs").then((Sentry) => Sentry.init(SENTRY_OPTIONS));
+}

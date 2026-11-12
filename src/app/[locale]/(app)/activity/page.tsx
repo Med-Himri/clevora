@@ -200,7 +200,7 @@ export default async function ActivityPage({ searchParams }: PageProps<"/[locale
           ))}
           {pages > 1 ? (
             <nav aria-label={t("pages")} className="flex items-center justify-center gap-3">
-              <Button variant="outline" size="icon" asChild={page > 1} disabled={page <= 1}>
+              <Button variant="outline" size="icon" asChild={page > 1} disabled={page <= 1} aria-label={page > 1 ? undefined : t("previous")}>
                 {page > 1 ? (
                   <Link href={qs({ page: String(page - 1) })} aria-label={t("previous")}>
                     <ChevronLeftIcon className="rtl:rotate-180" aria-hidden />
@@ -210,7 +210,7 @@ export default async function ActivityPage({ searchParams }: PageProps<"/[locale
                 )}
               </Button>
               <span className="text-sm">{t("pageOf", { page, pages })}</span>
-              <Button variant="outline" size="icon" asChild={page < pages} disabled={page >= pages}>
+              <Button variant="outline" size="icon" asChild={page < pages} disabled={page >= pages} aria-label={page < pages ? undefined : t("next")}>
                 {page < pages ? (
                   <Link href={qs({ page: String(page + 1) })} aria-label={t("next")}>
                     <ChevronRightIcon className="rtl:rotate-180" aria-hidden />

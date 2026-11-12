@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { CLIENT_NAMESPACES, pickMessages } from "@/i18n/client-namespaces";
+import { ServiceWorker } from "@/components/app/service-worker";
 import { Inter, Noto_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -25,6 +27,10 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
   return {
     title: { default: "Parcolia", template: "%s · Parcolia" },
     description: t("tagline"),
+    applicationName: "Parcolia",
+    appleWebApp: { capable: true, title: "Parcolia", statusBarStyle: "default" },
+    icons: { apple: "/icons/apple-touch-icon.png" },
+    formatDetection: { telephone: false },
   };
 }
 
@@ -42,8 +48,9 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <html lang={locale} dir={dir} className={`${latin.variable} ${arabic.variable}`} suppressHydrationWarning>
       {/* suppressHydrationWarning: browser extensions (e.g. Grammarly) add attributes to <body> */}
       <body className="min-h-dvh" suppressHydrationWarning>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider messages={pickMessages(await getMessages(), CLIENT_NAMESPACES)}>
           <Providers dir={dir}>{children}</Providers>
+          <ServiceWorker />
         </NextIntlClientProvider>
       </body>
     </html>

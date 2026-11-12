@@ -852,7 +852,10 @@
         "total": "Total",
         "advance": "Advance",
         "balance": "Left to pay"
-      }
+      },
+      "draftFound": "A booking draft started on {date} was kept on this device.",
+      "draftResume": "Resume",
+      "draftDiscard": "Discard"
     },
     "payment": {
       "cash": "Cash",

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon, CarIcon, CheckIcon, FuelIcon, ReceiptTextIcon, TriangleAlertIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, CarIcon, CheckIcon, FileClockIcon, FuelIcon, ReceiptTextIcon, RotateCcwIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -19,10 +19,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { YesNo, YesNoRow } from "@/components/ui/yes-no";
 import { useRouter } from "@/i18n/navigation";
 import { zodFieldErrors } from "@/lib/action-result";
-import { casablancaToIso, formatDateTime, formatMoney } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 import { rentalDays } from "@/lib/revenue";
 import { cn } from "@/lib/utils";
+import { useAgency } from "@/components/app/agency-context";
 import { availabilityAction, contractNumberTakenAction, saveReservationAction, type AvailableCar } from "../actions";
+import { useReservationDraft } from "./use-draft";
 import type { BookingSettings } from "../queries";
 import { EMPTY_DRIVER, PAYMENT_METHODS, reservationSchema, type ReservationInput } from "../schema";
 import { DriverFields } from "./driver-fields";
@@ -68,6 +70,26 @@ export function ReservationWizard({
   const form = useForm<ReservationInput>({ defaultValues: initial });
   const v = useWatch({ control: form.control }) as ReservationInput;
 
+  // Brouillon (new reservations only): offered back after a reload or a lost connection.
+  const { id: agencyId } = useAgency();
+  const { draft, save: saveDraft, clear: clearDraft } = useReservationDraft(agencyId, !reservationId);
+  const [draftDecided, setDraftDecided] = useState(false);
+  const touched = form.formState.isDirty;
+  useEffect(() => {
+    if (!reservationId && touched) saveDraft(form.getValues(), step);
+  }, [v, step, touched, reservationId, saveDraft, form]);
+  const resumeDraft = () => {
+    if (!draft) return;
+    form.reset(draft.values, { keepDefaultValues: true });
+    priceTouched.current = true;
+    setStep(Math.min(3, Math.max(0, draft.step)));
+    setDraftDecided(true);
+  };
+  const discardDraft = () => {
+    clearDraft();
+    setDraftDecided(true);
+  };
+
   const steps = [t("steps.dates"), t("steps.client"), t("steps.price"), t("steps.checkout")];
 
   // Available cars for the chosen dates
@@ -94,8 +116,9 @@ export function ReservationWizard({
   const car = cars?.find((c) => c.id === v.vehicle_id) ?? (initialCar?.id === v.vehicle_id ? initialCar : null);
   const days = useMemo(() => {
     if (!v.start_date || !v.end_date) return 0;
-    const s = casablancaToIso(v.start_date, v.start_time || "00:00");
-    const e = casablancaToIso(v.end_date, v.end_time || "00:00");
+    // Naive instants: only the difference matters (no time-zone maths in the browser).
+    const s = `${v.start_date}T${v.start_time || "00:00"}:00Z`;
+    const e = `${v.end_date}T${v.end_time || "00:00"}:00Z`;
     return e > s ? rentalDays(s, e) : 0;
   }, [v.start_date, v.start_time, v.end_date, v.end_time]);
   const total = days * (v.daily_price ?? 0) + (v.delivery ? (v.delivery_fee ?? 0) : 0);
@@ -159,6 +182,7 @@ export function ReservationWizard({
         toast.error(te(result.error));
         return;
       }
+      if (!reservationId) clearDraft();
       toast.success(reservationId ? t("updated") : t("created"));
       router.push(`/contracts/${result.data.id}`);
     });
@@ -177,8 +201,8 @@ export function ReservationWizard({
         <dd className="text-end">
           {v.start_date && v.end_date ? (
             <>
-              <Ltr>{formatDateTime(casablancaToIso(v.start_date, v.start_time))}</Ltr>
-              <br /><Arrow /><Ltr>{formatDateTime(casablancaToIso(v.end_date, v.end_time))}</Ltr>
+              <Ltr>{`${formatDate(v.start_date)} ${v.start_time}`}</Ltr>
+              <br /><Arrow /><Ltr>{`${formatDate(v.end_date)} ${v.end_time}`}</Ltr>
             </>
           ) : "—"}
         </dd>
@@ -215,6 +239,22 @@ export function ReservationWizard({
   return (
     <div className="grid gap-4 pb-40 sm:pb-0 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="flex min-w-0 flex-col gap-4">
+        {draft && !draftDecided && !touched ? (
+          <Alert variant="info" className="flex-wrap items-center" data-testid="draft-banner">
+            <FileClockIcon aria-hidden />
+            <span className="flex-1">{t("draftFound", { date: new Date(draft.savedAt).toLocaleString("fr-FR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) })}</span>
+            <span className="flex gap-2">
+              <Button size="sm" onClick={resumeDraft}>
+                <RotateCcwIcon aria-hidden />
+                {t("draftResume")}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={discardDraft}>
+                <Trash2Icon aria-hidden />
+                {t("draftDiscard")}
+              </Button>
+            </span>
+          </Alert>
+        ) : null}
         <Field
           id="contract_number"
           label={t("contractNumber")}

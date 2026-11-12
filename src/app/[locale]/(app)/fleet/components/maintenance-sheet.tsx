@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field } from "@/components/ui/field";
 import { DateField } from "@/components/ui/fields";
 import { Textarea } from "@/components/ui/textarea";
-import { dayKey, formatDateTime } from "@/lib/format";
+import { dayKey } from "@/lib/format";
 import { maintenanceOverlapsAction, startMaintenanceAction, type OverlappingReservation } from "../actions";
 import { MAINTENANCE_REASONS, maintenanceSchema } from "../schema";
 
@@ -108,7 +108,7 @@ export function MaintenanceSheet({
                 <ul className="flex flex-col gap-0.5">
                   {overlaps.map((r) => (
                     <li key={r.id}>
-                      <Ltr>{r.contract_number}</Ltr> · {r.client} · <Ltr>{formatDateTime(r.start_at)}</Ltr><Arrow /><Ltr>{formatDateTime(r.end_at)}</Ltr>
+                      <Ltr>{r.contract_number}</Ltr> · {r.client} · <Ltr>{r.startLabel}</Ltr><Arrow /><Ltr>{r.endLabel}</Ltr>
                     </li>
                   ))}
                 </ul>

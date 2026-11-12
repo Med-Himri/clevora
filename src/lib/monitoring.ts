@@ -1,4 +1,4 @@
-import type { ErrorEvent } from "@sentry/nextjs";
+import type { ErrorEvent } from "@sentry/nextjs"; // type only: no code is bundled
 
 /**
  * Error monitoring (Sentry) — off unless NEXT_PUBLIC_SENTRY_DSN is set.

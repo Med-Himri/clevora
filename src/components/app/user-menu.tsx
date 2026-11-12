@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/i18n/navigation";
 import { logoutAction } from "@/app/[locale]/(auth)/actions";
+import { clearReservationDrafts } from "@/app/[locale]/(app)/reservations/components/use-draft";
 
 /** Header, right side: the user's name with the role under it, and the menu. */
 export function UserMenu({
@@ -85,7 +86,13 @@ export function UserMenu({
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onSelect={() => void logoutAction()}>
+        <DropdownMenuItem
+          variant="destructive"
+          onSelect={() => {
+            clearReservationDrafts(); // drafts can hold a client's details: never leave them on a shared device
+            void logoutAction();
+          }}
+        >
           <LogOutIcon aria-hidden />
           {t("logout")}
         </DropdownMenuItem>

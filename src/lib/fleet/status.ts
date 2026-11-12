@@ -1,4 +1,4 @@
-import { dayKey } from "@/lib/format";
+import { dayKey, formatDate, formatTime } from "@/lib/format";
 
 /**
  * Computed status of a car (never stored), by priority:
@@ -6,9 +6,9 @@ import { dayKey } from "@/lib/format";
  */
 export type VehicleStatus =
   | { kind: "maintenance"; reason: string; until: string | null }
-  | { kind: "on_rental"; until: string }
+  | { kind: "on_rental"; until: string; untilDay: string }
   | { kind: "blocked" }
-  | { kind: "reserved_today"; at: string }
+  | { kind: "reserved_today"; at: string; time: string }
   | { kind: "available" }
   | { kind: "sold" };
 
@@ -37,10 +37,10 @@ export function computeVehicleStatus(v: StatusInput, now: Date = new Date()): Ve
   const m = v.maintenance.find((p) => maintenanceCovers(p, today));
   if (m) return { kind: "maintenance", reason: m.reason, until: m.expected_end_on };
   const rental = v.reservations.find((r) => r.status === "on_rental");
-  if (rental) return { kind: "on_rental", until: rental.end_at };
+  if (rental) return { kind: "on_rental", until: rental.end_at, untilDay: formatDate(rental.end_at).slice(0, 5) };
   if (v.insurance_expires_on && v.insurance_expires_on < today) return { kind: "blocked" };
   const leaving = v.reservations.find((r) => r.status === "reserved" && dayKey(r.start_at) === today);
-  if (leaving) return { kind: "reserved_today", at: leaving.start_at };
+  if (leaving) return { kind: "reserved_today", at: leaving.start_at, time: formatTime(leaving.start_at) };
   return { kind: "available" };
 }
 

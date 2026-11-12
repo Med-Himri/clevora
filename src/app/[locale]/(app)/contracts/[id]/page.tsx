@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { getContractData, missingInfo, type ContractDriver } from "@/lib/contracts/data";
-import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
+import { formatDate, formatDateTime, formatMoney, isoToCasablanca } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
 import { ReservationActions } from "../../reservations/components/reservation-actions";
@@ -107,6 +107,7 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
             deposit_amount: Number(r.deposit_amount),
             balance: totals.balance,
             planned_days: plannedRow?.planned_days ?? totals.days,
+            local: { start: isoToCasablanca(r.start_at), end: isoToCasablanca(r.end_at), now: isoToCasablanca(new Date().toISOString()) },
           }}
           initialAction={typeof sp.do === "string" ? sp.do : null}
         />
