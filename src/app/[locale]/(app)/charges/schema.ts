@@ -2,6 +2,9 @@ import { z } from "zod";
 
 export const CHARGE_CATEGORIES = ["carburant", "lavage", "vidange", "reparation", "assurance", "visite", "publicite", "salaires", "loyer", "autre"] as const;
 
+/** Vidange charges are created by "Vidange faite" (Vidange page), not by hand. */
+export const MANUAL_CHARGE_CATEGORIES = CHARGE_CATEGORIES.filter((c) => c !== "vidange");
+
 export const chargeSchema = z
   .object({
     category: z.enum(CHARGE_CATEGORIES, { error: "required" }),

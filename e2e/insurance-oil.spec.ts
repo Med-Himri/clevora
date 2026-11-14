@@ -49,13 +49,52 @@ test("vidange: the last interval is only a suggestion; saving updates km left", 
   await row.getByRole("button", { name: "Vidange faite" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByLabel("Prochaine vidange (km)")).toHaveValue("");
-  await expect(dialog.getByLabel("Coût (facultatif)")).toHaveCount(0); // staff never record money
+  await expect(dialog.getByTestId("oil-prices")).toHaveCount(0); // staff never record money
+  await expect(dialog.getByRole("button", { name: "Huile moteur" })).toHaveAttribute("aria-pressed", "true");
   await dialog.getByRole("button", { name: /Même intervalle que la dernière fois/ }).click();
   await expect(dialog.getByLabel("Prochaine vidange (km)")).toHaveValue("50000");
   await dialog.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText("Vidange enregistrée.")).toBeVisible();
   await expect(page.locator("[data-group='ok']:visible")).toContainText("Fiat Tipo");
   await expect(page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo", visible: true }).getByTestId("oil-km-left")).toHaveText("Dans 10 000 km");
+  await expect(page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo", visible: true }).getByTestId("oil-last-items")).toHaveText("Huile moteur, Filtre à huile");
+});
+
+test("vidange by an admin: several parts, each price becomes a Vidange charge", async ({ page }) => {
+  const agency = await createTestAgency();
+  const id = await addVehicle(agency.agencyId, { plate: `VC${uid().slice(-4).toUpperCase()}-A-6`, brand_model: "Renault Clio" });
+  await admin().from("vehicles").update({ current_km: 60000, oil_last_km: 50000, oil_next_km: 60000 }).eq("id", id);
+
+  await login(page, agency.email, agency.password);
+  await page.goto("/oil");
+  await page.getByTestId("oil-row").filter({ hasText: "Renault Clio", visible: true }).getByRole("button", { name: "Vidange faite" }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Prochaine vidange (km)").fill("70000");
+  await dialog.getByRole("button", { name: "Filtre à air" }).click();
+  await dialog.getByRole("button", { name: "Courroie / chaîne" }).click();
+  await dialog.getByRole("button", { name: "Courroie / chaîne" }).click(); // unselect
+  const prices = dialog.getByTestId("oil-prices");
+  await prices.getByLabel("Huile moteur").fill("300");
+  await prices.getByLabel("Filtre à huile").fill("80");
+  await prices.getByLabel("Filtre à air").fill("120");
+  await expect(dialog.getByTestId("oil-total")).toContainText("500 MAD");
+  await dialog.getByRole("button", { name: "Enregistrer" }).click();
+  await expect(page.getByText("Vidange enregistrée.")).toBeVisible();
+
+  const { data: charges } = await admin().from("charges").select("category, amount, note").eq("vehicle_id", id).order("amount");
+  expect(charges).toEqual([
+    { category: "vidange", amount: 80, note: "Vidange à 60 000 km · Filtre à huile" },
+    { category: "vidange", amount: 120, note: "Vidange à 60 000 km · Filtre à air" },
+    { category: "vidange", amount: 300, note: "Vidange à 60 000 km · Huile moteur" },
+  ]);
+  const { data: hist } = await admin().from("oil_changes").select("km, next_km, items").eq("vehicle_id", id);
+  expect(hist).toEqual([{ km: 60000, next_km: 70000, items: ["huile", "filtre_huile", "filtre_air"] }]);
+
+  // "Vidange" is no longer a category you pick by hand in Charges
+  await page.goto("/charges");
+  await page.getByRole("button", { name: /Ajouter une charge/ }).first().click();
+  await expect(page.getByRole("dialog").getByRole("radio", { name: "Vidange" })).toHaveCount(0);
+  await expect(page.getByRole("dialog").getByRole("radio", { name: "Carburant" })).toBeVisible();
 });
 
 test("daily alert email: protected by a secret, sent to admins, in their language", async ({ request }, testInfo) => {

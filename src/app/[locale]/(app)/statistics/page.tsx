@@ -1,4 +1,4 @@
-import { BarChart3Icon, CalendarDaysIcon, CarIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
+import { BarChart3Icon, CalendarDaysIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { ExcelExport } from "@/components/app/excel-export";
@@ -17,6 +17,7 @@ import { dayKey, formatDate, formatMoney } from "@/lib/format";
 import { occupancy, occupancyTone, PERIODS, resolvePeriod, toBuckets, type DailyRow } from "@/lib/stats";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { getBalances } from "../balances/queries";
 import { RevenueChartLazy } from "./components/revenue-chart-lazy";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,10 +34,12 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
   const t = await getTranslations("statistics");
   const format = await getFormatter();
   const supabase = await createClient();
-  const [{ data: daily }, { data: perCar }, { count: carCount }] = await Promise.all([
+  const [{ data: daily }, { data: perCar }, { count: carCount }, credit] = await Promise.all([
     supabase.rpc("stats_daily", { p_agency: agency.id, p_from: from, p_to: to }),
     supabase.rpc("stats_by_vehicle", { p_agency: agency.id, p_from: from, p_to: to }),
     supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "active"),
+    // Crédit clients: money still owed today (not limited to the period)
+    getBalances(supabase, agency.id),
   ]);
   const rows = (daily ?? []) as DailyRow[];
   const buckets = toBuckets(rows, from, to, today);
@@ -131,7 +134,18 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
         ) : null}
       </div>
 
-      <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 2xl:grid-cols-6">
+      <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4 2xl:grid-cols-7">
+        <li className="col-span-2 2xl:col-span-1">
+          <StatTile
+            label={t("credit")}
+            value={<Ltr>{formatMoney(credit.reduce((s, r) => s + r.balance, 0))}</Ltr>}
+            hint={t("creditHint", { count: credit.length })}
+            icon={HandCoinsIcon}
+            tone={credit.length ? "danger" : "success"}
+            href="/balances"
+            testId="stats-credit"
+          />
+        </li>
         <li><StatTile label={t("revenue")} value={<Ltr>{formatMoney(revenue)}</Ltr>} icon={WalletIcon} tone="success" testId="stats-revenue" /></li>
         <li><StatTile label={t("charges")} value={<Ltr>{formatMoney(charges)}</Ltr>} icon={WalletIcon} tone="warning" testId="stats-charges" /></li>
         <li><StatTile label={t("net")} value={<Ltr>{formatMoney(revenue - charges)}</Ltr>} icon={TrendingUpIcon} tone={revenue - charges < 0 ? "danger" : "success"} testId="stats-net" /></li>

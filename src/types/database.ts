@@ -716,6 +716,71 @@ export type Database = {
           },
         ];
       };
+      oil_changes: {
+        Row: {
+          agency_id: string;
+          created_at: string;
+          created_by: string | null;
+          date: string;
+          id: string;
+          items: string[];
+          km: number;
+          next_km: number | null;
+          note: string | null;
+          updated_at: string;
+          vehicle_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          id?: string;
+          items?: string[];
+          km: number;
+          next_km?: number | null;
+          note?: string | null;
+          updated_at?: string;
+          vehicle_id: string;
+        };
+        Update: {
+          agency_id?: string;
+          created_at?: string;
+          created_by?: string | null;
+          date?: string;
+          id?: string;
+          items?: string[];
+          km?: number;
+          next_km?: number | null;
+          note?: string | null;
+          updated_at?: string;
+          vehicle_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "oil_changes_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "oil_changes_agency_id_vehicle_id_fkey";
+            columns: ["agency_id", "vehicle_id"];
+            isOneToOne: false;
+            referencedRelation: "vehicles";
+            referencedColumns: ["agency_id", "id"];
+          },
+          {
+            foreignKeyName: "oil_changes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       plans: {
         Row: {
           active: boolean;

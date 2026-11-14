@@ -29,6 +29,8 @@ export async function saveChargeAction(formData: FormData): Promise<ActionResult
   const parsed = chargeSchema.safeParse(raw);
   if (!parsed.success) return fail("invalidForm", zodFieldErrors(parsed.error.issues));
   if (id && (typeof id !== "string" || !z.uuid().safeParse(id).success)) return fail("forbidden");
+  // New vidange charges come from the Vidange page only.
+  if (!id && parsed.data.category === "vidange") return fail("invalidForm", { category: "required" });
   const receipt = formData.get("receipt");
   if (receipt instanceof File && receipt.size > 0) {
     if (!RECEIPT_TYPES[receipt.type]) return fail("invalidForm", { receipt: "receiptType" });

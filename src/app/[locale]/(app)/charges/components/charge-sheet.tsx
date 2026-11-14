@@ -15,7 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { YesNo } from "@/components/ui/yes-no";
 import { dayKey } from "@/lib/format";
 import { saveChargeAction } from "../actions";
-import { CHARGE_CATEGORIES } from "../schema";
+import { CHARGE_CATEGORIES, MANUAL_CHARGE_CATEGORIES } from "../schema";
 
 export type ChargeRow = {
   id: string;
@@ -117,7 +117,7 @@ export function ChargeSheet({
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium">{t("category")}</span>
-              <ChoiceChips name="category" label={t("category")} value={category} onChange={setCategory} className="grid-cols-2 sm:grid-cols-3" options={CHARGE_CATEGORIES.map((c) => ({ value: c, label: tf(`chargeCategories.${c}`) }))} />
+              <ChoiceChips name="category" label={t("category")} value={category} onChange={setCategory} className="grid-cols-2 sm:grid-cols-3" options={(charge?.category === "vidange" ? CHARGE_CATEGORIES : MANUAL_CHARGE_CATEGORIES).map((c) => ({ value: c, label: tf(`chargeCategories.${c}`) }))} />
               {errors.category ? <p role="alert" className="text-sm font-medium text-destructive">{t("categoryRequired")}</p> : null}
             </div>
             <div className="grid gap-4 sm:grid-cols-2">

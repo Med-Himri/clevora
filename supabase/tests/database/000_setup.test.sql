@@ -37,6 +37,7 @@ as $$
       when 'invitation'  then '00000000010a'
       when 'subpay'      then '00000000010b'
       when 'booking'     then '00000000010c'
+      when 'oil'         then '00000000010d'
     end
   )::uuid
 $$;
@@ -52,7 +53,8 @@ as $$
          ('vehicles','agency_id'), ('maintenance_periods','agency_id'), ('clients','agency_id'),
          ('reservations','agency_id'), ('reservation_payments','agency_id'), ('charges','agency_id'),
          ('ai_documents','agency_id'), ('ai_chunks','agency_id'), ('activity_log','agency_id'),
-         ('subscription_payments','agency_id'), ('booking_requests','agency_id')
+         ('subscription_payments','agency_id'), ('booking_requests','agency_id'),
+         ('oil_changes','agency_id')
 $$;
 
 -- Act as a logged-in user (like PostgREST does with the JWT)
@@ -173,6 +175,8 @@ begin
     when 'booking_requests' then
       insert into public.booking_requests (agency_id, full_name, phone, start_date, end_date)
       values (p_agency, 'Pirate', '0600000000', current_date + 1, current_date + 2);
+    when 'oil_changes' then
+      insert into public.oil_changes (agency_id, vehicle_id, km) values (p_agency, tests.id(x || '_vehicle'), 1000);
     else
       raise exception 'unknown table %', p_table;
   end case;
@@ -264,6 +268,9 @@ begin
 
     insert into public.booking_requests (id, agency_id, vehicle_id, full_name, phone, start_date, end_date)
     values (tests.id(x || '_booking'), v_agency, tests.id(x || '_vehicle'), 'Web ' || x, '+212600000010', current_date + 10, current_date + 12);
+
+    insert into public.oil_changes (id, agency_id, vehicle_id, date, km, next_km, items)
+    values (tests.id(x || '_oil'), v_agency, tests.id(x || '_vehicle'), current_date - 40, 20000, 30000, array['huile','filtre_huile']);
 
     insert into public.ai_chunks (id, agency_id, document_id, content, embedding)
     values (tests.id(x || '_chunk'), v_agency, tests.id(x || '_doc'), 'Caution de l''agence ' || x,

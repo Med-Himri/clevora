@@ -61,7 +61,8 @@
     "tooMany": "30 items maximum.",
     "confirmName": "The name does not match.",
     "mfaCode": "Type the 6 digits of the code.",
-    "mfaWrong": "Wrong or expired code. Type the new code shown."
+    "mfaWrong": "Wrong or expired code. Type the new code shown.",
+    "oilItems": "Pick at least one changed part."
   },
   "errors": {
     "invalidCredentials": "Wrong email or password. Check and try again.",
@@ -514,7 +515,8 @@
       "management": "Management",
       "agency": "Agency"
     },
-    "activity": "Activity log"
+    "activity": "Activity log",
+    "balances": "Balances due"
   },
   "urgency": {
     "late": "Late",
@@ -1126,8 +1128,6 @@
     "kmAtChange": "Km at the oil change",
     "nextKmHint": "Type the mileage your mechanic gave you.",
     "suggestion": "Same interval as last time ({interval} km): {km} km",
-    "cost": "Cost (optional)",
-    "costHint": "Saved as an “Oil change” expense for this car.",
     "save": "Save",
     "done": "Oil change saved.",
     "updateKm": "Update km",
@@ -1142,7 +1142,25 @@
     "state": "Status",
     "search": "Plate or model",
     "noResult": "No car matches the search.",
-    "menu": "More actions for {car}"
+    "menu": "More actions for {car}",
+    "itemsTitle": "What was changed?",
+    "items": {
+      "huile": "Engine oil",
+      "filtre_huile": "Oil filter",
+      "filtre_air": "Air filter",
+      "filtre_carburant": "Fuel filter",
+      "filtre_habitacle": "Cabin filter",
+      "courroie": "Belt / chain",
+      "bougies": "Spark plugs",
+      "plaquettes": "Brake pads",
+      "liquide_refroidissement": "Coolant",
+      "autre": "Other"
+    },
+    "otherWhat": "Other: what?",
+    "pricesTitle": "Prices (added to Charges)",
+    "pricesHint": "Each price becomes a \"Vidange\" charge for this car. Leave empty if you don't know.",
+    "pricesTotal": "Total:",
+    "chargeNote": "Vidange at {km} km"
   },
   "charges": {
     "title": "Expenses",
@@ -1216,7 +1234,9 @@
     "car": "Car",
     "carCharges": "Car expenses",
     "exportExcel": "Export (Excel)",
-    "exportPdf": "PDF report"
+    "exportPdf": "PDF report",
+    "credit": "Client credit",
+    "creditHint": "{count, plural, =0 {Everything is paid} one {# client still owes} other {# clients still owe}}"
   },
   "assistant": {
     "title": "AI assistant",
@@ -1683,5 +1703,29 @@
     },
     "updated": "Last updated: November 2026.",
     "defaultRegion": "region of the Supabase project"
+  },
+  "balances": {
+    "title": "Balances due",
+    "subtitle": "Clients who still owe money, biggest amount first.",
+    "empty": "Nobody owes you money",
+    "emptyBody": "When a client leaves or returns the car without paying everything, they show up here.",
+    "search": "Name, phone, ID, contract or plate",
+    "noResult": "No client matches this search",
+    "totalOwed": "{count, plural, one {Total owed by # client} other {Total owed by # clients}}",
+    "client": "Client",
+    "contract": "Contract",
+    "end": "End",
+    "returned": "Car returned",
+    "onRental": "On rental",
+    "total": "Total",
+    "paid": "Paid",
+    "balance": "Left to pay",
+    "groups": {
+      "returned": "Car returned — collect now",
+      "on_rental": "Rental in progress"
+    },
+    "call": "Call {name}",
+    "callShort": "Call",
+    "collect": "Collect"
   }
 }

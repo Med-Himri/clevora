@@ -3,25 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
+import { getTranslations } from "next-intl/server";
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
+import { kmSchema as km, oilSchema, type OilChangeInput } from "./schema";
 
-const km = z.number({ error: "required" }).int({ error: "number" }).min(0, { error: "number" }).max(5_000_000, { error: "number" });
-
-const oilSchema = z
-  .object({
-    date: z.iso.date({ error: "date" }),
-    km,
-    next_km: km,
-    cost: z.number().min(0).nullable(),
-  })
-  .refine((v) => v.next_km > v.km, { error: "oilNextAfterLast", path: ["next_km"] });
-export type OilChangeInput = z.input<typeof oilSchema>;
+export type { OilChangeInput };
 
 function refresh() {
   revalidatePath("/[locale]", "layout");
 }
 
-/** "Vidange faite": staff too. The cost (a charge) is recorded only for admins. */
+/** "Vidange faite": staff too. Saves the history; prices become charges (admins only). */
 export async function recordOilChangeAction(vehicleId: string, input: OilChangeInput): Promise<ActionResult> {
   if (!z.uuid().safeParse(vehicleId).success) return fail("forbidden");
   const parsed = oilSchema.safeParse(input);
@@ -38,8 +30,32 @@ export async function recordOilChangeAction(vehicleId: string, input: OilChangeI
     .eq("id", vehicleId)
     .eq("agency_id", agency.id);
   if (error) return fail(dbErrorKey(error));
-  if (v.cost && v.cost > 0 && agency.role === "admin") {
-    await supabase.from("charges").insert({ agency_id: agency.id, vehicle_id: vehicleId, category: "vidange", amount: v.cost, date: v.date, note: `Vidange à ${v.km} km` });
+  const { error: histError } = await supabase.from("oil_changes").insert({
+    agency_id: agency.id,
+    vehicle_id: vehicleId,
+    date: v.date,
+    km: v.km,
+    next_km: v.next_km,
+    items: v.items.map((x) => x.item),
+    note: v.note || null,
+  });
+  if (histError) return fail(dbErrorKey(histError));
+  // Each priced item becomes a "vidange" charge (money: admins only).
+  const priced = v.items.filter((x) => x.price && x.price > 0);
+  if (priced.length && agency.role === "admin") {
+    const t = await getTranslations("oil");
+    const kmLabel = new Intl.NumberFormat("fr-FR").format(v.km).replace(/\u202f|\u00a0/g, " ");
+    const { error: chargeError } = await supabase.from("charges").insert(
+      priced.map((x) => ({
+        agency_id: agency.id,
+        vehicle_id: vehicleId,
+        category: "vidange",
+        amount: x.price!,
+        date: v.date,
+        note: `${t("chargeNote", { km: kmLabel })} · ${x.item === "autre" ? v.note : t(`items.${x.item}`)}`.slice(0, 500),
+      })),
+    );
+    if (chargeError) return fail(dbErrorKey(chargeError));
   }
   refresh();
   return ok();

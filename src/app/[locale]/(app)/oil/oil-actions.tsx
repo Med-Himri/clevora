@@ -11,8 +11,11 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field } from "@/components/ui/field";
 import { DateField, MoneyField } from "@/components/ui/fields";
 import { Input } from "@/components/ui/input";
-import { dayKey } from "@/lib/format";
+import { Ltr } from "@/components/app/ltr";
+import { dayKey, formatMoney } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { recordOilChangeAction, updateKmAction } from "./actions";
+import { OIL_ITEMS, type OilItem } from "./schema";
 
 const nf = (n: number) => new Intl.NumberFormat("fr-FR").format(n).replace(/ /g, " ");
 const digits = (s: string) => s.replace(/\D/g, "");
@@ -39,21 +42,32 @@ export function OilActions({
   const tc = useTranslations("common");
   const te = useTranslations("errors");
   const tv = useTranslations("validation");
-  const { writable } = useAgency();
+  const { writable, role } = useAgency();
   const [open, setOpen] = useState<"oil" | "km" | null>(null);
   const [pending, startTransition] = useTransition();
   const [date, setDate] = useState(dayKey(new Date()));
   const [km, setKm] = useState(String(currentKm));
   const [nextKm, setNextKm] = useState("");
-  const [cost, setCost] = useState<number | null>(null);
+  const [items, setItems] = useState<OilItem[]>(["huile", "filtre_huile"]);
+  const [prices, setPrices] = useState<Partial<Record<OilItem, number | null>>>({});
+  const [note, setNote] = useState("");
+  const toggle = (item: OilItem) => setItems((list) => (list.includes(item) ? list.filter((x) => x !== item) : [...list, item]));
+  const total = items.reduce((sum, i) => sum + (prices[i] ?? 0), 0);
   const [newKm, setNewKm] = useState(String(currentKm));
   const [error, setError] = useState<string | null>(null);
 
   const saveOil = () =>
     startTransition(async () => {
-      const r = await recordOilChangeAction(vehicleId, { date, km: Number(km), next_km: Number(nextKm), cost });
+      const r = await recordOilChangeAction(vehicleId, {
+        date,
+        km: Number(km),
+        next_km: Number(nextKm),
+        items: items.map((item) => ({ item, price: role === "admin" ? (prices[item] ?? null) : null })),
+        note,
+      });
       if (!r.ok) {
-        setError(r.fieldErrors?.next_km ? tv(r.fieldErrors.next_km) : te(r.error));
+        const field = r.fieldErrors?.next_km ?? r.fieldErrors?.items ?? r.fieldErrors?.note;
+        setError(field ? tv(field) : te(r.error));
         return;
       }
       toast.success(t("done"));
@@ -83,7 +97,7 @@ export function OilActions({
       )}
 
       <Dialog open={open === "oil"} onOpenChange={(o) => setOpen(o ? "oil" : null)}>
-        <DialogContent closeLabel={tc("close")}>
+        <DialogContent closeLabel={tc("close")} className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>{t("doneTitle")}</DialogTitle>
             <DialogDescription>{label}</DialogDescription>
@@ -99,20 +113,65 @@ export function OilActions({
               <Input id={`oil-next-${vehicleId}`} inputMode="numeric" dir="ltr" value={nextKm} onChange={(e) => setNextKm(digits(e.target.value))} />
             </Field>
             {lastInterval && km ? (
-              <Button type="button" variant="outline" className="sm:col-span-2" onClick={() => setNextKm(String(Number(km) + lastInterval))}>
+              <Button type="button" variant="outline" className="h-auto min-h-11 whitespace-normal py-2 text-start sm:col-span-2" onClick={() => setNextKm(String(Number(km) + lastInterval))}>
                 <CheckIcon aria-hidden />
                 {t("suggestion", { km: nf(Number(km) + lastInterval), interval: nf(lastInterval) })}
               </Button>
             ) : null}
-            <Can role="admin">
-              <Field id={`oil-cost-${vehicleId}`} label={t("cost")} hint={t("costHint")} className="sm:col-span-2">
-                <MoneyField id={`oil-cost-${vehicleId}`} value={cost} onChange={setCost} />
+            <fieldset className="flex flex-col gap-2 sm:col-span-2">
+              <legend className="mb-2 text-sm font-medium">{t("itemsTitle")}</legend>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3" data-testid="oil-items">
+                {OIL_ITEMS.map((item) => {
+                  const on = items.includes(item);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggle(item)}
+                      className={cn(
+                        "flex min-h-11 items-center gap-2 rounded-lg border-2 px-3 text-start text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        on ? "border-primary bg-primary/10 dark:border-ring" : "border-border bg-card hover:bg-accent",
+                      )}
+                    >
+                      <span className={cn("inline-flex size-5 shrink-0 items-center justify-center rounded border", on ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40")} aria-hidden>
+                        {on ? <CheckIcon className="size-3.5" /> : null}
+                      </span>
+                      {t(`items.${item}`)}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+            {items.includes("autre") ? (
+              <Field id={`oil-note-${vehicleId}`} label={t("otherWhat")} className="sm:col-span-2">
+                <Input id={`oil-note-${vehicleId}`} value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} />
               </Field>
+            ) : null}
+            <Can role="admin">
+              {items.length ? (
+                <div className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3 sm:col-span-2" data-testid="oil-prices">
+                  <p className="text-sm font-medium">{t("pricesTitle")}</p>
+                  <p className="text-xs text-muted-foreground">{t("pricesHint")}</p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {OIL_ITEMS.filter((i) => items.includes(i)).map((item) => (
+                      <Field key={item} id={`oil-price-${vehicleId}-${item}`} label={item === "autre" && note ? note : t(`items.${item}`)}>
+                        <MoneyField id={`oil-price-${vehicleId}-${item}`} value={prices[item] ?? null} onChange={(v) => setPrices((p) => ({ ...p, [item]: v }))} />
+                      </Field>
+                    ))}
+                  </div>
+                  {total > 0 ? (
+                    <p className="text-sm font-semibold" data-testid="oil-total">
+                      {t("pricesTotal")} <Ltr>{formatMoney(total)}</Ltr>
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
             </Can>
             {error ? <p role="alert" className="text-sm font-medium text-destructive sm:col-span-2">{error}</p> : null}
           </div>
           <DialogFooter>
-            <Button size="lg" onClick={saveOil} disabled={pending || !km || !nextKm}>
+            <Button size="lg" onClick={saveOil} disabled={pending || !km || !nextKm || items.length === 0}>
               <SaveIcon aria-hidden />
               {t("save")}
             </Button>

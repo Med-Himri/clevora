@@ -5,7 +5,7 @@ export function NavBadge({ count, tone, className }: { count: number; tone: "dan
     <span
       className={cn(
         "inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold tabular-nums text-white",
-        tone === "danger" ? "bg-red-600" : "bg-amber-600",
+        tone === "danger" ? "bg-red-600" : "bg-amber-700",
         className,
       )}
     >

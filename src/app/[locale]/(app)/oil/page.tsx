@@ -27,10 +27,17 @@ export default async function OilPage({ searchParams }: PageProps<"/[locale]/oil
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
   const t = await getTranslations("oil");
   const supabase = await createClient();
-  const [{ data: cars }, { data: cfg }] = await Promise.all([
+  const [{ data: cars }, { data: cfg }, { data: history }] = await Promise.all([
     supabase.from("vehicles").select("id, plate, brand_model, current_km, oil_last_km, oil_last_date, oil_next_km").eq("agency_id", agency.id).eq("status", "active"),
     supabase.from("agencies").select("alert_km_before").eq("id", agency.id).single(),
+    supabase.from("oil_changes").select("vehicle_id, items, note").eq("agency_id", agency.id).order("date", { ascending: false }).order("created_at", { ascending: false }).limit(1000),
   ]);
+  // Last vidange of each car: what was changed
+  const lastItems = new Map<string, string>();
+  for (const h of history ?? []) {
+    if (lastItems.has(h.vehicle_id)) continue;
+    lastItems.set(h.vehicle_id, h.items.map((i) => (i === "autre" && h.note ? h.note : t(`items.${i}`))).join(", "));
+  }
   const alertKm = cfg?.alert_km_before ?? 1500;
   const rows = (cars ?? []).map((c) => ({ ...c, status: oilStatus(c.current_km, c.oil_next_km, alertKm) }));
   rows.sort((a, b) => (a.status.kmLeft ?? 1e12) - (b.status.kmLeft ?? 1e12));
@@ -74,9 +81,14 @@ export default async function OilPage({ searchParams }: PageProps<"/[locale]/oil
       priority: "low",
       align: "end",
       cell: (c) => (
-        <span className="flex flex-col leading-tight">
+        <span className="flex flex-col items-end leading-tight">
           {c.oil_last_km !== null ? <Ltr className="tabular-nums">{nf(c.oil_last_km)} km</Ltr> : "—"}
           {c.oil_last_date ? <Ltr className="text-xs text-muted-foreground">{formatDate(c.oil_last_date)}</Ltr> : null}
+          {lastItems.has(c.id) ? (
+            <span className="max-w-44 whitespace-normal text-xs text-muted-foreground" data-testid="oil-last-items">
+              {lastItems.get(c.id)}
+            </span>
+          ) : null}
         </span>
       ),
     },

@@ -61,7 +61,8 @@
     "tooMany": "30 éléments maximum.",
     "confirmName": "Le nom ne correspond pas.",
     "mfaCode": "Tapez les 6 chiffres du code.",
-    "mfaWrong": "Code incorrect ou expiré. Tapez le nouveau code affiché."
+    "mfaWrong": "Code incorrect ou expiré. Tapez le nouveau code affiché.",
+    "oilItems": "Choisissez au moins une pièce changée."
   },
   "errors": {
     "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
@@ -514,7 +515,8 @@
       "management": "Gestion",
       "agency": "Agence"
     },
-    "activity": "Journal d'activité"
+    "activity": "Journal d'activité",
+    "balances": "Restes à payer"
   },
   "urgency": {
     "late": "En retard",
@@ -1126,8 +1128,6 @@
     "kmAtChange": "Km au moment de la vidange",
     "nextKmHint": "Tapez le kilométrage donné par votre garagiste.",
     "suggestion": "Même intervalle que la dernière fois ({interval} km) : {km} km",
-    "cost": "Coût (facultatif)",
-    "costHint": "Enregistré comme charge « Vidange » de cette voiture.",
     "save": "Enregistrer",
     "done": "Vidange enregistrée.",
     "updateKm": "Mettre à jour le km",
@@ -1142,7 +1142,25 @@
     "state": "État",
     "search": "Matricule ou modèle",
     "noResult": "Aucune voiture ne correspond à la recherche.",
-    "menu": "Plus d'actions pour {car}"
+    "menu": "Plus d'actions pour {car}",
+    "itemsTitle": "Qu'est-ce qui a été changé ?",
+    "items": {
+      "huile": "Huile moteur",
+      "filtre_huile": "Filtre à huile",
+      "filtre_air": "Filtre à air",
+      "filtre_carburant": "Filtre à carburant",
+      "filtre_habitacle": "Filtre habitacle",
+      "courroie": "Courroie / chaîne",
+      "bougies": "Bougies",
+      "plaquettes": "Plaquettes de frein",
+      "liquide_refroidissement": "Liquide de refroidissement",
+      "autre": "Autre"
+    },
+    "otherWhat": "Autre : quoi ?",
+    "pricesTitle": "Prix (ajoutés aux Charges)",
+    "pricesHint": "Chaque prix devient une charge « Vidange » pour cette voiture. Laissez vide si vous ne savez pas.",
+    "pricesTotal": "Total :",
+    "chargeNote": "Vidange à {km} km"
   },
   "charges": {
     "title": "Charges",
@@ -1216,7 +1234,9 @@
     "car": "Voiture",
     "carCharges": "Charges de la voiture",
     "exportExcel": "Exporter (Excel)",
-    "exportPdf": "Rapport PDF"
+    "exportPdf": "Rapport PDF",
+    "credit": "Crédit clients",
+    "creditHint": "{count, plural, =0 {Tout est payé} one {# client doit encore payer} other {# clients doivent encore payer}}"
   },
   "assistant": {
     "title": "Assistant IA",
@@ -1683,5 +1703,29 @@
     },
     "updated": "Dernière mise à jour : novembre 2026.",
     "defaultRegion": "région du projet Supabase"
+  },
+  "balances": {
+    "title": "Restes à payer",
+    "subtitle": "Les clients qui doivent encore de l'argent, du plus gros montant au plus petit.",
+    "empty": "Personne ne vous doit d'argent",
+    "emptyBody": "Quand un client part ou rend la voiture sans tout payer, il apparaît ici.",
+    "search": "Nom, téléphone, CIN, contrat ou matricule",
+    "noResult": "Aucun client ne correspond à cette recherche",
+    "totalOwed": "{count, plural, one {Total dû par # client} other {Total dû par # clients}}",
+    "client": "Client",
+    "contract": "Contrat",
+    "end": "Fin",
+    "returned": "Voiture rendue",
+    "onRental": "En location",
+    "total": "Total",
+    "paid": "Payé",
+    "balance": "Reste",
+    "groups": {
+      "returned": "Voiture rendue — à encaisser",
+      "on_rental": "Location en cours"
+    },
+    "call": "Appeler {name}",
+    "callShort": "Appeler",
+    "collect": "Encaisser"
   }
 }

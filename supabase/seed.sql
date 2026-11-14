@@ -317,6 +317,13 @@ begin
            oil_last_date   = v_today - (20 + i * 9),
            oil_next_km     = v_km[i] - case i when 2 then 9200 when 8 then 10300 else 3000 + i * 250 end + 10000
      where id = v_vehicle[i];
+    -- Vidange history: what was changed last time
+    insert into public.oil_changes (agency_id, vehicle_id, date, km, next_km, items, created_by)
+    values (c_agency, v_vehicle[i], v_today - (20 + i * 9),
+            v_km[i] - case i when 2 then 9200 when 8 then 10300 else 3000 + i * 250 end,
+            v_km[i] - case i when 2 then 9200 when 8 then 10300 else 3000 + i * 250 end + 10000,
+            case when i % 3 = 0 then array['huile','filtre_huile','filtre_air'] else array['huile','filtre_huile'] end,
+            c_staff);
   end loop;
   -- => car 2: vidange in ~800 km (Bientôt), car 8: vidange overdue (À faire)
 

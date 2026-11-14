@@ -5,6 +5,7 @@ import {
   CarIcon,
   DropletIcon,
   FileSignatureIcon,
+  HandCoinsIcon,
   HistoryIcon,
   HomeIcon,
   SettingsIcon,
@@ -20,6 +21,7 @@ export type NavKey =
   | "dashboard"
   | "reservations"
   | "contracts"
+  | "balances"
   | "planning"
   | "fleet"
   | "insurance"
@@ -44,6 +46,7 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "dashboard", href: "/dashboard", icon: HomeIcon },
   { key: "reservations", href: "/reservations", icon: CalendarCheckIcon },
   { key: "contracts", href: "/contracts", icon: FileSignatureIcon },
+  { key: "balances", href: "/balances", icon: HandCoinsIcon },
   { key: "planning", href: "/planning", icon: CalendarRangeIcon },
   { key: "fleet", href: "/fleet", icon: CarIcon },
   { key: "insurance", href: "/insurance", icon: ShieldCheckIcon },
@@ -62,7 +65,7 @@ export const NEW_RESERVATION_HREF = "/reservations/new";
 
 /** Sidebar sections, in order. */
 export const NAV_SECTIONS: Array<{ key: "activity" | "fleet" | "management" | "agency"; items: NavKey[] }> = [
-  { key: "activity", items: ["dashboard", "reservations", "contracts", "planning"] },
+  { key: "activity", items: ["dashboard", "reservations", "contracts", "balances", "planning"] },
   { key: "fleet", items: ["fleet", "insurance", "oil"] },
   { key: "management", items: ["charges", "statistics", "assistant"] },
   { key: "agency", items: ["team", "activity", "settings"] },
