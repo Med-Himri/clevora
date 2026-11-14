@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
+import { financeSchema, type FinanceInput } from "@/lib/fleet/finance";
 import { importedVehicleSchema, type ImportedVehicle } from "@/lib/fleet/import";
 import { dayKey, formatDateTime, plateNorm } from "@/lib/format";
 import { maintenanceSchema, vehicleSchema, type MaintenanceInput, type VehicleInput } from "./schema";
@@ -201,4 +202,33 @@ export async function importVehiclesAction(rows: ImportedVehicle[]): Promise<Act
   }
   refresh();
   return ok(result);
+}
+
+/** Achat et crédit of a car: admins only (RLS checks it again). */
+export async function saveFinanceAction(vehicleId: string, input: FinanceInput): Promise<ActionResult> {
+  if (!z.uuid().safeParse(vehicleId).success) return fail("forbidden");
+  const parsed = financeSchema.safeParse(input);
+  if (!parsed.success) return fail("invalidForm", zodFieldErrors(parsed.error.issues));
+  const guard = await requireActionContext({ roles: ["admin"] });
+  if (!guard.ok) return guard;
+  const { supabase, agency } = guard.ctx;
+  const { error } = await supabase
+    .from("vehicle_finance")
+    .upsert({ agency_id: agency.id, vehicle_id: vehicleId, ...parsed.data }, { onConflict: "agency_id,vehicle_id" });
+  if (error) return fail(dbErrorKey(error));
+  refresh(vehicleId);
+  revalidatePath("/[locale]/statistics", "page");
+  return ok();
+}
+
+export async function deleteFinanceAction(vehicleId: string): Promise<ActionResult> {
+  if (!z.uuid().safeParse(vehicleId).success) return fail("forbidden");
+  const guard = await requireActionContext({ roles: ["admin"] });
+  if (!guard.ok) return guard;
+  const { supabase, agency } = guard.ctx;
+  const { error } = await supabase.from("vehicle_finance").delete().eq("agency_id", agency.id).eq("vehicle_id", vehicleId);
+  if (error) return fail(dbErrorKey(error));
+  refresh(vehicleId);
+  revalidatePath("/[locale]/statistics", "page");
+  return ok();
 }

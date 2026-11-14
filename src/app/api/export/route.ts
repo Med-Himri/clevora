@@ -14,6 +14,8 @@ const SHEETS = [
   ["Paiements", "reservation_payments"],
   ["Entretiens", "maintenance_periods"],
   ["Charges", "charges"],
+  ["Vidanges", "oil_changes"],
+  ["Achats et crédits", "vehicle_finance"],
 ] as const;
 
 type Cell = string | number | boolean | null;

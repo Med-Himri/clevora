@@ -1236,6 +1236,70 @@ export type Database = {
           },
         ];
       };
+      vehicle_finance: {
+        Row: {
+          agency_id: string;
+          created_at: string;
+          down_payment: number;
+          first_payment_on: string | null;
+          id: string;
+          lender: string | null;
+          mode: string;
+          monthly_payment: number | null;
+          months: number | null;
+          purchase_date: string;
+          purchase_price: number;
+          updated_at: string;
+          vehicle_id: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          created_at?: string;
+          down_payment?: number;
+          first_payment_on?: string | null;
+          id?: string;
+          lender?: string | null;
+          mode: string;
+          monthly_payment?: number | null;
+          months?: number | null;
+          purchase_date: string;
+          purchase_price: number;
+          updated_at?: string;
+          vehicle_id: string;
+        };
+        Update: {
+          agency_id?: string;
+          created_at?: string;
+          down_payment?: number;
+          first_payment_on?: string | null;
+          id?: string;
+          lender?: string | null;
+          mode?: string;
+          monthly_payment?: number | null;
+          months?: number | null;
+          purchase_date?: string;
+          purchase_price?: number;
+          updated_at?: string;
+          vehicle_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_finance_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "vehicle_finance_agency_id_vehicle_id_fkey";
+            columns: ["agency_id", "vehicle_id"];
+            isOneToOne: true;
+            referencedRelation: "vehicles";
+            referencedColumns: ["agency_id", "id"];
+          },
+        ];
+      };
       vehicles: {
         Row: {
           agency_id: string;
@@ -1552,6 +1616,31 @@ export type Database = {
         Args: { p_agency: string; p_end: string; p_exclude_reservation?: string; p_start: string };
         Returns: {
           reason: string;
+          vehicle_id: string;
+        }[];
+      };
+      vehicle_profitability: {
+        Args: { p_agency: string };
+        Returns: {
+          brand_model: string;
+          charges: number;
+          credit_left: number;
+          down_payment: number;
+          first_payment_on: string;
+          gain: number;
+          gain_3_months: number;
+          lender: string;
+          mode: string;
+          monthly_payment: number;
+          months: number;
+          months_paid: number;
+          paid_so_far: number;
+          plate: string;
+          purchase_date: string;
+          purchase_price: number;
+          revenue: number;
+          status: string;
+          total_cost: number;
           vehicle_id: string;
         }[];
       };

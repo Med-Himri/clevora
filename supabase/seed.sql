@@ -327,6 +327,16 @@ begin
   end loop;
   -- => car 2: vidange in ~800 km (Bientôt), car 8: vidange overdue (À faire)
 
+  -- Achat et crédit: cars 1-4 on credit (car 1 finished), 5-6 paid cash
+  insert into public.vehicle_finance (agency_id, vehicle_id, purchase_date, purchase_price, mode, down_payment, monthly_payment, months, first_payment_on, lender)
+  values
+    (c_agency, v_vehicle[1], v_today - 1500, 145000, 'credit', 30000, 2900, 48, v_today - 1470, 'Wafasalaf'),
+    (c_agency, v_vehicle[2], v_today - 420,  165000, 'credit', 35000, 3600, 48, v_today - 390,  'Wafasalaf'),
+    (c_agency, v_vehicle[3], v_today - 200,  230000, 'credit', 50000, 4900, 48, v_today - 170,  'Eqdom'),
+    (c_agency, v_vehicle[4], v_today - 700,  120000, 'credit', 20000, 2600, 48, v_today - 670,  'Salafin'),
+    (c_agency, v_vehicle[5], v_today - 900,  110000, 'cash',   0, null, null, null, null),
+    (c_agency, v_vehicle[6], v_today - 300,  185000, 'cash',   0, null, null, null, null);
+
   -- -------------------------------------------------------------------------
   -- 6 months of charges (current month + 5 previous), only dates up to today
   -- -------------------------------------------------------------------------

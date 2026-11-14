@@ -18,6 +18,8 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminVehicleMenu } from "../components/admin-vehicle-menu";
 import { VehicleStatusBadge } from "../components/status-badge";
 import { VehicleActions } from "../components/vehicle-actions";
+import { getProfitability } from "@/lib/fleet/finance-query";
+import { FinanceCard } from "../components/finance-card";
 import { getVehicle } from "../queries";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,6 +37,8 @@ export default async function VehicleDetailPage({ params }: PageProps<"/[locale]
   if (!data) notFound();
   const { vehicle: v, computed, maintenance, openMaintenance, upcoming, charges, monthReservations } = data;
 
+  // Achat et crédit (admins only: the function refuses staff)
+  const finance = isAdmin ? ((await getProfitability(supabase, agency.id)).find((p) => p.vehicle_id === v.id) ?? null) : null;
   const { data: alertCfg } = await supabase.from("agencies").select("alert_days_before, alert_km_before").eq("id", agency.id).single();
   const today = dayKey(new Date());
   const dateState = (d: string | null) => {
@@ -228,6 +232,7 @@ export default async function VehicleDetailPage({ params }: PageProps<"/[locale]
             </CardContent>
           </Card>
         ) : null}
+        {isAdmin ? <FinanceCard vehicleId={v.id} label={label} row={finance} /> : null}
       </div>
 
       {v.status === "sold" ? null : (

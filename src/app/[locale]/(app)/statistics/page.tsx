@@ -1,4 +1,4 @@
-import { BarChart3Icon, CalendarDaysIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
+import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { ExcelExport } from "@/components/app/excel-export";
@@ -17,6 +17,10 @@ import { dayKey, formatDate, formatMoney } from "@/lib/format";
 import { occupancy, occupancyTone, PERIODS, resolvePeriod, toBuckets, type DailyRow } from "@/lib/stats";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { ProgressBar } from "@/components/app/progress-bar";
+import { StatusPill } from "@/components/app/status-pill";
+import { summarize } from "@/lib/fleet/finance";
+import { getProfitability } from "@/lib/fleet/finance-query";
 import { getBalances } from "../balances/queries";
 import { RevenueChartLazy } from "./components/revenue-chart-lazy";
 
@@ -34,13 +38,65 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
   const t = await getTranslations("statistics");
   const format = await getFormatter();
   const supabase = await createClient();
-  const [{ data: daily }, { data: perCar }, { count: carCount }, credit] = await Promise.all([
+  const [{ data: daily }, { data: perCar }, { count: carCount }, credit, profit] = await Promise.all([
     supabase.rpc("stats_daily", { p_agency: agency.id, p_from: from, p_to: to }),
     supabase.rpc("stats_by_vehicle", { p_agency: agency.id, p_from: from, p_to: to }),
     supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "active"),
     // Crédit clients: money still owed today (not limited to the period)
     getBalances(supabase, agency.id),
+    // Rentabilité depuis l'achat (all time, not the period)
+    getProfitability(supabase, agency.id),
   ]);
+  const profitRows = profit
+    .filter((p) => p.status !== "sold")
+    .map((p) => ({ ...p, s: summarize(p) }))
+    .sort((a, b) => a.s.paybackPct - b.s.paybackPct);
+  const withoutPurchase = (perCar ?? []).filter((c) => !profit.some((p) => p.vehicle_id === c.vehicle_id)).length;
+  type ProfitRow = (typeof profitRows)[number];
+  const profitColumns: Column<ProfitRow>[] = [
+    { key: "car", header: t("car"), priority: "primary", cell: (c) => <span>{c.brand_model} <Ltr className="text-sm font-normal text-muted-foreground">{c.plate}</Ltr></span> },
+    {
+      key: "credit",
+      header: t("profit.credit"),
+      priority: "high",
+      cell: (c) =>
+        c.mode === "cash" ? (
+          <StatusPill tone="neutral" label={t("profit.cash")} />
+        ) : c.s.creditRunning ? (
+          <StatusPill tone="info" label={t("profit.monthsLeft", { count: c.s.monthsLeft })} detail={<Ltr>{formatMoney(c.credit_left)}</Ltr>} />
+        ) : (
+          <StatusPill tone="success" label={t("profit.creditDone")} />
+        ),
+    },
+    {
+      key: "payback",
+      header: t("profit.payback"),
+      priority: "high",
+      className: "lg:w-44",
+      cell: (c) => (
+        <span className="flex flex-col gap-1">
+          <span className={cn("text-sm font-semibold", c.s.paidBack ? "text-success" : "text-foreground")}>{c.s.paidBack ? t("profit.paidBack") : <Ltr>{`${c.s.paybackPct} %`}</Ltr>}</span>
+          <ProgressBar value={c.s.paybackPct} label={t("profit.payback")} tone={c.s.paidBack ? "success" : "warning"} />
+        </span>
+      ),
+    },
+    { key: "result", header: t("profit.result"), priority: "high", align: "end", cell: (c) => <Ltr className={cn("font-bold", c.s.result < 0 ? "text-destructive" : "text-success")}>{formatMoney(c.s.result)}</Ltr> },
+    {
+      key: "monthly",
+      header: t("profit.monthly"),
+      priority: "low",
+      cell: (c) =>
+        c.s.coversCredit === null ? (
+          <Ltr>{formatMoney(c.s.monthlyGain)}</Ltr>
+        ) : (
+          <StatusPill
+            tone={c.s.coversCredit ? "success" : "danger"}
+            label={<Ltr>{formatMoney(c.s.monthlyGain)}</Ltr>}
+            detail={c.s.coversCredit ? t("profit.covers", { amount: formatMoney(c.monthly_payment ?? 0) }) : t("profit.notCovers", { amount: formatMoney(c.monthly_payment ?? 0) })}
+          />
+        ),
+    },
+  ];
   const rows = (daily ?? []) as DailyRow[];
   const buckets = toBuckets(rows, from, to, today);
   const days = rows.length;
@@ -196,6 +252,22 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
         </h2>
         <p className="mb-3 text-sm text-muted-foreground">{t("perCarHint")}</p>
         <ResponsiveList rows={cars} columns={columns} rowKey={(c) => c.vehicle_id} rowHref={(c) => `/fleet/${c.vehicle_id}`} caption={t("perCar")} testId="per-car" />
+      </section>
+
+      <section aria-labelledby="profit-title" className="mt-8">
+        <h2 id="profit-title" className="mb-1 flex items-center gap-2 text-xl font-bold">
+          <BanknoteIcon className="size-5 text-muted-foreground" aria-hidden />
+          {t("profit.title")}
+        </h2>
+        <p className="mb-3 text-sm text-muted-foreground">{t("profit.hint")}</p>
+        {profitRows.length ? (
+          <ResponsiveList rows={profitRows} columns={profitColumns} rowKey={(c) => c.vehicle_id} rowHref={(c) => `/fleet/${c.vehicle_id}`} caption={t("profit.title")} testId="profit-list" rowTestId="profit-row" />
+        ) : null}
+        {withoutPurchase ? (
+          <p className="mt-3 rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground" data-testid="profit-missing">
+            {t("profit.missing", { count: withoutPurchase })}
+          </p>
+        ) : null}
       </section>
     </>
   );
