@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftIcon, ArrowRightIcon, CarIcon, CheckIcon, FileClockIcon, FuelIcon, ReceiptTextIcon, RotateCcwIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, CalendarClockIcon, CarIcon, CheckIcon, FileClockIcon, FuelIcon, ReceiptTextIcon, RotateCcwIcon, Trash2Icon, TriangleAlertIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -30,7 +30,7 @@ import { EMPTY_DRIVER, PAYMENT_METHODS, reservationSchema, type ReservationInput
 import { DriverFields } from "./driver-fields";
 
 const STEP_FIELDS: string[][] = [
-  ["contract_number", "start_date", "start_time", "end_date", "end_time", "vehicle_id"],
+  ["contract_number", "start_date", "start_time", "end_date", "end_time", "vehicle_id", "car_later"],
   ["driver1", "has_driver2", "driver2"],
   ["daily_price", "delivery", "delivery_place", "return_place", "delivery_fee", "advance_amount", "advance_method", "franchise", "deposit_taken", "deposit_amount", "deposit_method"],
   ["km_out", "fuel_out", "equipment", "documents_given", "notes"],
@@ -129,7 +129,8 @@ export function ReservationWizard({
   }, [step]);
 
   const pickCar = (c: AvailableCar) => {
-    form.setValue("vehicle_id", c.id);
+    form.setValue("car_later", false, { shouldDirty: true });
+    form.setValue("vehicle_id", c.id, { shouldDirty: true });
     if (!priceTouched.current) form.setValue("daily_price", c.daily_rate);
     if (!reservationId) form.setValue("km_out", c.current_km);
   };
@@ -194,7 +195,7 @@ export function ReservationWizard({
     <dl className="flex flex-col gap-2 text-sm" data-testid="wizard-summary">
       <div className="flex justify-between gap-3">
         <dt className="text-muted-foreground">{t("summary.car")}</dt>
-        <dd className="text-end font-medium">{car ? <>{car.brand_model} · <Ltr>{car.plate}</Ltr></> : "—"}</dd>
+        <dd className="text-end font-medium">{car ? <>{car.brand_model} · <Ltr>{car.plate}</Ltr></> : v.car_later ? t("carLaterShort") : "—"}</dd>
       </div>
       <div className="flex justify-between gap-3">
         <dt className="text-muted-foreground">{t("summary.dates")}</dt>
@@ -303,6 +304,28 @@ export function ReservationWizard({
                   ))}
                 </div>
                 <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium">{t("carWhen")}</span>
+                  <ChoiceChips
+                    name="car_when"
+                    label={t("carWhen")}
+                    value={v.car_later ? "later" : "now"}
+                    onChange={(x) => {
+                      form.setValue("car_later", x === "later", { shouldDirty: true });
+                      if (x === "later") form.setValue("vehicle_id", "", { shouldDirty: true });
+                    }}
+                    options={[
+                      { value: "now", label: t("carNow"), description: t("carNowHint"), icon: <CarIcon className="size-4" aria-hidden /> },
+                      { value: "later", label: t("carLater"), description: t("carLaterHint"), icon: <CalendarClockIcon className="size-4" aria-hidden /> },
+                    ]}
+                  />
+                </div>
+                {v.car_later ? (
+                  <Alert variant="info" data-testid="car-later-note">
+                    <CalendarClockIcon aria-hidden />
+                    {t("carLaterNote")}
+                  </Alert>
+                ) : (
+                <div className="flex flex-col gap-2">
                   <span className="text-sm font-medium">{t("chooseCar")}</span>
                   {loadingCars && !cars ? <p className="text-muted-foreground">{t("loadingCars")}</p> : null}
                   {cars && cars.length === 0 ? <Alert variant="warning">{t("noCarFree")}</Alert> : null}
@@ -350,6 +373,7 @@ export function ReservationWizard({
                     </p>
                   ) : null}
                 </div>
+                )}
               </>
             ) : null}
 
@@ -471,6 +495,13 @@ export function ReservationWizard({
 
             {step === 3 ? (
               <>
+                {v.car_later ? (
+                  <Alert variant="info">
+                    <CalendarClockIcon aria-hidden />
+                    {t("checkoutLater")}
+                  </Alert>
+                ) : (
+                <>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="km_out" label={t("kmOut")} hint={car ? t("kmOutHint", { km: car.current_km.toLocaleString("fr-FR").replace(/ /g, " ") }) : undefined}>
                     <Controller
@@ -495,6 +526,8 @@ export function ReservationWizard({
                   </span>
                   <Controller control={form.control} name="fuel_out" render={({ field }) => <FuelPicker value={field.value} onChange={field.onChange} label={t("fuelOut")} />} />
                 </div>
+                </>
+                )}
                 {settings.equipmentItems.length ? (
                   <div className="border-t pt-2">
                     <h3 className="pt-2 font-semibold">{t("equipment")}</h3>

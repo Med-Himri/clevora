@@ -98,7 +98,10 @@
     "signFirst": "وقّع العقد أولًا.",
     "reservationStateChanged": "تغيّر الحجز في هذه الأثناء. حدّث الصفحة.",
     "mfaReauth": "سجّل الخروج ثم ادخل من جديد برمزك، ثم أعد المحاولة.",
-    "clientActive": "لهذا الزبون كراء جارٍ أو قادم: انتظر انتهاءه."
+    "clientActive": "لهذا الزبون كراء جارٍ أو قادم: انتظر انتهاءه.",
+    "carMissing": "اختر سيارة هذا الحجز أولا.",
+    "vehicleInsuranceExpired": "تأمين هذه السيارة منتهٍ في تاريخ الانطلاق. جدده أو اختر سيارة أخرى.",
+    "reservationStarted": "الكراء بدأ بالفعل: لا يمكن تغيير السيارة."
   },
   "notices": {
     "passwordUpdated": "تم تغيير كلمة المرور.",
@@ -309,7 +312,9 @@
       "oilDue": "تغيير الزيت مستحق: {car}",
       "maintenanceLate": "{car}: كان من المتوقع خروجها من الصيانة في {date}، ولا تزال في المرأب"
     },
-    "seeAll": "عرض الحجوزات ({count})"
+    "seeAll": "عرض الحجوزات ({count})",
+    "chooseCar": "السيارة",
+    "carToChoose": "السيارة لم تختر بعد"
   },
   "billing": {
     "title": "الاشتراك",
@@ -745,7 +750,9 @@
       "car": "السيارة",
       "dates": "التواريخ",
       "open": "فتح العقد",
-      "menu": "إجراءات {name}"
+      "menu": "إجراءات {name}",
+      "chooseCar": "اختيار السيارة",
+      "carToChoose": "للاختيار"
     },
     "status": {
       "late": "متأخر",
@@ -855,7 +862,15 @@
       },
       "draftFound": "تم الاحتفاظ على هذا الجهاز بمسودة حجز بدأت في {date}.",
       "draftResume": "متابعة",
-      "draftDiscard": "حذف"
+      "draftDiscard": "حذف",
+      "carWhen": "متى تختار السيارة؟",
+      "carNow": "الآن",
+      "carNowHint": "أختار السيارة",
+      "carLater": "لاحقا",
+      "carLaterHint": "عند الانطلاق، في العقد",
+      "carLaterNote": "سيتم اختيار السيارة في العقد يوم الانطلاق. ثمن اليوم يبقى الذي تكتبه هنا.",
+      "checkoutLater": "سيتم تسجيل العداد والوقود عند اختيار السيارة.",
+      "carLaterShort": "السيارة تختار عند الانطلاق"
     },
     "payment": {
       "cash": "نقدًا",
@@ -939,7 +954,19 @@
       "paymentSubtitle": "الباقي للأداء: {amount}",
       "amount": "المبلغ",
       "kind": "النوع",
-      "savePayment": "حفظ الأداء"
+      "savePayment": "حفظ الأداء",
+      "chooseCar": "اختيار السيارة",
+      "chooseCarFirst": "اختر السيارة أولا",
+      "changeCar": "تغيير السيارة",
+      "carAssigned": "تم تسجيل السيارة",
+      "chooseCarTitle": "اختيار السيارة",
+      "chooseCarSubtitle": "السيارات المتاحة طوال مدة هذا الحجز.",
+      "loadingCars": "البحث عن السيارات المتاحة…",
+      "noCarFree": "لا توجد سيارة متاحة في هذه التواريخ. غيّر التواريخ أو حرّر سيارة.",
+      "priceChoice": "ثمن اليوم",
+      "keepPrice": "الإبقاء على {price}",
+      "carPrice": "ثمن السيارة {price}",
+      "confirmCar": "تأكيد السيارة"
     }
   },
   "contracts": {
@@ -977,7 +1004,8 @@
       "driver1Phone": "هاتف السائق 1",
       "driver2License": "رخصة السائق 2",
       "kmOut": "الكيلومترات عند المغادرة",
-      "fuelOut": "الوقود عند المغادرة"
+      "fuelOut": "الوقود عند المغادرة",
+      "car": "السيارة"
     },
     "sections": {
       "rental": "الكراء",
@@ -1045,7 +1073,10 @@
       "returned": "مُرجعة",
       "maintenance": "صيانة",
       "delivery": "توصيل"
-    }
+    },
+    "carToChoose": "السيارة لم تختر بعد",
+    "chooseCar": "اختيار",
+    "carlessTitle": "{count, plural, one {حجز واحد بدون سيارة} other {# حجوزات بدون سيارة}}"
   },
   "insurance": {
     "title": "التأمين والفحص التقني",

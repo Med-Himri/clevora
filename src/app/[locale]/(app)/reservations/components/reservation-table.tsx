@@ -66,12 +66,15 @@ export async function ReservationTable({
       key: "car",
       header: t("list.car"),
       priority: "high",
-      cell: (r) => (
-        <span className="flex flex-col leading-tight">
-          <span>{r.vehicle.brand_model}</span>
-          <Ltr className="text-xs text-muted-foreground">{r.vehicle.plate}</Ltr>
-        </span>
-      ),
+      cell: (r) =>
+        r.vehicle ? (
+          <span className="flex flex-col leading-tight">
+            <span>{r.vehicle.brand_model}</span>
+            <Ltr className="text-xs text-muted-foreground">{r.vehicle.plate}</Ltr>
+          </span>
+        ) : (
+          <StatusPill tone={r.status === "cancelled" ? "neutral" : "warning"} label={t("list.carToChoose")} />
+        ),
     },
     {
       key: "dates",
@@ -108,7 +111,7 @@ export async function ReservationTable({
     testId,
     caption: t("title"),
     actions: (r: Row, mode: "table" | "card") => (
-      <ReservationRowActions id={r.id} status={r.status} clientName={r.client.full_name} phone={r.client.phone} compact={mode === "table"} />
+      <ReservationRowActions id={r.id} status={r.status} hasCar={Boolean(r.vehicle)} clientName={r.client.full_name} phone={r.client.phone} compact={mode === "table"} />
     ),
   };
 

@@ -20,7 +20,8 @@ export type ListedReservation = {
   signed_at: string | null;
   delivery: boolean;
   delivery_place: string | null;
-  vehicle: { plate: string; brand_model: string };
+  /** null: the car will be chosen on the contract */
+  vehicle: { plate: string; brand_model: string } | null;
   client: { full_name: string; phone: string | null };
   balance: number;
 };

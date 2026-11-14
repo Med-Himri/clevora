@@ -1,6 +1,6 @@
 "use client";
 
-import { CornerDownLeftIcon, EyeIcon, MessageCircleIcon, PhoneIcon, PlayIcon } from "lucide-react";
+import { CarIcon, CornerDownLeftIcon, EyeIcon, MessageCircleIcon, PhoneIcon, PlayIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { RowMenu, type RowMenuItem } from "@/components/app/row-menu";
 import { Button } from "@/components/ui/button";
@@ -14,19 +14,28 @@ import { whatsappNumber } from "@/lib/phone";
 export function ReservationRowActions({
   id,
   status,
+  hasCar = true,
   clientName,
   phone,
   compact,
 }: {
   id: string;
   status: string;
+  hasCar?: boolean;
   clientName: string;
   phone: string | null;
   compact: boolean;
 }) {
   const t = useTranslations("reservations.list");
   const main =
-    status === "reserved" ? (
+    status === "reserved" && !hasCar ? (
+      <Button size="sm" asChild>
+        <Link href={`/contracts/${id}?do=car`}>
+          <CarIcon aria-hidden />
+          {t("chooseCar")}
+        </Link>
+      </Button>
+    ) : status === "reserved" ? (
       <Button variant="outline" size="sm" asChild>
         <Link href={`/contracts/${id}?do=start`}>
           <PlayIcon aria-hidden />

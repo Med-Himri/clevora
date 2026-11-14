@@ -42,6 +42,9 @@ export function dbErrorKey(error: { code?: string; message?: string; hint?: stri
   if (error.hint === "plan_limit_users") return "planLimitUsers";
   if (error.hint === "plan_limit_vehicles") return "planLimitVehicles";
   if (error.hint === "vehicle_in_maintenance") return "vehicleInMaintenance";
+  if (error.hint === "vehicle_insurance_expired") return "vehicleInsuranceExpired";
+  if (error.hint === "reservation_not_reserved") return "reservationStarted";
+  if (error.code === "23514" && error.message?.includes("car_before_signing")) return "carMissing";
   if (error.code === "42501") return "forbidden";
   if (error.code === "23505") return "duplicate";
   if (error.code === "23P01") return "doubleBooking";

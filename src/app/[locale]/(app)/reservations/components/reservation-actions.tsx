@@ -1,8 +1,8 @@
 "use client";
 
-import { BanIcon, CalendarPlusIcon, CornerDownLeftIcon, PenLineIcon, PencilIcon, PlayIcon, PlusIcon } from "lucide-react";
+import { BanIcon, CalendarPlusIcon, CarIcon, CheckIcon, CornerDownLeftIcon, PenLineIcon, PencilIcon, PlayIcon, PlusIcon, RepeatIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useAgency } from "@/components/app/agency-context";
 import { Ltr } from "@/components/app/ltr";
@@ -19,8 +19,12 @@ import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { ActionResult } from "@/lib/action-result";
 import { formatMoney } from "@/lib/format";
 import { rentalDays } from "@/lib/revenue";
+import { cn } from "@/lib/utils";
 import {
   addPaymentAction,
+  assignVehicleAction,
+  availabilityAction,
+  type AvailableCar,
   cancelReservationAction,
   extendReservationAction,
   returnReservationAction,
@@ -34,6 +38,8 @@ type R = {
   id: string;
   status: "reserved" | "on_rental" | "returned" | "cancelled";
   signed: boolean;
+  /** false: the car is chosen later (on this contract, before signing). */
+  hasCar: boolean;
   start_at: string;
   end_at: string;
   daily_price: number;
@@ -49,7 +55,7 @@ type R = {
 /** "yyyy-mm-dd" + "HH:mm" as a naive instant: only differences between two of them are used. */
 const naive = (date: string, time: string) => `${date}T${time || "00:00"}:00Z`;
 
-type Dialogs = "return" | "extend" | "cancel" | "payment" | null;
+type Dialogs = "return" | "extend" | "cancel" | "payment" | "car" | null;
 
 export function ReservationActions({ reservation: r, initialAction }: { reservation: R; initialAction: string | null }) {
   const t = useTranslations("reservations.actions");
@@ -58,7 +64,15 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
   const pathname = usePathname();
   const { writable } = useAgency();
   const [pending, startTransition] = useTransition();
-  const [open, setOpen] = useState<Dialogs>(initialAction === "return" && r.status === "on_rental" ? "return" : null);
+  const [open, setOpen] = useState<Dialogs>(
+    initialAction === "return" && r.status === "on_rental"
+      ? "return"
+      : initialAction === "car" && r.status === "reserved"
+        ? "car"
+        : initialAction === "payment" && r.status !== "cancelled"
+          ? "payment"
+          : null,
+  );
 
   const run = (action: () => Promise<ActionResult>, success: string) =>
     startTransition(async () => {
@@ -76,8 +90,20 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
 
   return (
     <div className="flex flex-wrap gap-2" data-testid="reservation-actions">
+      {r.status === "reserved" && !r.hasCar ? (
+        <Button size="lg" disabled={!writable} onClick={() => setOpen("car")}>
+          <CarIcon aria-hidden />
+          {t("chooseCar")}
+        </Button>
+      ) : null}
       {r.status === "reserved" && !r.signed ? (
-        <Button size="lg" disabled={!writable || pending} onClick={() => run(() => signReservationAction(r.id), t("signed"))}>
+        <Button
+          size="lg"
+          variant={r.hasCar ? "default" : "outline"}
+          disabled={!writable || pending || !r.hasCar}
+          title={r.hasCar ? undefined : t("chooseCarFirst")}
+          onClick={() => run(() => signReservationAction(r.id), t("signed"))}
+        >
           <PenLineIcon aria-hidden />
           {t("sign")}
         </Button>
@@ -109,6 +135,12 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
           {t("extend")}
         </Button>
       ) : null}
+      {r.status === "reserved" && r.hasCar ? (
+        <Button size="lg" variant="outline" disabled={!writable} onClick={() => setOpen("car")}>
+          <RepeatIcon aria-hidden />
+          {t("changeCar")}
+        </Button>
+      ) : null}
       {r.status === "reserved" ? (
         <Button size="lg" variant="outline" asChild disabled={!writable}>
           <Link href={`/reservations/${r.id}/edit`}>
@@ -133,6 +165,7 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
       {open === "return" ? <ReturnDialog r={r} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
       {open === "extend" ? <ExtendDialog r={r} pending={pending} onClose={close} onSubmit={(d, tm) => run(() => extendReservationAction(r.id, d, tm), t("extended"))} /> : null}
       {open === "cancel" ? <CancelDialog pending={pending} onClose={close} onSubmit={(reason) => run(() => cancelReservationAction(r.id, reason), t("cancelled"))} /> : null}
+      {open === "car" ? <AssignCarDialog r={r} pending={pending} onClose={close} onSubmit={(vehicleId, price) => run(() => assignVehicleAction(r.id, vehicleId, price), t("carAssigned"))} /> : null}
       {open === "payment" ? <PaymentDialog balance={r.balance} pending={pending} onClose={close} onSubmit={(p) => run(() => addPaymentAction(r.id, p), t("paymentAdded"))} /> : null}
     </div>
   );
@@ -361,6 +394,100 @@ function PaymentDialog({
           <Button size="lg" onClick={() => amount && onSubmit({ amount, method, kind, note: "" })} disabled={pending || !amount}>
             <PlusIcon aria-hidden />
             {t("savePayment")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
+/** Choisir la voiture: the cars free on the reservation's dates; keep the agreed price or use the car's. */
+function AssignCarDialog({
+  r,
+  pending,
+  onClose,
+  onSubmit,
+}: {
+  r: R;
+  pending: boolean;
+  onClose: () => void;
+  onSubmit: (vehicleId: string, newDailyPrice: number | null) => void;
+}) {
+  const { t, tc } = useDialogTexts();
+  const tf = useTranslations("fleet");
+  const te = useTranslations("errors");
+  const [cars, setCars] = useState<AvailableCar[] | null>(null);
+  const [chosen, setChosen] = useState<string | null>(null);
+  const [price, setPrice] = useState<"keep" | "car">("keep");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void availabilityAction(r.local.start, r.local.end, r.id).then((res) => {
+      if (cancelled) return;
+      if (res.ok) setCars(res.data.available);
+      else setError(te(res.error));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [r.id, r.local.start, r.local.end, te]);
+
+  const car = cars?.find((c) => c.id === chosen) ?? null;
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent closeLabel={tc("close")} className="sm:max-w-2xl" data-testid="assign-car-dialog">
+        <DialogHeader>
+          <DialogTitle>{t("chooseCarTitle")}</DialogTitle>
+          <DialogDescription>{t("chooseCarSubtitle")}</DialogDescription>
+        </DialogHeader>
+        {error ? <Alert variant="danger">{error}</Alert> : null}
+        {!cars && !error ? <p className="text-muted-foreground">{t("loadingCars")}</p> : null}
+        {cars && cars.length === 0 ? <Alert variant="warning">{t("noCarFree")}</Alert> : null}
+        <ul className="grid max-h-[50dvh] gap-2 overflow-y-auto sm:grid-cols-2" role="radiogroup" aria-label={t("chooseCarTitle")}>
+          {(cars ?? []).map((c) => (
+            <li key={c.id}>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={chosen === c.id}
+                onClick={() => setChosen(c.id)}
+                className={cn(
+                  "flex w-full items-start gap-3 rounded-xl border-2 bg-card p-3 text-start transition-colors hover:bg-accent",
+                  chosen === c.id ? "border-primary bg-primary/5 dark:border-ring" : "border-border",
+                )}
+              >
+                <CarIcon className="mt-0.5 size-5 shrink-0 text-muted-foreground" aria-hidden />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="font-semibold">{c.brand_model}</span>
+                  <Ltr className="text-sm text-muted-foreground">{c.plate}</Ltr>
+                  <span className="text-xs text-muted-foreground">{tf(`categories.${c.category}`)} · {tf(`gearboxes.${c.gearbox}`)}</span>
+                </span>
+                <Ltr className="shrink-0 font-bold">{formatMoney(c.daily_rate)}</Ltr>
+              </button>
+            </li>
+          ))}
+        </ul>
+        {car && car.daily_rate !== r.daily_price ? (
+          <div className="flex flex-col gap-2 border-t pt-3">
+            <span className="text-sm font-medium">{t("priceChoice")}</span>
+            <ChoiceChips
+              name="price-choice"
+              label={t("priceChoice")}
+              value={price}
+              onChange={setPrice}
+              options={[
+                { value: "keep", label: t("keepPrice", { price: formatMoney(r.daily_price) }) },
+                { value: "car", label: t("carPrice", { price: formatMoney(car.daily_rate) }) },
+              ]}
+            />
+          </div>
+        ) : null}
+        <DialogFooter>
+          <Button size="lg" disabled={!chosen || pending} onClick={() => chosen && onSubmit(chosen, price === "car" && car ? car.daily_rate : null)}>
+            <CheckIcon aria-hidden />
+            {t("confirmCar")}
           </Button>
         </DialogFooter>
       </DialogContent>

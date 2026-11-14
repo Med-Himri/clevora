@@ -173,7 +173,7 @@ export async function saveReservationAction(input: ReservationInput, reservation
 
   const payload = {
     contract_number: v.contract_number,
-    vehicle_id: v.vehicle_id,
+    vehicle_id: v.car_later || !v.vehicle_id ? null : v.vehicle_id,
     start_at: casablancaToIso(v.start_date, v.start_time),
     end_at: casablancaToIso(v.end_date, v.end_time),
     daily_price: v.daily_price,
@@ -306,5 +306,26 @@ export async function addPaymentAction(reservationId: string, input: PaymentInpu
   });
   if (error) return fail(dbErrorKey(error));
   refresh(reservationId);
+  return ok();
+}
+
+
+/** Choose (or change) the car of a booked reservation, from the cars free on its dates. */
+export async function assignVehicleAction(reservationId: string, vehicleId: string, newDailyPrice: number | null): Promise<ActionResult> {
+  if (!z.uuid().safeParse(reservationId).success || !z.uuid().safeParse(vehicleId).success) return fail("forbidden");
+  if (newDailyPrice !== null && !(Number.isFinite(newDailyPrice) && newDailyPrice >= 0 && newDailyPrice <= 10_000_000)) return fail("invalidForm");
+  const guard = await requireActionContext();
+  if (!guard.ok) return guard;
+  const { supabase, agency } = guard.ctx;
+  const { error } = await supabase.rpc("assign_vehicle", {
+    p_agency: agency.id,
+    p_reservation: reservationId,
+    p_vehicle: vehicleId,
+    ...(newDailyPrice !== null ? { p_daily_price: newDailyPrice } : {}),
+  });
+  if (error) return fail(dbErrorKey(error));
+  revalidatePath("/[locale]/contracts/[id]", "page");
+  revalidatePath("/[locale]/reservations", "page");
+  revalidatePath("/[locale]/dashboard", "page");
   return ok();
 }

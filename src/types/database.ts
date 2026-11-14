@@ -958,7 +958,7 @@ export type Database = {
           start_at: string;
           status: string;
           updated_at: string;
-          vehicle_id: string;
+          vehicle_id: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -995,7 +995,7 @@ export type Database = {
           start_at: string;
           status?: string;
           updated_at?: string;
-          vehicle_id: string;
+          vehicle_id?: string | null;
         };
         Update: {
           actual_return_at?: string | null;
@@ -1031,7 +1031,7 @@ export type Database = {
           start_at?: string;
           status?: string;
           updated_at?: string;
-          vehicle_id?: string;
+          vehicle_id?: string | null;
         };
         Relationships: [
           {
@@ -1325,6 +1325,15 @@ export type Database = {
       };
       anonymize_client: { Args: { p_agency: string; p_client: string }; Returns: undefined };
       anonymize_old_clients: { Args: { p_agency: string; p_years: number }; Returns: number };
+      assign_vehicle: {
+        Args: {
+          p_agency: string;
+          p_daily_price?: number;
+          p_reservation: string;
+          p_vehicle: string;
+        };
+        Returns: undefined;
+      };
       confirm_subscription_payment: {
         Args: { p_payment: string; p_provider_ref?: string };
         Returns: string;

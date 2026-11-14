@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { ChevronLeftIcon, ChevronRightIcon, CornerDownLeftIcon, LogOutIcon, PlusIcon, TruckIcon } from "lucide-react";
+import { CarIcon, ChevronLeftIcon, ChevronRightIcon, CornerDownLeftIcon, LogOutIcon, PlusIcon, TruckIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Ltr } from "@/components/app/ltr";
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { maintenanceCovers } from "@/lib/fleet/status";
-import { casablancaToIso, dayKey, daysBetween, formatTime } from "@/lib/format";
+import { casablancaToIso, dayKey, daysBetween, formatDate, formatTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 
@@ -37,7 +37,7 @@ type Booking = {
   end_at: string;
   actual_return_at: string | null;
   delivery: boolean;
-  vehicle_id: string;
+  vehicle_id: string | null;
   client: { full_name: string } | null;
 };
 
@@ -120,14 +120,36 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
   const busyIds = new Set(outOn(selectedDay).map((b) => b.vehicle_id));
   const garageIds = new Set((maintenance ?? []).filter((m) => maintenanceCovers(m, selectedDay, { openMeansOngoing: false })).map((m) => m.vehicle_id));
   const free = cars.filter((c) => !busyIds.has(c.id) && !garageIds.has(c.id));
-  const carName = (id: string) => {
+  const carName = (id: string | null) => {
+    if (!id) return t("carToChoose");
     const c = cars.find((x) => x.id === id);
     return c ? `${c.brand_model} · ${c.plate}` : "";
   };
+  // Reservations of the week still without a car (chosen on the contract)
+  const carless = list.filter((b) => !b.vehicle_id && b.status === "reserved" && span(bookingDays(b).start, bookingDays(b).end));
 
   return (
     <>
       <PageHeader title={t("title")} action={nav} />
+      {carless.length ? (
+        <section aria-labelledby="carless-title" className="mb-4 rounded-xl border border-warning/40 bg-warning-soft p-3" data-testid="planning-carless">
+          <h2 id="carless-title" className="mb-2 flex items-center gap-2 text-sm font-semibold">
+            <CarIcon className="size-4 text-warning" aria-hidden />
+            {t("carlessTitle", { count: carless.length })}
+          </h2>
+          <ul className="flex flex-wrap gap-2">
+            {carless.map((b) => (
+              <li key={b.id}>
+                <Link href={`/contracts/${b.id}?do=car`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border bg-card px-3 text-sm hover:bg-accent">
+                  <Ltr className="font-semibold">{formatDate(b.start_at).slice(0, 5)}</Ltr>
+                  {b.client?.full_name}
+                  <span className="font-semibold text-primary">{t("chooseCar")}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {/* Phone (< 768 px): day picker + lists instead of a tiny grid */}
       <div className="md:hidden" data-testid="planning-day">

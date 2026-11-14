@@ -99,6 +99,7 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
             id: r.id,
             status: r.status as "reserved" | "on_rental" | "returned" | "cancelled",
             signed: Boolean(r.signed_at),
+            hasCar: Boolean(r.vehicle),
             start_at: r.start_at,
             end_at: r.end_at,
             daily_price: Number(r.daily_price),
@@ -134,7 +135,7 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
                 {missing.map((m) => (
                   <li key={m.key}>
                     {r.status === "reserved" ? (
-                      <Link href={`/reservations/${r.id}/edit?step=${m.step}`} className="font-medium underline underline-offset-4">
+                      <Link href={m.key === "car" ? `/contracts/${r.id}?do=car` : `/reservations/${r.id}/edit?step=${m.step}`} className="font-medium underline underline-offset-4">
                         {t(`missing.${m.key}`)}
                       </Link>
                     ) : (

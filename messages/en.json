@@ -98,7 +98,10 @@
     "signFirst": "Have the contract signed first.",
     "reservationStateChanged": "The reservation changed meanwhile. Refresh the page.",
     "mfaReauth": "Log out, log in again with your code, then try again.",
-    "clientActive": "This client has a running or upcoming rental: wait until it is over."
+    "clientActive": "This client has a running or upcoming rental: wait until it is over.",
+    "carMissing": "Choose the car of this booking first.",
+    "vehicleInsuranceExpired": "This car's insurance has expired by departure. Renew it or choose another car.",
+    "reservationStarted": "The rental has started: the car can no longer change."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
@@ -309,7 +312,9 @@
       "oilDue": "Oil change due: {car}",
       "maintenanceLate": "{car}: expected back from maintenance on {date}, still at the garage"
     },
-    "seeAll": "See all {count} bookings"
+    "seeAll": "See all {count} bookings",
+    "chooseCar": "Car",
+    "carToChoose": "Car to choose"
   },
   "billing": {
     "title": "Subscription",
@@ -745,7 +750,9 @@
       "car": "Car",
       "dates": "Dates",
       "open": "Open the contract",
-      "menu": "Actions for {name}"
+      "menu": "Actions for {name}",
+      "chooseCar": "Choose the car",
+      "carToChoose": "To choose"
     },
     "status": {
       "late": "Late",
@@ -855,7 +862,15 @@
       },
       "draftFound": "A booking draft started on {date} was kept on this device.",
       "draftResume": "Resume",
-      "draftDiscard": "Discard"
+      "draftDiscard": "Discard",
+      "carWhen": "When do you pick the car?",
+      "carNow": "Now",
+      "carNowHint": "I pick the car",
+      "carLater": "Later",
+      "carLaterHint": "At departure, on the contract",
+      "carLaterNote": "The car will be chosen on the contract on departure day. The daily price stays the one you type here.",
+      "checkoutLater": "Mileage and fuel will be noted when the car is chosen.",
+      "carLaterShort": "Car chosen at departure"
     },
     "payment": {
       "cash": "Cash",
@@ -939,7 +954,19 @@
       "paymentSubtitle": "Left to pay: {amount}",
       "amount": "Amount",
       "kind": "Type",
-      "savePayment": "Save payment"
+      "savePayment": "Save payment",
+      "chooseCar": "Choose the car",
+      "chooseCarFirst": "Choose the car first",
+      "changeCar": "Change car",
+      "carAssigned": "Car saved",
+      "chooseCarTitle": "Choose the car",
+      "chooseCarSubtitle": "Cars free for the whole booking.",
+      "loadingCars": "Looking for free cars…",
+      "noCarFree": "No car is free on these dates. Change the dates or free a car.",
+      "priceChoice": "Daily price",
+      "keepPrice": "Keep {price}",
+      "carPrice": "Car price {price}",
+      "confirmCar": "Confirm car"
     }
   },
   "contracts": {
@@ -977,7 +1004,8 @@
       "driver1Phone": "Driver 1 phone",
       "driver2License": "Driver 2 licence",
       "kmOut": "Mileage at departure",
-      "fuelOut": "Fuel at departure"
+      "fuelOut": "Fuel at departure",
+      "car": "The car"
     },
     "sections": {
       "rental": "Rental",
@@ -1045,7 +1073,10 @@
       "returned": "Returned",
       "maintenance": "Maintenance",
       "delivery": "Delivery"
-    }
+    },
+    "carToChoose": "Car to choose",
+    "chooseCar": "Choose",
+    "carlessTitle": "{count, plural, one {# booking without a car} other {# bookings without a car}}"
   },
   "insurance": {
     "title": "Insurance and inspection",

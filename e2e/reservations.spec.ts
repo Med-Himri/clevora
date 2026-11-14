@@ -151,3 +151,44 @@ test("search finds a reservation by phone, CIN or plate", async ({ page }) => {
     await expect(page.getByTestId("reservation-row").first()).toContainText("Karim Connu");
   }
 });
+
+test("car later: book without a car, choose it on the contract, then sign", async ({ page }) => {
+  const s = await setupAgency();
+  await login(page, s.staff.email, s.staff.password);
+  await page.goto("/reservations/new");
+
+  // Step 1 — "Plus tard": no car list, a note explains when the car is chosen
+  await page.getByRole("radiogroup", { name: "Quand choisir la voiture ?" }).getByRole("radio", { name: /Plus tard/ }).click();
+  await expect(page.getByTestId("car-later-note")).toBeVisible();
+  await expect(page.getByTestId("available-cars")).toHaveCount(0);
+  await goNext(page);
+
+  await page.getByLabel("Numéro de CIN").fill(s.cin);
+  await expect(page.getByText("Client trouvé : Karim Connu")).toBeVisible();
+  await goNext(page);
+
+  // Step 3 — no car, so the price is typed by hand
+  await page.getByLabel("Prix par jour").fill("250");
+  await goNext(page);
+  await expect(page.getByText("Le kilométrage et le carburant seront notés")).toBeVisible();
+  await page.getByRole("button", { name: "Enregistrer la réservation" }).click();
+  await page.waitForURL(/\/contracts\/[0-9a-f-]{36}$/);
+
+  // The contract asks for the car; signing waits for it
+  const actions = page.getByTestId("reservation-actions");
+  await expect(actions.getByRole("button", { name: "Marquer comme signé" })).toBeDisabled();
+  await actions.getByRole("button", { name: "Choisir la voiture" }).click();
+  const dialog = page.getByTestId("assign-car-dialog");
+  await dialog.getByRole("radio", { name: /Dacia Sandero/ }).click();
+  // Car price (300) differs from the agreed price (250): keep the agreed one
+  await dialog.getByRole("radio", { name: /Garder/ }).click();
+  await dialog.getByRole("button", { name: "Valider la voiture" }).click();
+  await expect(page.getByText("Voiture enregistrée")).toBeVisible();
+  await expect(actions.getByRole("button", { name: "Marquer comme signé" })).toBeEnabled();
+  await expect(actions.getByRole("button", { name: "Changer de voiture" })).toBeVisible();
+
+  const id = page.url().split("/").pop()!;
+  const { data } = await admin().from("reservations").select("vehicle_id, daily_price").eq("id", id).single();
+  expect(data).toEqual({ vehicle_id: s.vehicleId, daily_price: 250 });
+  await expectNoHorizontalScroll(page);
+});

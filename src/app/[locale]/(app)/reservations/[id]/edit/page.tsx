@@ -62,6 +62,7 @@ export default async function EditReservationPage({ params, searchParams }: Page
     end_date: end.date,
     end_time: end.time,
     vehicle_id: r.vehicle?.id ?? "",
+    car_later: !r.vehicle,
     driver1: toDriver(r.client as ClientRow),
     has_driver2: Boolean(r.driver2),
     driver2: r.driver2 ? toDriver(r.driver2 as ClientRow) : undefined,

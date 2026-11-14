@@ -62,6 +62,7 @@ export function missingInfo(data: ContractData): Array<{ key: string; step: numb
   const r = data.reservation;
   const missing: Array<{ key: string; step: number }> = [];
   const d1 = r.driver1;
+  if (!r.vehicle) missing.push({ key: "car", step: 0 });
   if (!d1?.id_number) missing.push({ key: "driver1Id", step: 1 });
   if (!d1?.license_number) missing.push({ key: "driver1License", step: 1 });
   if (!d1?.phone) missing.push({ key: "driver1Phone", step: 1 });

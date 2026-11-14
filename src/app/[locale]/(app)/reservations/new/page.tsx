@@ -57,6 +57,7 @@ export default async function NewReservationPage({ searchParams }: PageProps<"/[
     end_date: addDays(startDate, 1),
     end_time: startTime,
     vehicle_id: initialCar?.id ?? "",
+    car_later: false,
     driver1: { ...EMPTY_DRIVER },
     has_driver2: false,
     daily_price: initialCar?.daily_rate ?? 0,

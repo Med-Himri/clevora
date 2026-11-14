@@ -49,7 +49,9 @@ export const reservationSchema = z
     start_time: z.string().regex(/^\d{2}:\d{2}$/, { error: "time" }),
     end_date: z.iso.date({ error: "date" }),
     end_time: z.string().regex(/^\d{2}:\d{2}$/, { error: "time" }),
-    vehicle_id: z.uuid({ error: "chooseCar" }),
+    // Empty with car_later = the car is chosen on the contract, before the departure.
+    vehicle_id: z.union([z.uuid({ error: "chooseCar" }), z.literal("")]).default(""),
+    car_later: z.boolean().default(false),
     driver1: driverSchema.extend({ phone: phoneField }),
     has_driver2: z.boolean(),
     driver2: driverSchema.optional(),
@@ -72,7 +74,8 @@ export const reservationSchema = z
   })
   .refine((v) => `${v.end_date}T${v.end_time}` > `${v.start_date}T${v.start_time}`, { error: "endBeforeStart", path: ["end_date"] })
   .refine((v) => !v.has_driver2 || v.driver2 !== undefined, { error: "required", path: ["driver2", "id_number"] })
-  .refine((v) => !v.delivery || v.delivery_place.length > 0, { error: "required", path: ["delivery_place"] });
+  .refine((v) => !v.delivery || v.delivery_place.length > 0, { error: "required", path: ["delivery_place"] })
+  .refine((v) => v.car_later || v.vehicle_id !== "", { error: "chooseCar", path: ["vehicle_id"] });
 export type ReservationInput = z.input<typeof reservationSchema>;
 
 export const extendSchema = z.object({

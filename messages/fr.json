@@ -98,7 +98,10 @@
     "signFirst": "Faites d'abord signer le contrat.",
     "reservationStateChanged": "La réservation a changé entre-temps. Actualisez la page.",
     "mfaReauth": "Déconnectez-vous puis reconnectez-vous avec votre code, puis réessayez.",
-    "clientActive": "Ce client a une location en cours ou à venir : attendez qu'elle soit terminée."
+    "clientActive": "Ce client a une location en cours ou à venir : attendez qu'elle soit terminée.",
+    "carMissing": "Choisissez d'abord la voiture de cette réservation.",
+    "vehicleInsuranceExpired": "L'assurance de cette voiture est expirée à la date du départ. Renouvelez-la ou choisissez une autre voiture.",
+    "reservationStarted": "La location a déjà commencé : la voiture ne peut plus changer."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
@@ -309,7 +312,9 @@
       "oilDue": "Vidange à faire : {car}",
       "maintenanceLate": "{car} : retour de maintenance prévu le {date}, toujours au garage"
     },
-    "seeAll": "Voir les {count} réservations"
+    "seeAll": "Voir les {count} réservations",
+    "chooseCar": "Voiture",
+    "carToChoose": "Voiture à choisir"
   },
   "billing": {
     "title": "Abonnement",
@@ -745,7 +750,9 @@
       "car": "Voiture",
       "dates": "Dates",
       "open": "Ouvrir le contrat",
-      "menu": "Actions pour {name}"
+      "menu": "Actions pour {name}",
+      "chooseCar": "Choisir la voiture",
+      "carToChoose": "À choisir"
     },
     "status": {
       "late": "En retard",
@@ -855,7 +862,15 @@
       },
       "draftFound": "Un brouillon de réservation commencé le {date} a été gardé sur cet appareil.",
       "draftResume": "Reprendre",
-      "draftDiscard": "Effacer"
+      "draftDiscard": "Effacer",
+      "carWhen": "Quand choisir la voiture ?",
+      "carNow": "Maintenant",
+      "carNowHint": "Je choisis la voiture",
+      "carLater": "Plus tard",
+      "carLaterHint": "Au départ, sur le contrat",
+      "carLaterNote": "La voiture sera choisie sur le contrat, le jour du départ. Le prix par jour reste celui que vous écrivez ici.",
+      "checkoutLater": "Le kilométrage et le carburant seront notés quand la voiture sera choisie.",
+      "carLaterShort": "Voiture à choisir au départ"
     },
     "payment": {
       "cash": "Espèces",
@@ -939,7 +954,19 @@
       "paymentSubtitle": "Reste à payer : {amount}",
       "amount": "Montant",
       "kind": "Type",
-      "savePayment": "Enregistrer le paiement"
+      "savePayment": "Enregistrer le paiement",
+      "chooseCar": "Choisir la voiture",
+      "chooseCarFirst": "Choisissez d'abord la voiture",
+      "changeCar": "Changer de voiture",
+      "carAssigned": "Voiture enregistrée",
+      "chooseCarTitle": "Choisir la voiture",
+      "chooseCarSubtitle": "Voitures libres pour toutes les dates de cette réservation.",
+      "loadingCars": "Recherche des voitures libres…",
+      "noCarFree": "Aucune voiture libre à ces dates. Changez les dates ou libérez une voiture.",
+      "priceChoice": "Prix par jour",
+      "keepPrice": "Garder {price}",
+      "carPrice": "Prix de la voiture {price}",
+      "confirmCar": "Valider la voiture"
     }
   },
   "contracts": {
@@ -977,7 +1004,8 @@
       "driver1Phone": "Téléphone du conducteur 1",
       "driver2License": "Permis du conducteur 2",
       "kmOut": "Kilométrage au départ",
-      "fuelOut": "Carburant au départ"
+      "fuelOut": "Carburant au départ",
+      "car": "La voiture"
     },
     "sections": {
       "rental": "Location",
@@ -1045,7 +1073,10 @@
       "returned": "Rendue",
       "maintenance": "Maintenance",
       "delivery": "Livraison"
-    }
+    },
+    "carToChoose": "Voiture à choisir",
+    "chooseCar": "Choisir",
+    "carlessTitle": "{count, plural, one {# réservation sans voiture} other {# réservations sans voiture}}"
   },
   "insurance": {
     "title": "Assurance et visite technique",

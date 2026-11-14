@@ -1,4 +1,4 @@
-import { ArrowRightIcon, CornerDownLeftIcon, FileSignatureIcon, FolderOpenIcon, PhoneIcon, TruckIcon, type LucideIcon } from "lucide-react";
+import { ArrowRightIcon, CarIcon, CornerDownLeftIcon, FileSignatureIcon, FolderOpenIcon, PhoneIcon, TruckIcon, type LucideIcon } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Ltr } from "@/components/app/ltr";
 import { Button } from "@/components/ui/button";
@@ -72,7 +72,9 @@ export async function MovementList({
                   const main =
                     kind === "return"
                       ? { href: `/contracts/${r.id}?do=return`, label: t("return"), icon: CornerDownLeftIcon, primary: true }
-                      : r.signed_at
+                      : !r.vehicle
+                        ? { href: `/contracts/${r.id}?do=car`, label: t("chooseCar"), icon: CarIcon, primary: true }
+                        : r.signed_at
                         ? { href: `/contracts/${r.id}`, label: t("open"), icon: FolderOpenIcon, primary: false }
                         : { href: `/contracts/${r.id}`, label: t("sign"), icon: FileSignatureIcon, primary: false };
                   const MainIcon = main.icon;
@@ -85,7 +87,13 @@ export async function MovementList({
                       <Link href={`/contracts/${r.id}`} className="flex min-w-0 flex-1 flex-col rounded-md leading-tight hover:underline-offset-4">
                         <span className="truncate font-semibold">{r.client.full_name}</span>
                         <span className="truncate text-sm text-muted-foreground">
-                          {r.vehicle.brand_model} · <Ltr>{r.vehicle.plate}</Ltr>
+                          {r.vehicle ? (
+                            <>
+                              {r.vehicle.brand_model} · <Ltr>{r.vehicle.plate}</Ltr>
+                            </>
+                          ) : (
+                            <span className="font-medium text-warning">{t("carToChoose")}</span>
+                          )}
                         </span>
                         <span className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
                           <Ltr>{r.contract_number}</Ltr>
