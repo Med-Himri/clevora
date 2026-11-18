@@ -17,7 +17,7 @@ export default async function PlatformLayout({ children }: { children: ReactNode
       <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-2">
           <Link href="/platform" className="flex items-center gap-3 rounded-md">
-            <ParcoliaLogo />
+            <ParcoliaLogo priority />
             <span className="rounded-md bg-muted px-2 py-0.5 text-xs font-semibold">{t("badge")}</span>
           </Link>
           <span className="flex flex-col text-end text-sm leading-tight">

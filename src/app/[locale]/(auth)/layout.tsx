@@ -11,7 +11,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
     <div className="flex min-h-dvh flex-col bg-muted/60 dark:bg-background">
       <header className="flex flex-col items-center gap-2 px-4 pb-4 pt-8 text-center sm:pt-12">
         <Link href="/login" aria-label="Parcolia" className="rounded-lg">
-          <ParcoliaLogo />
+          <ParcoliaLogo priority />
         </Link>
         <p className="text-sm text-muted-foreground">{t("tagline")}</p>
       </header>

@@ -7,7 +7,11 @@ test("marketing home: hero, features and the three plans from the database", asy
   await expect(page.getByTestId("marketing-plans").getByRole("listitem").filter({ has: page.getByRole("heading", { level: 3 }) })).toHaveCount(3);
   await expect(page.getByTestId("marketing-plans")).toContainText("599 MAD");
   await expectNoHorizontalScroll(page);
-  await page.getByRole("link", { name: "Essayer gratuitement 14 jours" }).first().click();
+  // The Parcolia logo is on the page, and the calls to action look like real buttons
+  await expect(page.getByRole("img", { name: "Parcolia" }).first()).toBeVisible();
+  const cta = page.getByRole("link", { name: "Essayer gratuitement 14 jours" }).first();
+  expect((await cta.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await cta.click();
   await page.waitForURL(/\/signup/);
   await page.goto("/ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");

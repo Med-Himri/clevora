@@ -17,6 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ReservationActions } from "../../reservations/components/reservation-actions";
 import { ReservationStatusBadge } from "../../reservations/components/status-badge";
 import { ContractShare } from "../components/contract-share";
+import { PoweredBy } from "@/components/app/powered-by";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -207,7 +208,9 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
               {r.signed_at ? <p className="mt-1 font-medium text-foreground">{tr("detail.signedOn", { date: formatDateTime(r.signed_at) })}</p> : null}
             </div>
           </div>
-          <p className="mt-4 text-center text-xs text-muted-foreground">{t("poweredBy")}</p>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            <PoweredBy label={t("poweredBy")} />
+          </p>
         </article>
 
         <Card className="h-fit">

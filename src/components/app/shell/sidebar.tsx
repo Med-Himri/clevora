@@ -9,6 +9,7 @@ import type { Role } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import { NavBadge } from "./nav-badge";
 import { isActive, NAV_SECTIONS, navItemsFor, type NavBadges, type NavItem } from "./nav-config";
+import { PoweredBy } from "@/components/app/powered-by";
 
 /**
  * Tablet (768–1279 px): icon rail; tap the top button to open it over the content.
@@ -122,7 +123,9 @@ export function Sidebar({
           })}
         </nav>
 
-        <p className={cn("border-t px-3 py-2.5 text-xs text-muted-foreground", !open && "hidden xl:block")}>{t("poweredBy")}</p>
+        <p className={cn("border-t px-3 py-2.5 text-xs text-muted-foreground", !open && "hidden xl:block")}>
+          <PoweredBy label={t("poweredBy")} />
+        </p>
       </aside>
     </>
   );

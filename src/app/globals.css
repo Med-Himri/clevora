@@ -5,10 +5,11 @@
 /*
  * Parcolia design tokens.
  * --brand / --brand-foreground come from the active agency (set by <BrandStyle>);
- * Parcolia pages (login, signup…) use the Parcolia navy below.
+ * Parcolia pages (login, signup…) use the Parcolia blue below (from the logo:
+ * blue #054570 → turquoise #0E8F92).
  */
 :root {
-  --brand: #1e2a4a;
+  --brand: #054570;
   --brand-foreground: #ffffff;
 
   --background: #f8fafc;
@@ -42,7 +43,7 @@
 
 .dark {
   /* Parcolia pages only: agencies override --brand with their own colour */
-  --brand: #2f4170;
+  --brand: #0b5f8a;
   --background: #0b1120;
   --foreground: #e2e8f0;
   --card: #111a2e;

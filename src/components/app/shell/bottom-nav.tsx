@@ -9,6 +9,7 @@ import type { Role } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import { NavBadge } from "./nav-badge";
 import { BOTTOM_KEYS, isActive, NEW_RESERVATION_HREF, navItemsFor, type NavBadges } from "./nav-config";
+import { PoweredBy } from "@/components/app/powered-by";
 
 /** Phones (< 768 px): Aujourd'hui, Réservations, big +, Parc auto, Plus. */
 export function BottomNav({ role, badges }: { role: Role; badges: NavBadges }) {
@@ -109,7 +110,9 @@ export function BottomNav({ role, badges }: { role: Role; badges: NavBadges }) {
               );
             })}
           </ul>
-          <p className="text-center text-xs text-muted-foreground">{t("poweredBy")}</p>
+          <p className="text-center text-xs text-muted-foreground">
+            <PoweredBy label={t("poweredBy")} />
+          </p>
         </DialogContent>
       </Dialog>
     </>

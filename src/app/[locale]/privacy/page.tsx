@@ -24,7 +24,7 @@ export default async function PrivacyPage() {
       <header className="border-b">
         <div className="mx-auto flex max-w-3xl items-center px-4 py-3">
           <Link href="/" aria-label="Parcolia" className="rounded-md">
-            <ParcoliaLogo className="[&_span]:text-xl" />
+            <ParcoliaLogo size="sm" priority />
           </Link>
         </div>
       </header>

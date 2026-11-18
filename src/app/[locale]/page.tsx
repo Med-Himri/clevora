@@ -13,8 +13,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
-import { Suspense, type ReactNode } from "react";
+import { Suspense, type ComponentProps, type ReactNode } from "react";
 import { LocaleLinks } from "@/components/app/locale-links";
 import { Ltr } from "@/components/app/ltr";
 import { ParcoliaLogo } from "@/components/app/parcolia-logo";
@@ -48,10 +49,21 @@ const FEATURES: Array<{ key: string; icon: LucideIcon }> = [
  * Link to an app page. When the marketing site has its own domain
  * (NEXT_PUBLIC_MARKETING_URL), app pages live on NEXT_PUBLIC_SITE_URL: plain <a>.
  */
-function AppLink({ href, locale, children }: { href: string; locale: string; children: ReactNode }) {
+function AppLink({ href, locale, children, ...rest }: { href: string; locale: string; children: ReactNode } & Omit<ComponentProps<"a">, "href">) {
+  // ...rest carries the button styles (Button asChild passes className to its child).
   const split = process.env.NEXT_PUBLIC_MARKETING_URL && process.env.NEXT_PUBLIC_MARKETING_URL !== process.env.NEXT_PUBLIC_SITE_URL;
-  if (!split) return <Link href={href}>{children}</Link>;
-  return <a href={`${process.env.NEXT_PUBLIC_SITE_URL}${localizedPath(href, locale)}`}>{children}</a>;
+  if (!split) {
+    return (
+      <Link href={href} {...rest}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={`${process.env.NEXT_PUBLIC_SITE_URL}${localizedPath(href, locale)}`} {...rest}>
+      {children}
+    </a>
+  );
 }
 
 /** Parcolia marketing home. Logged-in users go straight to their agency. */
@@ -72,7 +84,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       <header className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2">
           <Link href="/" aria-label="Parcolia" className="rounded-md">
-            <ParcoliaLogo className="[&_span]:text-xl" />
+            <ParcoliaLogo size="sm" priority />
           </Link>
           <nav aria-label={t("navLabel")} className="flex items-center gap-1">
             <a href="#tarifs" className="hidden min-h-11 items-center rounded-lg px-3 text-sm font-medium hover:bg-accent sm:inline-flex">{t("navPricing")}</a>
@@ -88,6 +100,8 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
       <main className="flex-1">
         <section className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 pb-16 pt-12 text-center sm:pt-20">
+          <Image src="/brand/parcolia-logo.png" alt="" width={240} height={162} priority className="h-auto w-48 sm:w-60 dark:hidden" />
+          <Image src="/brand/parcolia-logo-dark.png" alt="" width={240} height={162} priority className="hidden h-auto w-48 sm:w-60 dark:block" />
           <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium">{t("badge")}</span>
           <h1 className="max-w-3xl text-balance text-4xl font-extrabold tracking-tight sm:text-5xl">{t("heroTitle")}</h1>
           <p className="max-w-2xl text-pretty text-lg text-muted-foreground">{t("heroBody")}</p>
