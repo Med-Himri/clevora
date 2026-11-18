@@ -25,7 +25,9 @@ export function scrubEvent(event: ErrorEvent): ErrorEvent {
 export const SENTRY_OPTIONS = {
   dsn: SENTRY_DSN,
   enabled: Boolean(SENTRY_DSN),
-  environment: process.env.VERCEL_ENV || process.env.NODE_ENV,
+  environment: process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.VERCEL_ENV || process.env.NODE_ENV,
+  // The git commit (Vercel exposes it): errors are grouped per release.
+  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || undefined,
   sendDefaultPii: false,
   tracesSampleRate: 0.05,
   beforeSend: scrubEvent,

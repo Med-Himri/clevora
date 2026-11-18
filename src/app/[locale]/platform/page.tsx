@@ -5,7 +5,9 @@ import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
 import { SearchBar } from "@/components/app/search-bar";
+import { ProgressBar } from "@/components/app/progress-bar";
 import { StatTile } from "@/components/app/stat-tile";
+import { formatUsage, usageLines } from "@/lib/usage";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatMoney } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
@@ -24,14 +26,17 @@ export default async function PlatformPage({ searchParams }: PageProps<"/[locale
   const q = typeof sp.q === "string" ? sp.q.trim().toLowerCase() : "";
   const t = await getTranslations("platform");
   const supabase = await createClient();
-  const [{ data: agencies }, { data: pending }] = await Promise.all([
+  const [{ data: agencies }, { data: pending }, { data: usageRows }] = await Promise.all([
     supabase.rpc("platform_overview"),
     supabase
       .from("subscription_payments")
       .select("id, created_at, period, amount, method, reference, plan:plans(name), agency:agencies(id, name)")
       .eq("status", "pending")
       .order("created_at"),
+    supabase.rpc("platform_usage"),
   ]);
+  const u = usageRows?.[0];
+  const usage = u ? usageLines({ database_bytes: Number(u.database_bytes), storage_bytes: Number(u.storage_bytes), active_users_30d: u.active_users_30d }) : [];
   const all = agencies ?? [];
   const rows = q ? all.filter((a) => a.name.toLowerCase().includes(q) || a.slug.includes(q) || (a.city ?? "").toLowerCase().includes(q)) : all;
   type Row = (typeof all)[number];
@@ -54,6 +59,25 @@ export default async function PlatformPage({ searchParams }: PageProps<"/[locale
         <li><StatTile label={t("tiles.paying")} value={all.filter((a) => a.subscription_status === "active" && a.writable).length} icon={LandmarkIcon} tone="success" /></li>
         <li><StatTile label={t("tiles.readOnly")} value={all.filter((a) => !a.writable).length} icon={LockIcon} tone="warning" /></li>
       </ul>
+
+      {usage.length ? (
+        <section aria-labelledby="usage-title" className="mb-6 rounded-xl border bg-card p-4" data-testid="platform-usage">
+          <h2 id="usage-title" className="mb-1 text-lg font-bold">{t("supabaseUsage.title")}</h2>
+          <p className="mb-3 text-sm text-muted-foreground">{t("supabaseUsage.hint")}</p>
+          <ul className="grid gap-4 md:grid-cols-3">
+            {usage.map((l) => (
+              <li key={l.metric} className="flex flex-col gap-1.5">
+                <span className="flex items-baseline justify-between gap-2 text-sm">
+                  <span className="font-medium">{t(`supabaseUsage.${l.metric}`)}</span>
+                  <Ltr className={l.level === 95 ? "font-bold text-destructive" : l.level === 80 ? "font-bold text-warning" : "text-muted-foreground"}>{`${l.pct} %`}</Ltr>
+                </span>
+                <ProgressBar value={l.pct} label={t(`supabaseUsage.${l.metric}`)} tone={l.level ? "warning" : "primary"} />
+                <Ltr className="text-xs text-muted-foreground">{`${formatUsage(l.metric, l.used)} / ${formatUsage(l.metric, l.limit)}`}</Ltr>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section aria-labelledby="pending-title" className="mb-8">
         <h2 id="pending-title" className="mb-3 text-xl font-bold">{t("pendingTitle")}</h2>

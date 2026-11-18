@@ -6,6 +6,7 @@ import { resolveBrandColor } from "@/lib/brand";
 import { siteUrl } from "@/lib/env";
 import { dayKey } from "@/lib/format";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { checkUsageAndWarn } from "@/lib/usage-check";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -97,5 +98,7 @@ export async function GET(request: NextRequest) {
     await sb.from("agencies").update({ alerts_sent_on: today }).eq("id", a.id);
     report.push({ agency: a.id, alerts: size, sent });
   }
-  return NextResponse.json({ date: today, agencies: report.length, report });
+  // Parcolia itself: warn the platform admins before the Supabase plan limits.
+  const usage = onlyAgency ? [] : await checkUsageAndWarn().catch(() => []);
+  return NextResponse.json({ date: today, agencies: report.length, report, usage: usage.map((u) => ({ metric: u.metric, pct: u.pct })) });
 }

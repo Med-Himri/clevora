@@ -1532,6 +1532,13 @@
       "pending": "Pending",
       "paid": "Paid",
       "cancelled": "Cancelled"
+    },
+    "supabaseUsage": {
+      "title": "Supabase usage",
+      "hint": "Compared with the plan limits (free by default). An email goes out at 80 % and 95 %. Egress is tracked in the Supabase dashboard.",
+      "database": "Database",
+      "storage": "Files",
+      "activeUsers": "Active users (30 days)"
     }
   },
   "marketing": {
@@ -1640,7 +1647,9 @@
     },
     "finalTitle": "Try Parcolia with your agency today.",
     "footer": "Management software for car rental agencies",
-    "privacy": "Privacy"
+    "privacy": "Privacy",
+    "whatsapp": "A question? WhatsApp",
+    "support": "WhatsApp support"
   },
   "activity": {
     "title": "Activity log",

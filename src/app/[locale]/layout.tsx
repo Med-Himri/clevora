@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { CLIENT_NAMESPACES, pickMessages } from "@/i18n/client-namespaces";
+import { Analytics } from "@vercel/analytics/next";
 import { ServiceWorker } from "@/components/app/service-worker";
 import { Inter, Noto_Sans_Arabic } from "next/font/google";
 import { notFound } from "next/navigation";
@@ -51,6 +52,8 @@ export default async function LocaleLayout({ children, params }: { children: Rea
         <NextIntlClientProvider messages={pickMessages(await getMessages(), CLIENT_NAMESPACES)}>
           <Providers dir={dir}>{children}</Providers>
           <ServiceWorker />
+          {/* Page views on Vercel (no cookies, no personal data). */}
+          {process.env.VERCEL ? <Analytics /> : null}
         </NextIntlClientProvider>
       </body>
     </html>

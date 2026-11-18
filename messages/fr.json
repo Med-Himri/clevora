@@ -1532,6 +1532,13 @@
       "pending": "En attente",
       "paid": "Payé",
       "cancelled": "Annulé"
+    },
+    "supabaseUsage": {
+      "title": "Utilisation de Supabase",
+      "hint": "Comparé aux limites du plan (gratuit par défaut). Un e-mail part à 80 % et 95 %. La bande passante (egress) se suit dans le tableau de bord Supabase.",
+      "database": "Base de données",
+      "storage": "Fichiers",
+      "activeUsers": "Utilisateurs actifs (30 j)"
     }
   },
   "marketing": {
@@ -1640,7 +1647,9 @@
     },
     "finalTitle": "Essayez Parcolia avec votre agence dès aujourd'hui.",
     "footer": "Logiciel de gestion pour agences de location de voitures",
-    "privacy": "Confidentialité"
+    "privacy": "Confidentialité",
+    "whatsapp": "Une question ? WhatsApp",
+    "support": "Support WhatsApp"
   },
   "activity": {
     "title": "Journal d'activité",

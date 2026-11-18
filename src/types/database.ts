@@ -1236,6 +1236,25 @@ export type Database = {
           },
         ];
       };
+      usage_alerts_sent: {
+        Row: {
+          level: number;
+          metric: string;
+          sent_on: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          level: number;
+          metric: string;
+          sent_on?: string;
+        };
+        Update: {
+          level?: number;
+          metric?: string;
+          sent_on?: string;
+        };
+        Relationships: [];
+      };
       vehicle_finance: {
         Row: {
           agency_id: string;
@@ -1541,6 +1560,17 @@ export type Database = {
           trial_ends_at: string;
           vehicles: number;
           writable: boolean;
+        }[];
+      };
+      platform_usage: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          active_users_30d: number;
+          agencies: number;
+          auth_users: number;
+          database_bytes: number;
+          storage_bytes: number;
+          vehicles: number;
         }[];
       };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };

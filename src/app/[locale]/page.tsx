@@ -5,6 +5,7 @@ import {
   CheckIcon,
   FileSignatureIcon,
   LanguagesIcon,
+  MessageCircleIcon,
   SmartphoneIcon,
   SparklesIcon,
   UsersIcon,
@@ -13,12 +14,14 @@ import {
 } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { Suspense } from "react";
+import { Suspense, type ReactNode } from "react";
 import { LocaleLinks } from "@/components/app/locale-links";
 import { Ltr } from "@/components/app/ltr";
 import { ParcoliaLogo } from "@/components/app/parcolia-logo";
 import { Button } from "@/components/ui/button";
 import { Link, redirect } from "@/i18n/navigation";
+import { localizedPath } from "@/i18n/routing";
+import { whatsappNumber } from "@/lib/phone";
 import { getUser } from "@/lib/auth/session";
 import { formatMoney } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
@@ -41,11 +44,22 @@ const FEATURES: Array<{ key: string; icon: LucideIcon }> = [
   { key: "languages", icon: LanguagesIcon },
 ];
 
+/**
+ * Link to an app page. When the marketing site has its own domain
+ * (NEXT_PUBLIC_MARKETING_URL), app pages live on NEXT_PUBLIC_SITE_URL: plain <a>.
+ */
+function AppLink({ href, locale, children }: { href: string; locale: string; children: ReactNode }) {
+  const split = process.env.NEXT_PUBLIC_MARKETING_URL && process.env.NEXT_PUBLIC_MARKETING_URL !== process.env.NEXT_PUBLIC_SITE_URL;
+  if (!split) return <Link href={href}>{children}</Link>;
+  return <a href={`${process.env.NEXT_PUBLIC_SITE_URL}${localizedPath(href, locale)}`}>{children}</a>;
+}
+
 /** Parcolia marketing home. Logged-in users go straight to their agency. */
 export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   if (await getUser()) redirect({ href: "/dashboard", locale });
   const t = await getTranslations("marketing");
+  const support = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP?.trim() || null;
   const supabase = await createClient();
   const { data: plans } = await supabase
     .from("plans")
@@ -63,10 +77,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <nav aria-label={t("navLabel")} className="flex items-center gap-1">
             <a href="#tarifs" className="hidden min-h-11 items-center rounded-lg px-3 text-sm font-medium hover:bg-accent sm:inline-flex">{t("navPricing")}</a>
             <Button variant="ghost" asChild>
-              <Link href="/login">{t("login")}</Link>
+              <AppLink href="/login" locale={locale}>{t("login")}</AppLink>
             </Button>
             <Button asChild className="hidden sm:inline-flex">
-              <Link href="/signup">{t("tryFree")}</Link>
+              <AppLink href="/signup" locale={locale}>{t("tryFree")}</AppLink>
             </Button>
           </nav>
         </div>
@@ -79,7 +93,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <p className="max-w-2xl text-pretty text-lg text-muted-foreground">{t("heroBody")}</p>
           <div className="flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row">
             <Button size="lg" asChild>
-              <Link href="/signup">{t("ctaTrial")}</Link>
+              <AppLink href="/signup" locale={locale}>{t("ctaTrial")}</AppLink>
             </Button>
             <Button size="lg" variant="outline" asChild>
               <a href="#fonctions">{t("ctaFeatures")}</a>
@@ -152,7 +166,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                       ))}
                   </ul>
                   <Button size="lg" variant={p.code === "pro" ? "default" : "outline"} asChild>
-                    <Link href="/signup">{t("ctaTrial")}</Link>
+                    <AppLink href="/signup" locale={locale}>{t("ctaTrial")}</AppLink>
                   </Button>
                 </li>
               ))}
@@ -175,9 +189,19 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
 
         <section className="bg-primary px-4 py-14 text-center text-primary-foreground">
           <h2 className="mb-3 text-2xl font-bold sm:text-3xl">{t("finalTitle")}</h2>
-          <Button size="lg" variant="secondary" asChild>
-            <Link href="/signup">{t("ctaTrial")}</Link>
-          </Button>
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button size="lg" variant="secondary" asChild>
+              <AppLink href="/signup" locale={locale}>{t("ctaTrial")}</AppLink>
+            </Button>
+            {support ? (
+              <Button size="lg" variant="outline" asChild className="border-primary-foreground/40 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                <a href={`https://wa.me/${whatsappNumber(support)}`} target="_blank" rel="noopener noreferrer" data-testid="support-whatsapp">
+                  <MessageCircleIcon aria-hidden />
+                  {t("whatsapp")}
+                </a>
+              </Button>
+            ) : null}
+          </div>
         </section>
       </main>
 
@@ -186,6 +210,14 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <LocaleLinks />
         </Suspense>
         <p>
+          {support ? (
+            <>
+              <a href={`https://wa.me/${whatsappNumber(support)}`} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+                {t("support")} <Ltr>{support}</Ltr>
+              </a>{" "}
+              ·{" "}
+            </>
+          ) : null}
           © {new Date().getFullYear()} Parcolia · {t("footer")} ·{" "}
           <Link href="/privacy" className="underline underline-offset-4">
             {t("privacy")}

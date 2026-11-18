@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { localizedPath, routing } from "@/i18n/routing";
+import { domainRedirect } from "@/lib/domains";
 import type { Database } from "@/types/database";
 
 const intl = createIntlMiddleware(routing);
@@ -24,12 +25,20 @@ function splitLocale(pathname: string): { locale: string; path: string } {
 }
 
 /**
+ * 0. Domains: marketing pages on NEXT_PUBLIC_MARKETING_URL, the app on NEXT_PUBLIC_SITE_URL.
  * 1. next-intl: locale prefix handling.
  * 2. Supabase: refresh the session cookie on every request.
  * 3. Optimistic redirects (login required / already logged in).
  *    The real checks happen again on the server (pages, actions) and in RLS.
  */
 export async function proxy(request: NextRequest) {
+  // 0. Two domains (app / marketing): send each page to its domain.
+  const moved = domainRedirect(
+    { host: request.headers.get("x-forwarded-host") ?? request.headers.get("host"), pathname: request.nextUrl.pathname, search: request.nextUrl.search },
+    { appUrl: process.env.NEXT_PUBLIC_SITE_URL, marketingUrl: process.env.NEXT_PUBLIC_MARKETING_URL },
+  );
+  if (moved) return NextResponse.redirect(moved, 308);
+
   const response = intl(request);
   if (response.headers.get("location")) return response;
 

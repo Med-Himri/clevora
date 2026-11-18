@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
@@ -80,4 +81,21 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+const config = withNextIntl(nextConfig);
+
+/**
+ * Sentry releases + readable stack traces: only when SENTRY_AUTH_TOKEN, SENTRY_ORG
+ * and SENTRY_PROJECT are set (Vercel production). The release is the git commit.
+ */
+const sentryBuild = Boolean(process.env.SENTRY_AUTH_TOKEN && process.env.SENTRY_ORG && process.env.SENTRY_PROJECT);
+export default sentryBuild
+  ? withSentryConfig(config, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: true,
+      release: { name: process.env.VERCEL_GIT_COMMIT_SHA },
+      sourcemaps: { deleteSourcemapsAfterUpload: true },
+      telemetry: false,
+    })
+  : config;
