@@ -25,9 +25,18 @@ if (!email) stop("Usage: npm run platform:admin -- you@example.com   (add --prod
 if (!url || !key) stop(`Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in ${envFile}.`);
 
 const sb = createClient(url, key, { auth: { persistSession: false } });
-const { data: profile, error } = await sb.from("profiles").select("id, full_name").ilike("email", email).maybeSingle();
-if (error) stop(error.message);
-if (!profile) stop(`No account with ${email}. Sign up first on the site (email + password), then run this again.`);
-const { error: insertError } = await sb.from("platform_admins").upsert({ user_id: profile.id }, { onConflict: "user_id" });
+// Find the account: the profile first, then the login accounts themselves
+// (an account created in the Supabase dashboard is found either way).
+let userId = (await sb.from("profiles").select("id").ilike("email", email).maybeSingle()).data?.id ?? null;
+for (let page = 1; !userId && page <= 50; page++) {
+  const { data, error } = await sb.auth.admin.listUsers({ page, perPage: 1000 });
+  if (error) stop(error.message);
+  userId = data.users.find((u) => u.email?.toLowerCase() === email)?.id ?? null;
+  if (data.users.length < 1000) break;
+}
+if (!userId) stop(`No account with ${email} on ${new URL(url).host}. Create it first (site sign-up, or Supabase → Authentication → Add user), then run this again.`);
+// The profile row is needed by the app (created automatically at sign-up; made here if missing).
+await sb.from("profiles").upsert({ id: userId, email }, { onConflict: "id", ignoreDuplicates: true });
+const { error: insertError } = await sb.from("platform_admins").upsert({ user_id: userId }, { onConflict: "user_id" });
 if (insertError) stop(insertError.message);
 console.log(`\n✔ ${email} is now a Parcolia admin (${new URL(url).host}). Log in and open /platform.\n`);
