@@ -739,7 +739,6 @@
       "credit": "Crédit",
       "cash": "Comptant",
       "downPayment": "Apport (avance)",
-      "monthlyPayment": "Mensualité",
       "months": "Nombre de mois",
       "firstPayment": "Date de la 1re mensualité",
       "lender": "Organisme (facultatif)",
@@ -756,14 +755,15 @@
       "monthsLeft": "{count, plural, one {Encore # mois} other {Encore # mois}}",
       "endsOn": "fin le",
       "creditDone": "Crédit terminé",
-      "gainSince": "Gagné depuis l'achat (revenus − charges)",
-      "totalCost": "Coût total de la voiture",
-      "result": "Bénéfice à ce jour",
-      "monthlyGain": "Gain moyen par mois (3 derniers mois)",
+      "result": "Bénéfice (revenus − charges − crédit)",
       "payback": "Rentabilisée à {pct} %",
       "paidBack": "Voiture rentabilisée",
-      "covers": "Paie son crédit",
-      "notCovers": "Ne paie pas son crédit"
+      "creditPerMonth": "Crédit par mois",
+      "sincePurchase": "Depuis l'achat",
+      "revenueSince": "Revenus des locations",
+      "chargesSince": "Charges de la voiture",
+      "creditPaid": "Crédit déjà payé (apport + mensualités)",
+      "paidCash": "Prix payé comptant"
     },
     "bulk": {
       "select": "Sélectionner {car}",
@@ -1318,18 +1318,17 @@
     "creditHint": "{count, plural, =0 {Tout est payé} one {# client doit encore payer} other {# clients doivent encore payer}}",
     "profit": {
       "title": "Rentabilité par voiture",
-      "hint": "Depuis l'achat de chaque voiture, sans tenir compte de la période choisie. Bénéfice = revenus − charges − ce que vous avez déjà payé pour la voiture.",
+      "hint": "Loyers, charges, crédit et bénéfice : ce mois-ci (bénéfice = loyers − charges − mensualité). « Depuis l'achat » : revenus − charges − ce que vous avez déjà payé pour la voiture.",
       "credit": "Crédit",
       "cash": "Payée comptant",
       "monthsLeft": "{count, plural, one {# mois restant} other {# mois restants}}",
       "creditDone": "Crédit terminé",
-      "payback": "Rentabilisée",
-      "paidBack": "Oui, 100 %",
-      "result": "Bénéfice à ce jour",
-      "monthly": "Gain / mois",
-      "covers": "paie sa mensualité ({amount})",
-      "notCovers": "moins que la mensualité ({amount})",
-      "missing": "{count, plural, one {# voiture n'a pas de prix d'achat : ouvrez sa fiche dans Parc auto → « Achat et crédit ».} other {# voitures n'ont pas de prix d'achat : ouvrez leur fiche dans Parc auto → « Achat et crédit ».}}"
+      "result": "Depuis l'achat",
+      "missing": "{count, plural, one {# voiture n'a pas de prix d'achat : ouvrez sa fiche dans Parc auto → « Achat et crédit ».} other {# voitures n'ont pas de prix d'achat : ouvrez leur fiche dans Parc auto → « Achat et crédit ».}}",
+      "rentMonth": "Loyers",
+      "chargesMonth": "Charges",
+      "creditMonth": "Crédit",
+      "resultMonth": "Bénéfice"
     }
   },
   "assistant": {

@@ -55,7 +55,9 @@ export type Profitability = {
   revenue: number;
   charges: number;
   gain: number;
-  gain_3_months: number;
+  revenue_month: number;
+  charges_month: number;
+  credit_month: number;
 };
 
 /** "2026-03-05" + 3 months => "2026-06-05" (same day, clamped to the month end). */
@@ -78,12 +80,10 @@ export type FinanceSummary = {
   paybackPct: number;
   /** The car has earned back everything it costs. */
   paidBack: boolean;
-  /** Gain − what was really paid until today: positive = the car already gave money. */
+  /** Since purchase: revenue − charges − what was really paid for the car. */
   result: number;
-  /** Average revenue − charges per month, over the last 3 months. */
-  monthlyGain: number;
-  /** Only while the credit runs: does the car earn its monthly payment? */
-  coversCredit: boolean | null;
+  /** This month: rent − charges − this month's credit payment. */
+  monthResult: number;
 };
 
 export function summarize(p: Profitability): FinanceSummary {
@@ -91,7 +91,6 @@ export function summarize(p: Profitability): FinanceSummary {
   const monthsLeft = p.mode === "credit" && p.months !== null ? Math.max(0, p.months - p.months_paid) : 0;
   const creditEnd = p.mode === "credit" && p.first_payment_on && p.months ? addMonths(p.first_payment_on, p.months - 1) : null;
   const paybackPct = p.total_cost > 0 ? Math.max(0, Math.round((p.gain / p.total_cost) * 100)) : 0;
-  const monthlyGain = Math.round(p.gain_3_months / 3);
   return {
     creditRunning,
     monthsLeft,
@@ -99,7 +98,6 @@ export function summarize(p: Profitability): FinanceSummary {
     paybackPct,
     paidBack: p.gain >= p.total_cost,
     result: p.gain - p.paid_so_far,
-    monthlyGain,
-    coversCredit: creditRunning && p.monthly_payment ? monthlyGain >= p.monthly_payment : null,
+    monthResult: p.revenue_month - p.charges_month - p.credit_month,
   };
 }

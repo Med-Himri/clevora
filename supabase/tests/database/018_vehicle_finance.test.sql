@@ -1,7 +1,7 @@
 -- Achat et crédit: admins only; profitability numbers.
 begin;
 set local search_path = public, extensions, tests;
-select plan(9);
+select plan(11);
 
 select tests.create_fixture();
 
@@ -23,6 +23,8 @@ select is((select months_paid from p), 13, 'months paid so far');
 select is((select paid_so_far from p), 69000.00::numeric, 'paid so far = apport + 13 × 3 000');
 select is((select credit_left from p), 105000.00::numeric, 'credit left = 35 × 3 000');
 select is((select total_cost from p), 174000.00::numeric, 'total cost of the credit');
+select is((select credit_month from p), 3000.00::numeric, 'this month''s credit payment');
+select ok((select revenue_month >= 0 and charges_month >= 0 from p), 'this month''s rent and charges are computed');
 select tests.authenticate_as(tests.id('b_admin'));
 select is((select count(*)::int from public.vehicle_profitability(tests.id('b_agency')) where vehicle_id = tests.id('a_vehicle')), 0, 'never another agency''s cars');
 

@@ -104,7 +104,7 @@ export function FinanceDialog({ vehicleId, label, defaults }: { vehicleId: strin
                 <Field id="fin-down" label={t("downPayment")} error={errors.down_payment?.message}>
                   {money("down_payment", "fin-down")}
                 </Field>
-                <Field id="fin-monthly" label={t("monthlyPayment")} error={errors.monthly_payment?.message}>
+                <Field id="fin-monthly" label={t("creditPerMonth")} error={errors.monthly_payment?.message}>
                   {money("monthly_payment", "fin-monthly")}
                 </Field>
                 <Field id="fin-months" label={t("months")} error={errors.months?.message}>

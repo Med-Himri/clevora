@@ -17,6 +17,8 @@ export async function getProfitability(supabase: ServerSupabase, agencyId: strin
     revenue: n(r.revenue),
     charges: n(r.charges),
     gain: n(r.gain),
-    gain_3_months: n(r.gain_3_months),
+    revenue_month: n(r.revenue_month),
+    charges_month: n(r.charges_month),
+    credit_month: n(r.credit_month),
   }));
 }

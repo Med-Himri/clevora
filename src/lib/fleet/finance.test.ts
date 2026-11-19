@@ -21,7 +21,9 @@ const base: Profitability = {
   revenue: 120000,
   charges: 20000,
   gain: 100000,
-  gain_3_months: 10500,
+  revenue_month: 9000,
+  charges_month: 1200,
+  credit_month: 3000,
 };
 
 describe("addMonths", () => {
@@ -41,16 +43,15 @@ describe("summarize", () => {
     expect(s.paybackPct).toBe(57);
     expect(s.paidBack).toBe(false);
     expect(s.result).toBe(31000);
-    expect(s.monthlyGain).toBe(3500);
-    expect(s.coversCredit).toBe(true);
+    expect(s.monthResult).toBe(4800); // 9 000 rent − 1 200 charges − 3 000 credit
   });
 
-  it("a car that earns less than its monthly payment", () => {
-    expect(summarize({ ...base, gain_3_months: 6000 }).coversCredit).toBe(false);
+  it("a month that earns less than its credit payment is negative", () => {
+    expect(summarize({ ...base, revenue_month: 2000 }).monthResult).toBe(-2200);
   });
 
-  it("finished credit and cash cars never say 'pays its credit'", () => {
-    expect(summarize({ ...base, months_paid: 48, credit_left: 0 }).coversCredit).toBeNull();
+  it("finished credit and cash cars", () => {
+    expect(summarize({ ...base, months_paid: 48, credit_left: 0, credit_month: 0 }).monthResult).toBe(7800);
     const cash = summarize({ ...base, mode: "cash", monthly_payment: null, months: null, first_payment_on: null, total_cost: 150000, paid_so_far: 150000, credit_left: 0, gain: 160000 });
     expect(cash.creditRunning).toBe(false);
     expect(cash.paidBack).toBe(true);

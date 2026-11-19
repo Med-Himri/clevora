@@ -17,7 +17,6 @@ import { dayKey, formatDate, formatMoney } from "@/lib/format";
 import { occupancy, occupancyTone, PERIODS, resolvePeriod, toBuckets, type DailyRow } from "@/lib/stats";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
-import { ProgressBar } from "@/components/app/progress-bar";
 import { StatusPill } from "@/components/app/status-pill";
 import { summarize } from "@/lib/fleet/finance";
 import { getProfitability } from "@/lib/fleet/finance-query";
@@ -50,11 +49,21 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
   const profitRows = profit
     .filter((p) => p.status !== "sold")
     .map((p) => ({ ...p, s: summarize(p) }))
-    .sort((a, b) => a.s.paybackPct - b.s.paybackPct);
+    .sort((a, b) => a.s.monthResult - b.s.monthResult);
   const withoutPurchase = (perCar ?? []).filter((c) => !profit.some((p) => p.vehicle_id === c.vehicle_id)).length;
   type ProfitRow = (typeof profitRows)[number];
   const profitColumns: Column<ProfitRow>[] = [
-    { key: "car", header: t("car"), priority: "primary", cell: (c) => <span>{c.brand_model} <Ltr className="text-sm font-normal text-muted-foreground">{c.plate}</Ltr></span> },
+    {
+      key: "car",
+      header: t("car"),
+      priority: "primary",
+      cell: (c) => (
+        <span className="flex flex-col">
+          <span>{c.brand_model}</span>
+          <Ltr className="text-xs font-normal text-muted-foreground">{c.plate}</Ltr>
+        </span>
+      ),
+    },
     {
       key: "credit",
       header: t("profit.credit"),
@@ -68,33 +77,22 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
           <StatusPill tone="success" label={t("profit.creditDone")} />
         ),
     },
+    { key: "rent", header: t("profit.rentMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.revenue_month)}</Ltr> },
+    { key: "charges", header: t("profit.chargesMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.charges_month)}</Ltr> },
+    { key: "creditMonth", header: t("profit.creditMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.credit_month)}</Ltr> },
     {
-      key: "payback",
-      header: t("profit.payback"),
+      key: "month",
+      header: t("profit.resultMonth"),
       priority: "high",
-      className: "lg:w-44",
-      cell: (c) => (
-        <span className="flex flex-col gap-1">
-          <span className={cn("text-sm font-semibold", c.s.paidBack ? "text-success" : "text-foreground")}>{c.s.paidBack ? t("profit.paidBack") : <Ltr>{`${c.s.paybackPct} %`}</Ltr>}</span>
-          <ProgressBar value={c.s.paybackPct} label={t("profit.payback")} tone={c.s.paidBack ? "success" : "warning"} />
-        </span>
-      ),
+      align: "end",
+      cell: (c) => <Ltr className={cn("font-bold", c.s.monthResult < 0 ? "text-destructive" : "text-success")}>{formatMoney(c.s.monthResult)}</Ltr>,
     },
-    { key: "result", header: t("profit.result"), priority: "high", align: "end", cell: (c) => <Ltr className={cn("font-bold", c.s.result < 0 ? "text-destructive" : "text-success")}>{formatMoney(c.s.result)}</Ltr> },
     {
-      key: "monthly",
-      header: t("profit.monthly"),
+      key: "result",
+      header: t("profit.result"),
       priority: "low",
-      cell: (c) =>
-        c.s.coversCredit === null ? (
-          <Ltr>{formatMoney(c.s.monthlyGain)}</Ltr>
-        ) : (
-          <StatusPill
-            tone={c.s.coversCredit ? "success" : "danger"}
-            label={<Ltr>{formatMoney(c.s.monthlyGain)}</Ltr>}
-            detail={c.s.coversCredit ? t("profit.covers", { amount: formatMoney(c.monthly_payment ?? 0) }) : t("profit.notCovers", { amount: formatMoney(c.monthly_payment ?? 0) })}
-          />
-        ),
+      align: "end",
+      cell: (c) => <Ltr className={cn("font-semibold", c.s.result < 0 ? "text-destructive" : "text-success")}>{formatMoney(c.s.result)}</Ltr>,
     },
   ];
   const rows = (daily ?? []) as DailyRow[];

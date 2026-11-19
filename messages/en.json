@@ -739,7 +739,6 @@
       "credit": "Credit",
       "cash": "Cash",
       "downPayment": "Down payment",
-      "monthlyPayment": "Monthly payment",
       "months": "Number of months",
       "firstPayment": "First payment date",
       "lender": "Lender (optional)",
@@ -756,14 +755,15 @@
       "monthsLeft": "{count, plural, one {# month left} other {# months left}}",
       "endsOn": "ends on",
       "creditDone": "Credit finished",
-      "gainSince": "Earned since purchase (revenue − charges)",
-      "totalCost": "Total cost of the car",
-      "result": "Profit to date",
-      "monthlyGain": "Average gain per month (last 3 months)",
+      "result": "Profit (revenue − charges − credit)",
       "payback": "{pct} % paid back",
       "paidBack": "Car paid back",
-      "covers": "Pays its credit",
-      "notCovers": "Doesn't pay its credit"
+      "creditPerMonth": "Credit per month",
+      "sincePurchase": "Since purchase",
+      "revenueSince": "Rental revenue",
+      "chargesSince": "Car charges",
+      "creditPaid": "Credit already paid (down payment + instalments)",
+      "paidCash": "Price paid cash"
     },
     "bulk": {
       "select": "Select {car}",
@@ -1318,18 +1318,17 @@
     "creditHint": "{count, plural, =0 {Everything is paid} one {# client still owes} other {# clients still owe}}",
     "profit": {
       "title": "Profitability per car",
-      "hint": "Since each car was bought, whatever the period chosen. Profit = revenue − charges − what you already paid for the car.",
+      "hint": "Rent, charges, credit and profit: this month (profit = rent − charges − instalment). “Since purchase”: revenue − charges − what you already paid for the car.",
       "credit": "Credit",
       "cash": "Paid cash",
       "monthsLeft": "{count, plural, one {# month left} other {# months left}}",
       "creditDone": "Credit finished",
-      "payback": "Paid back",
-      "paidBack": "Yes, 100 %",
-      "result": "Profit to date",
-      "monthly": "Gain / month",
-      "covers": "covers its payment ({amount})",
-      "notCovers": "less than its payment ({amount})",
-      "missing": "{count, plural, one {# car has no purchase price: open it in Fleet → \"Purchase and credit\".} other {# cars have no purchase price: open them in Fleet → \"Purchase and credit\".}}"
+      "result": "Since purchase",
+      "missing": "{count, plural, one {# car has no purchase price: open it in Fleet → \"Purchase and credit\".} other {# cars have no purchase price: open them in Fleet → \"Purchase and credit\".}}",
+      "rentMonth": "Rent",
+      "chargesMonth": "Charges",
+      "creditMonth": "Credit",
+      "resultMonth": "Profit"
     }
   },
   "assistant": {

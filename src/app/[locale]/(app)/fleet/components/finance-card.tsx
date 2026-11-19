@@ -55,7 +55,7 @@ export async function FinanceCard({ vehicleId, label, row }: { vehicleId: string
                   : (
                     <>
                       {line(t("mode"), row.lender ? `${t("credit")} · ${row.lender}` : t("credit"))}
-                      {line(t("monthlyPayment"), <Ltr>{formatMoney(row.monthly_payment ?? 0)}</Ltr>)}
+                      {line(t("creditPerMonth"), <Ltr>{formatMoney(row.monthly_payment ?? 0)}</Ltr>)}
                       {line(t("paidMonths"), <Ltr>{`${row.months_paid} / ${row.months}`}</Ltr>)}
                       {line(t("creditLeft"), <Ltr>{formatMoney(row.credit_left)}</Ltr>, true)}
                     </>
@@ -73,19 +73,15 @@ export async function FinanceCard({ vehicleId, label, row }: { vehicleId: string
               ) : null}
             </section>
             <section aria-label={t("profit")} className="flex flex-col gap-2">
+              <p className="text-sm font-semibold">{t("sincePurchase")}</p>
               <dl className="divide-y">
-                {line(t("gainSince"), <Ltr>{formatMoney(row.gain)}</Ltr>)}
-                {line(t("totalCost"), <Ltr>{formatMoney(row.total_cost)}</Ltr>)}
+                {line(t("revenueSince"), <Ltr>{formatMoney(row.revenue)}</Ltr>)}
+                {line(t("chargesSince"), <Ltr>{formatMoney(row.charges)}</Ltr>)}
+                {line(row.mode === "cash" ? t("paidCash") : t("creditPaid"), <Ltr>{formatMoney(row.paid_so_far)}</Ltr>)}
                 {line(t("result"), <Ltr className={s.result < 0 ? "text-destructive" : "text-success"}>{formatMoney(s.result)}</Ltr>, true)}
-                {line(t("monthlyGain"), <Ltr>{formatMoney(s.monthlyGain)}</Ltr>)}
               </dl>
               <ProgressBar value={s.paybackPct} label={t("payback", { pct: s.paybackPct })} tone={s.paidBack ? "success" : "warning"} />
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <StatusPill tone={s.paidBack ? "success" : "warning"} label={s.paidBack ? t("paidBack") : t("payback", { pct: s.paybackPct })} testId="finance-payback" />
-                {s.coversCredit === null ? null : (
-                  <StatusPill tone={s.coversCredit ? "success" : "danger"} label={s.coversCredit ? t("covers") : t("notCovers")} testId="finance-covers" />
-                )}
-              </div>
+              <StatusPill tone={s.paidBack ? "success" : "warning"} label={s.paidBack ? t("paidBack") : t("payback", { pct: s.paybackPct })} testId="finance-payback" />
             </section>
           </div>
         )}

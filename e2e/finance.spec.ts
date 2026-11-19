@@ -36,7 +36,7 @@ test("Achat et crédit: the admin records a credit; the car page and Statistique
   // A credit needs its details
   await expect(dialog.getByText("Ce champ est obligatoire.").first()).toBeVisible();
   await dialog.getByLabel("Apport (avance)").fill("30000");
-  await dialog.getByLabel("Mensualité", { exact: true }).fill("3000");
+  await dialog.getByLabel("Crédit par mois", { exact: true }).fill("3000");
   await dialog.getByLabel("Nombre de mois").fill("48");
   await dialog.getByLabel("Date de la 1re mensualité").fill(monthsAgo(12));
   await dialog.getByLabel("Organisme (facultatif)").fill("Wafasalaf");
@@ -47,15 +47,18 @@ test("Achat et crédit: the admin records a credit; the car page and Statistique
   await expect(card).toContainText("13 / 48");
   await expect(card.getByTestId("finance-credit-state")).toContainText("Encore 35 mois");
   await expect(card).toContainText("105 000 MAD"); // credit left
-  await expect(card).toContainText("1 000 MAD"); // earned: 1 200 − 200
+  await expect(card).toContainText("1 200 MAD"); // rental revenue
+  await expect(card).toContainText("69 000 MAD"); // credit paid: 30 000 + 13 × 3 000
+  await expect(card).toContainText("-68 000 MAD"); // 1 200 − 200 − 69 000
   await expect(card.getByTestId("finance-payback")).toContainText("Rentabilisée à 1 %");
-  await expect(card.getByTestId("finance-covers")).toContainText("Ne paie pas son crédit");
+  await expect(card).not.toContainText("Gain moyen");
   await expectNoHorizontalScroll(page);
 
   await page.goto("/statistics");
   const row = page.getByTestId("profit-row").filter({ hasText: "Dacia Jogger", visible: true });
   await expect(row).toContainText("35 mois restants");
-  await expect(row).toContainText("-68 000 MAD"); // 1 000 earned − 69 000 paid
+  await expect(row).toContainText("-68 000 MAD"); // since purchase
+  await expect(row).toContainText("3 000 MAD"); // this month's credit payment
   await expectNoHorizontalScroll(page);
 
   // Staff never see it

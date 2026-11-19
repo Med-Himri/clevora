@@ -1654,11 +1654,12 @@ export type Database = {
         Returns: {
           brand_model: string;
           charges: number;
+          charges_month: number;
           credit_left: number;
+          credit_month: number;
           down_payment: number;
           first_payment_on: string;
           gain: number;
-          gain_3_months: number;
           lender: string;
           mode: string;
           monthly_payment: number;
@@ -1669,6 +1670,7 @@ export type Database = {
           purchase_date: string;
           purchase_price: number;
           revenue: number;
+          revenue_month: number;
           status: string;
           total_cost: number;
           vehicle_id: string;
