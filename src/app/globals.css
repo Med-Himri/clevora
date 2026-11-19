@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* Short screens (laptops at 720–768 px): the sidebar packs tighter so nothing scrolls. */
+@custom-variant short (@media (max-height: 800px));
+@custom-variant shorter (@media (max-height: 700px));
 
 @custom-variant dark (&:is(.dark *));
 
