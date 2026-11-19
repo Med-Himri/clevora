@@ -232,3 +232,45 @@ export async function deleteFinanceAction(vehicleId: string): Promise<ActionResu
   revalidatePath("/[locale]/statistics", "page");
   return ok();
 }
+
+export type BulkVehicleResult = { deleted: number; kept: Array<{ id: string; label: string }> };
+
+/**
+ * Delete several cars (admins). A car with history (rentals, charges, maintenance)
+ * cannot be deleted: it is kept and listed, so it can be marked "vendue" instead.
+ */
+export async function bulkDeleteVehiclesAction(ids: string[]): Promise<ActionResult<BulkVehicleResult>> {
+  const parsed = z.array(z.uuid()).min(1).max(500).safeParse(ids);
+  if (!parsed.success) return fail("invalidForm");
+  const guard = await requireActionContext({ roles: ["admin"] });
+  if (!guard.ok) return guard;
+  const { supabase, agency } = guard.ctx;
+  const { data: cars } = await supabase.from("vehicles").select("id, plate, brand_model").eq("agency_id", agency.id).in("id", parsed.data);
+  let deleted = 0;
+  const kept: BulkVehicleResult["kept"] = [];
+  for (const car of cars ?? []) {
+    const { error } = await supabase.from("vehicles").delete().eq("id", car.id).eq("agency_id", agency.id);
+    if (!error) deleted++;
+    else if (error.code === "23503") kept.push({ id: car.id, label: `${car.brand_model} · ${car.plate}` });
+    else return fail(dbErrorKey(error));
+  }
+  refresh();
+  return ok({ deleted, kept });
+}
+
+/** Mark several cars as sold (admins). They leave the fleet but keep their history. */
+export async function bulkSetSoldAction(ids: string[]): Promise<ActionResult<number>> {
+  const parsed = z.array(z.uuid()).min(1).max(500).safeParse(ids);
+  if (!parsed.success) return fail("invalidForm");
+  const guard = await requireActionContext({ roles: ["admin"] });
+  if (!guard.ok) return guard;
+  const { data, error } = await guard.ctx.supabase
+    .from("vehicles")
+    .update({ status: "sold" })
+    .eq("agency_id", guard.ctx.agency.id)
+    .in("id", parsed.data)
+    .select("id");
+  if (error) return fail(dbErrorKey(error));
+  refresh();
+  return ok(data?.length ?? 0);
+}

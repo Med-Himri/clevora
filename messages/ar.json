@@ -764,6 +764,25 @@
       "paidBack": "السيارة استرجعت ثمنها",
       "covers": "تؤدي قرضها",
       "notCovers": "لا تغطي قرضها"
+    },
+    "bulk": {
+      "select": "تحديد {car}",
+      "selectAll": "تحديد الكل",
+      "count": "{count, plural, one {سيارة واحدة محددة} other {# سيارات محددة}}",
+      "clear": "إلغاء التحديد",
+      "delete": "حذف",
+      "markSold": "تحديد كمباعة",
+      "deleteTitle": "{count, plural, one {حذف هذه السيارة؟} other {حذف هذه السيارات (#)؟}}",
+      "deleteBody": "السيارات التي لها كراء أو مصاريف أو صيانة ستبقى (يمكنك تحديدها كمباعة). الباقي سيحذف نهائيا.",
+      "deleteConfirm": "{count, plural, one {حذف السيارة} other {حذف # سيارات}}",
+      "soldTitle": "{count, plural, one {تحديد هذه السيارة كمباعة؟} other {تحديد هذه السيارات (#) كمباعة؟}}",
+      "soldBody": "تخرج من الأسطول والتخطيط، لكن يبقى تاريخها. يمكنك إرجاعها في أي وقت.",
+      "soldConfirm": "{count, plural, one {تحديد كمباعة} other {تحديد # كمباعة}}",
+      "deleted": "{count, plural, one {تم حذف سيارة واحدة.} other {تم حذف # سيارات.}}",
+      "soldDone": "{count, plural, one {تم تحديد سيارة واحدة كمباعة.} other {تم تحديد # سيارات كمباعة.}}",
+      "keptTitle": "{count, plural, one {لم تحذف سيارة واحدة} other {لم تحذف # سيارات}}",
+      "keptBody": "لها تاريخ يجب الاحتفاظ به. حددها كمباعة: تختفي من الأسطول دون فقدان تاريخها.",
+      "keep": "الإبقاء عليها"
     }
   },
   "reservations": {
@@ -1008,6 +1027,27 @@
       "keepPrice": "الإبقاء على {price}",
       "carPrice": "ثمن السيارة {price}",
       "confirmCar": "تأكيد السيارة"
+    },
+    "bulk": {
+      "select": "تحديد {contract} · {client}",
+      "selectAll": "تحديد الكل",
+      "count": "{count, plural, one {حجز واحد محدد} other {# حجوزات محددة}}",
+      "clear": "إلغاء التحديد",
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "back": "رجوع",
+      "cancelTitle": "{count, plural, one {إلغاء هذا الحجز؟} other {إلغاء هذه الحجوزات (#)؟}}",
+      "cancelBody": "تلغى فقط الحجوزات التي لم تبدأ. تصبح السيارات متاحة. تبقى ظاهرة في «المنتهية».",
+      "reason": "سبب الإلغاء",
+      "reasonPlaceholder": "مثال: الزبون ألغى",
+      "cancelConfirm": "{count, plural, one {إلغاء الحجز} other {إلغاء # حجوزات}}",
+      "deleteTitle": "{count, plural, one {حذف هذا الحجز؟} other {حذف هذه الحجوزات (#)؟}}",
+      "deleteBody": "للحجوزات المكررة والأخطاء. تحذف فقط الحجوزات التي لم تبدأ (غير موقعة ولا أداء)، نهائيا. العقود الموقعة أو المؤداة تبقى: ألغها بدلا من ذلك.",
+      "deleteConfirm": "{count, plural, one {حذف الحجز} other {حذف # حجوزات}}",
+      "cancelled": "{count, plural, one {تم إلغاء حجز واحد.} other {تم إلغاء # حجوزات.}}",
+      "deleted": "{count, plural, one {تم حذف حجز واحد.} other {تم حذف # حجوزات.}}",
+      "cancelSkipped": "{count, plural, one {حجز واحد لم يلغ: بدأ أو انتهى أو ملغى.} other {# حجوزات لم تلغ: بدأت أو انتهت أو ملغاة.}}",
+      "deleteSkipped": "{count, plural, one {حجز واحد لم يحذف: عقد موقع أو كراء بدأ أو أداء. ألغه إن لزم.} other {# حجوزات لم تحذف: عقد موقع أو كراء بدأ أو أداء. ألغها إن لزم.}}"
     }
   },
   "contracts": {

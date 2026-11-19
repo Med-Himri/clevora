@@ -6,6 +6,7 @@ import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
 import { SearchBar } from "@/components/app/search-bar";
+import { SelectAllBox, SelectBox, SelectionProvider } from "@/components/app/selection";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -14,6 +15,7 @@ import { AGE_WARNING_YEARS, vehicleAgeYears } from "@/lib/fleet/status";
 import { formatMoney, plateNorm } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { FleetBulkBar } from "./components/fleet-bulk-bar";
 import { ImportDialog } from "./components/import-dialog";
 import { VehicleStatusBadge } from "./components/status-badge";
 import { VehicleActions } from "./components/vehicle-actions";
@@ -189,10 +191,18 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
       ) : rows.length === 0 ? (
         <EmptyState icon={SearchXIcon} title={t("noResult.title")} description={t("noResult.body")} />
       ) : (
-        <ResponsiveList
-          rows={rows}
-          columns={columns}
-          rowKey={(v) => v.id}
+        <SelectionProvider>
+          {isAdmin ? (
+            <div className="mb-2 flex items-center gap-2 ps-3 text-sm text-muted-foreground lg:hidden">
+              <SelectAllBox ids={rows.map((v) => v.id)} label={t("bulk.selectAll")} />
+              {t("bulk.selectAll")}
+            </div>
+          ) : null}
+          <ResponsiveList
+            rows={rows}
+            columns={columns}
+            select={isAdmin ? { cell: (v) => <SelectBox id={v.id} label={t("bulk.select", { car: `${v.brand_model} · ${v.plate}` })} />, all: <SelectAllBox ids={rows.map((v) => v.id)} label={t("bulk.selectAll")} /> } : undefined}
+            rowKey={(v) => v.id}
           rowHref={(v) => `/fleet/${v.id}`}
           caption={t("title")}
           testId="fleet-list"
@@ -205,7 +215,9 @@ export default async function FleetPage({ searchParams }: PageProps<"/[locale]/f
               sold={v.status === "sold"}
             />
           )}
-        />
+          />
+          {isAdmin ? <FleetBulkBar /> : null}
+        </SelectionProvider>
       )}
     </>
   );

@@ -41,6 +41,8 @@ type Props<T> = {
   rowTestId?: string;
   /** Under the table: totals, a count… */
   footer?: ReactNode;
+  /** Multi-select: a box per row (first column / card corner) and a "select all" box in the header. */
+  select?: { cell: (row: T) => ReactNode; all: ReactNode };
 } & ({ rows: T[]; groups?: never } | { groups: ListGroup<T>[]; rows?: never });
 
 const TONE = { danger: "text-destructive", warning: "text-warning", default: "text-foreground" } as const;
@@ -60,13 +62,13 @@ function GroupTitle({ label, count, tone = "default" }: { label: ReactNode; coun
  * Works in server and client components.
  */
 export function ResponsiveList<T>(props: Props<T>) {
-  const { columns, rowKey, rowHref, actions, caption, testId, rowTestId, footer } = props;
+  const { columns, rowKey, rowHref, actions, caption, testId, rowTestId, footer, select } = props;
   const groups: ListGroup<T>[] = props.groups ?? [{ key: "all", label: null, rows: props.rows ?? [] }];
   const grouped = Boolean(props.groups);
   const primary = columns.filter((c) => c.priority === "primary");
   const high = columns.filter((c) => c.priority === "high");
   const low = columns.filter((c) => c.priority === "low");
-  const span = columns.length + (actions ? 1 : 0);
+  const span = columns.length + (actions ? 1 : 0) + (select ? 1 : 0);
   const nowrap = (c: Column<T>) => c.nowrap ?? c.align === "end";
 
   return (
@@ -77,6 +79,7 @@ export function ResponsiveList<T>(props: Props<T>) {
           {caption ? <caption className="sr-only">{caption}</caption> : null}
           <thead className="border-b bg-muted/50">
             <tr>
+              {select ? <th scope="col" className="w-0 ps-4 pe-0 py-1">{select.all}</th> : null}
               {columns.map((c) => (
                 <th
                   key={c.key}
@@ -109,6 +112,7 @@ export function ResponsiveList<T>(props: Props<T>) {
                 ) : null}
                 {g.rows.map((row) => (
                   <tr key={rowKey(row)} className={cn("relative align-middle transition-colors", rowHref && "hover:bg-accent/60")} data-testid={rowTestId}>
+                    {select ? <td className="relative z-10 w-0 ps-4 pe-0 py-1">{select.cell(row)}</td> : null}
                     {columns.map((c, i) => (
                       <td key={c.key} className={cn("px-4 py-3", c.align === "end" ? "text-end" : "text-start", nowrap(c) ? "whitespace-nowrap" : "break-words", c.className)}>
                         {i === 0 && rowHref ? (
@@ -152,7 +156,8 @@ export function ResponsiveList<T>(props: Props<T>) {
                     </div>
                   );
                   return (
-                    <li key={rowKey(row)} className="flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs" data-testid={rowTestId}>
+                    <li key={rowKey(row)} className={cn("relative flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs", select && "pe-14")} data-testid={rowTestId}>
+                      {select ? <div className="absolute end-3 top-3">{select.cell(row)}</div> : null}
                       {rowHref ? (
                         <Link href={rowHref(row)} className="rounded-md">
                           {title}

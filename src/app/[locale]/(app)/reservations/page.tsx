@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
 import { PageHeader } from "@/components/app/page-header";
+import { SelectAllBox, SelectionProvider } from "@/components/app/selection";
 import { SearchBar } from "@/components/app/search-bar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { InfractionResults } from "./components/infraction-results";
+import { ReservationBulkBar } from "./components/reservation-bulk-bar";
 import { ReservationTable } from "./components/reservation-table";
 import { listReservations } from "./queries";
 
@@ -104,26 +106,33 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
           />
         )
       ) : (
-        <div className="flex flex-col gap-8">
+        <SelectionProvider>
+          <div className="mb-2 flex items-center gap-2 ps-3 text-sm text-muted-foreground lg:hidden">
+            <SelectAllBox ids={rows.map((r) => r.id)} label={t("bulk.selectAll")} />
+            {t("bulk.selectAll")}
+          </div>
+          <div className="flex flex-col gap-8">
           {returns.length ? (
             <section aria-labelledby="returns-title" data-testid="returns">
               <h2 id="returns-title" className="mb-3 text-xl font-bold">{t("list.returns")}</h2>
-              <ReservationTable rows={returns} now={now} groupBy="end" />
+              <ReservationTable rows={returns} now={now} groupBy="end" selectable />
             </section>
           ) : null}
           {departures.length ? (
             <section aria-labelledby="departures-title" data-testid="departures">
               <h2 id="departures-title" className="mb-3 text-xl font-bold">{t("list.departures")}</h2>
-              <ReservationTable rows={departures} now={now} groupBy="start" />
+              <ReservationTable rows={departures} now={now} groupBy="start" selectable />
             </section>
           ) : null}
           {finished.length ? (
             <section aria-labelledby="finished-title" data-testid="finished">
               <h2 id="finished-title" className="mb-3 text-xl font-bold">{t("list.finished")}</h2>
-              <ReservationTable rows={finished} now={now} />
+              <ReservationTable rows={finished} now={now} selectable />
             </section>
           ) : null}
-        </div>
+          </div>
+          <ReservationBulkBar />
+        </SelectionProvider>
       )}
     </>
   );

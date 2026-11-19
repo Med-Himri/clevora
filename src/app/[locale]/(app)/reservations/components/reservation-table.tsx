@@ -1,6 +1,7 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Ltr } from "@/components/app/ltr";
 import { ResponsiveList, type Column, type ListGroup } from "@/components/app/responsive-list";
+import { SelectAllBox, SelectBox } from "@/components/app/selection";
 import { StatusPill } from "@/components/app/status-pill";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
@@ -19,12 +20,15 @@ export async function ReservationTable({
   now,
   groupBy,
   testId,
+  selectable = false,
 }: {
   rows: Row[];
   now: Date;
   /** Group by urgency of this date (returns: end, departures: start). */
   groupBy?: "start" | "end";
   testId?: string;
+  /** Tick boxes for bulk actions (needs a SelectionProvider around the page). */
+  selectable?: boolean;
 }) {
   const t = await getTranslations("reservations");
   const tu = await getTranslations("urgency");
@@ -108,6 +112,12 @@ export async function ReservationTable({
     rowKey: (r: Row) => r.id,
     rowHref: (r: Row) => `/contracts/${r.id}`,
     rowTestId: "reservation-row",
+    select: selectable
+      ? {
+          cell: (r: Row) => <SelectBox id={r.id} label={t("bulk.select", { contract: r.contract_number, client: r.client.full_name })} />,
+          all: <SelectAllBox ids={rows.map((r) => r.id)} label={t("bulk.selectAll")} />,
+        }
+      : undefined,
     testId,
     caption: t("title"),
     actions: (r: Row, mode: "table" | "card") => (

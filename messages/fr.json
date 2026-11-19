@@ -764,6 +764,25 @@
       "paidBack": "Voiture rentabilisée",
       "covers": "Paie son crédit",
       "notCovers": "Ne paie pas son crédit"
+    },
+    "bulk": {
+      "select": "Sélectionner {car}",
+      "selectAll": "Tout sélectionner",
+      "count": "{count, plural, one {# voiture sélectionnée} other {# voitures sélectionnées}}",
+      "clear": "Tout désélectionner",
+      "delete": "Supprimer",
+      "markSold": "Marquer vendues",
+      "deleteTitle": "{count, plural, one {Supprimer cette voiture ?} other {Supprimer ces # voitures ?}}",
+      "deleteBody": "Les voitures qui ont déjà des locations, des charges ou des entretiens seront gardées (vous pourrez les marquer vendues). Les autres seront supprimées définitivement.",
+      "deleteConfirm": "{count, plural, one {Supprimer la voiture} other {Supprimer # voitures}}",
+      "soldTitle": "{count, plural, one {Marquer cette voiture vendue ?} other {Marquer ces # voitures vendues ?}}",
+      "soldBody": "Elles sortent du parc et du planning, mais leur historique (locations, charges) est gardé. Vous pouvez les remettre dans le parc à tout moment.",
+      "soldConfirm": "{count, plural, one {Marquer vendue} other {Marquer # vendues}}",
+      "deleted": "{count, plural, one {# voiture supprimée.} other {# voitures supprimées.}}",
+      "soldDone": "{count, plural, one {# voiture marquée vendue.} other {# voitures marquées vendues.}}",
+      "keptTitle": "{count, plural, one {# voiture n'a pas été supprimée} other {# voitures n'ont pas été supprimées}}",
+      "keptBody": "Elles ont un historique (locations, charges ou entretiens) qu'il faut garder. Marquez-les vendues : elles disparaissent du parc sans perdre leur historique.",
+      "keep": "Les garder"
     }
   },
   "reservations": {
@@ -1008,6 +1027,27 @@
       "keepPrice": "Garder {price}",
       "carPrice": "Prix de la voiture {price}",
       "confirmCar": "Valider la voiture"
+    },
+    "bulk": {
+      "select": "Sélectionner {contract} · {client}",
+      "selectAll": "Tout sélectionner",
+      "count": "{count, plural, one {# réservation sélectionnée} other {# réservations sélectionnées}}",
+      "clear": "Tout désélectionner",
+      "cancel": "Annuler",
+      "delete": "Supprimer",
+      "back": "Retour",
+      "cancelTitle": "{count, plural, one {Annuler cette réservation ?} other {Annuler ces # réservations ?}}",
+      "cancelBody": "Seules les réservations pas encore commencées sont annulées. Les voitures redeviennent libres. Elles restent visibles dans « Terminées ».",
+      "reason": "Raison de l'annulation",
+      "reasonPlaceholder": "Ex. : le client a annulé",
+      "cancelConfirm": "{count, plural, one {Annuler la réservation} other {Annuler # réservations}}",
+      "deleteTitle": "{count, plural, one {Supprimer cette réservation ?} other {Supprimer ces # réservations ?}}",
+      "deleteBody": "Pour les doublons et les erreurs. Seules les réservations jamais commencées (pas signées, aucun argent reçu) sont supprimées, définitivement. Les contrats signés ou payés sont gardés : annulez-les à la place.",
+      "deleteConfirm": "{count, plural, one {Supprimer la réservation} other {Supprimer # réservations}}",
+      "cancelled": "{count, plural, one {# réservation annulée.} other {# réservations annulées.}}",
+      "deleted": "{count, plural, one {# réservation supprimée.} other {# réservations supprimées.}}",
+      "cancelSkipped": "{count, plural, one {# réservation gardée : elle a déjà commencé, est terminée ou annulée.} other {# réservations gardées : déjà commencées, terminées ou annulées.}}",
+      "deleteSkipped": "{count, plural, one {# réservation gardée : contrat signé, location commencée ou argent reçu. Annulez-la si besoin.} other {# réservations gardées : contrat signé, location commencée ou argent reçu. Annulez-les si besoin.}}"
     }
   },
   "contracts": {

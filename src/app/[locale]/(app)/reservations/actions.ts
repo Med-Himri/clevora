@@ -329,3 +329,47 @@ export async function assignVehicleAction(reservationId: string, vehicleId: stri
   revalidatePath("/[locale]/dashboard", "page");
   return ok();
 }
+
+export type BulkReservationResult = { done: number; skipped: number };
+const bulkIds = z.array(z.uuid()).min(1).max(500);
+
+/** Cancel several reservations at once (staff and admins). Only bookings not started yet. */
+export async function bulkCancelReservationsAction(ids: string[], reason: string): Promise<ActionResult<BulkReservationResult>> {
+  const parsedIds = bulkIds.safeParse(ids);
+  const parsed = cancelSchema.safeParse({ reason });
+  if (!parsedIds.success) return fail("invalidForm");
+  if (!parsed.success) return fail("invalidForm", zodFieldErrors(parsed.error.issues));
+  const guard = await requireActionContext();
+  if (!guard.ok) return guard;
+  const { data, error } = await guard.ctx.supabase
+    .from("reservations")
+    .update({ status: "cancelled", cancelled_at: new Date().toISOString(), cancel_reason: parsed.data.reason })
+    .eq("agency_id", guard.ctx.agency.id)
+    .in("id", parsedIds.data)
+    .eq("status", "reserved")
+    .select("id");
+  if (error) return reservationError(error);
+  refresh();
+  const done = data?.length ?? 0;
+  return ok({ done, skipped: parsedIds.data.length - done });
+}
+
+/**
+ * Delete several reservations (admins). Only those that never started: not signed,
+ * no money received (the database checks it too). The others are skipped.
+ */
+export async function bulkDeleteReservationsAction(ids: string[]): Promise<ActionResult<BulkReservationResult>> {
+  const parsedIds = bulkIds.safeParse(ids);
+  if (!parsedIds.success) return fail("invalidForm");
+  const guard = await requireActionContext({ roles: ["admin"] });
+  if (!guard.ok) return guard;
+  const { supabase, agency } = guard.ctx;
+  let done = 0;
+  for (const id of parsedIds.data) {
+    const { data, error } = await supabase.from("reservations").delete().eq("id", id).eq("agency_id", agency.id).select("id");
+    if (error && error.hint !== "reservation_not_deletable") return reservationError(error);
+    if (data?.length) done++;
+  }
+  refresh();
+  return ok({ done, skipped: parsedIds.data.length - done });
+}

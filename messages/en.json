@@ -764,6 +764,25 @@
       "paidBack": "Car paid back",
       "covers": "Pays its credit",
       "notCovers": "Doesn't pay its credit"
+    },
+    "bulk": {
+      "select": "Select {car}",
+      "selectAll": "Select all",
+      "count": "{count, plural, one {# car selected} other {# cars selected}}",
+      "clear": "Clear",
+      "delete": "Delete",
+      "markSold": "Mark sold",
+      "deleteTitle": "{count, plural, one {Delete this car?} other {Delete these # cars?}}",
+      "deleteBody": "Cars with rentals, charges or maintenance are kept (you can mark them sold). The others are deleted for good.",
+      "deleteConfirm": "{count, plural, one {Delete the car} other {Delete # cars}}",
+      "soldTitle": "{count, plural, one {Mark this car sold?} other {Mark these # cars sold?}}",
+      "soldBody": "They leave the fleet and the planning but keep their history. You can bring them back any time.",
+      "soldConfirm": "{count, plural, one {Mark sold} other {Mark # sold}}",
+      "deleted": "{count, plural, one {# car deleted.} other {# cars deleted.}}",
+      "soldDone": "{count, plural, one {# car marked sold.} other {# cars marked sold.}}",
+      "keptTitle": "{count, plural, one {# car was not deleted} other {# cars were not deleted}}",
+      "keptBody": "They have history that must be kept. Mark them sold: they leave the fleet without losing their history.",
+      "keep": "Keep them"
     }
   },
   "reservations": {
@@ -1008,6 +1027,27 @@
       "keepPrice": "Keep {price}",
       "carPrice": "Car price {price}",
       "confirmCar": "Confirm car"
+    },
+    "bulk": {
+      "select": "Select {contract} · {client}",
+      "selectAll": "Select all",
+      "count": "{count, plural, one {# booking selected} other {# bookings selected}}",
+      "clear": "Clear",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "back": "Back",
+      "cancelTitle": "{count, plural, one {Cancel this booking?} other {Cancel these # bookings?}}",
+      "cancelBody": "Only bookings not started yet are cancelled. The cars become free again. They stay visible under “Finished”.",
+      "reason": "Reason for cancelling",
+      "reasonPlaceholder": "E.g. the client cancelled",
+      "cancelConfirm": "{count, plural, one {Cancel the booking} other {Cancel # bookings}}",
+      "deleteTitle": "{count, plural, one {Delete this booking?} other {Delete these # bookings?}}",
+      "deleteBody": "For duplicates and mistakes. Only bookings that never started (not signed, no money received) are deleted, for good. Signed or paid contracts are kept: cancel them instead.",
+      "deleteConfirm": "{count, plural, one {Delete the booking} other {Delete # bookings}}",
+      "cancelled": "{count, plural, one {# booking cancelled.} other {# bookings cancelled.}}",
+      "deleted": "{count, plural, one {# booking deleted.} other {# bookings deleted.}}",
+      "cancelSkipped": "{count, plural, one {# booking kept: already started, finished or cancelled.} other {# bookings kept: already started, finished or cancelled.}}",
+      "deleteSkipped": "{count, plural, one {# booking kept: signed, started or paid. Cancel it if needed.} other {# bookings kept: signed, started or paid. Cancel them if needed.}}"
     }
   },
   "contracts": {
