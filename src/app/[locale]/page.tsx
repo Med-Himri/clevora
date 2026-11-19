@@ -27,6 +27,8 @@ import { getUser } from "@/lib/auth/session";
 import { formatMoney } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
+import { ModeToggle } from "@/components/app/mode-toggle";
+import { LanguageSwitch } from "@/components/app/language-switch";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("marketing");
@@ -87,6 +89,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
             <ParcoliaLogo size="sm" priority />
           </Link>
           <nav aria-label={t("navLabel")} className="flex items-center gap-1">
+            <Suspense>
+              <LanguageSwitch save={false} />
+            </Suspense>
+            <ModeToggle save={false} className="hidden sm:inline-flex" />
             <a href="#tarifs" className="hidden min-h-11 items-center rounded-lg px-3 text-sm font-medium hover:bg-accent sm:inline-flex">{t("navPricing")}</a>
             <Button variant="ghost" asChild>
               <AppLink href="/login" locale={locale}>{t("login")}</AppLink>

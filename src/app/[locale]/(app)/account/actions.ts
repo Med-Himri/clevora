@@ -83,3 +83,15 @@ export async function updateThemeAction(theme: "light" | "dark" | "system"): Pro
   if (error) return fail("unknown");
   return ok();
 }
+
+/** Language from the header switch: saved in the profile (emails, next login). */
+export async function updateLocaleAction(locale: "fr" | "ar" | "en"): Promise<ActionResult> {
+  if (!["fr", "ar", "en"].includes(locale)) return fail("invalidForm");
+  const user = await getUser();
+  if (!user) return ok(); // before login: the address alone carries the language
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update({ preferred_locale: locale }).eq("id", user.id);
+  if (error) return fail("unknown");
+  await supabase.auth.updateUser({ data: { locale } });
+  return ok();
+}

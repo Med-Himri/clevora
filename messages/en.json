@@ -278,7 +278,8 @@
       "readOnlyBody": "Your data is kept. The app is read-only until payment.",
       "choosePlan": "Choose a plan",
       "askAdmin": "Contact the agency admin."
-    }
+    },
+    "language": "Language"
   },
   "dashboard": {
     "title": "Today",
@@ -412,7 +413,8 @@
       "light": "Light",
       "dark": "Dark",
       "system": "Automatic",
-      "save": "Save"
+      "save": "Save",
+      "toggle": "Light / dark mode"
     },
     "password": {
       "title": "Password",

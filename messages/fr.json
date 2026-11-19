@@ -278,7 +278,8 @@
       "readOnlyBody": "Vos données sont conservées. L'application est en lecture seule jusqu'au paiement.",
       "choosePlan": "Choisir un forfait",
       "askAdmin": "Contactez l'administrateur de l'agence."
-    }
+    },
+    "language": "Langue"
   },
   "dashboard": {
     "title": "Aujourd'hui",
@@ -412,7 +413,8 @@
       "light": "Clair",
       "dark": "Sombre",
       "system": "Automatique",
-      "save": "Enregistrer"
+      "save": "Enregistrer",
+      "toggle": "Mode clair / sombre"
     },
     "password": {
       "title": "Mot de passe",

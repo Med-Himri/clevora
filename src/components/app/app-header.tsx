@@ -2,6 +2,8 @@ import { AgencyLogo } from "@/components/app/agency-logo";
 import { ModeToggle } from "@/components/app/mode-toggle";
 import { UserMenu } from "@/components/app/user-menu";
 import { Link } from "@/i18n/navigation";
+import { LanguageSwitch } from "@/components/app/language-switch";
+import { Suspense } from "react";
 
 /**
  * Sticky header: agency logo + name (in the sidebar on laptops), and on the
@@ -34,7 +36,10 @@ export function AppHeader({
             {agencyName}
           </span>
         </Link>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1 max-sm:gap-0.5">
+          <Suspense>
+            <LanguageSwitch />
+          </Suspense>
           <ModeToggle />
           <UserMenu name={userName} email={userEmail} roleLabel={roleLabel} canSwitchAgency={canSwitchAgency} platformAdmin={platformAdmin} />
         </div>

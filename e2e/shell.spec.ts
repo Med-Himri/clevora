@@ -81,12 +81,30 @@ test("light / dark switch in the header is saved in the profile", async ({ page 
   const { createTestAgency, login, admin } = await import("./helpers");
   const agency = await createTestAgency();
   await login(page, agency.email, agency.password);
-  await page.getByTestId("mode-toggle").click();
-  await page.getByRole("menuitem", { name: "Sombre" }).click();
+  await page.getByTestId("mode-toggle").click(); // one tap: light -> dark
   await expect(page.locator("html")).toHaveClass(/dark/);
   await expect
     .poll(async () => (await admin().from("profiles").select("preferred_theme").eq("id", agency.userId).single()).data?.preferred_theme)
     .toBe("dark");
   await page.reload();
   await expect(page.locator("html")).toHaveClass(/dark/);
+});
+
+test("language pill in the header: same page in Arabic (RTL), saved in the profile", async ({ page }, testInfo) => {
+  const { createTestAgency, login, admin } = await import("./helpers");
+  const agency = await createTestAgency();
+  await login(page, agency.email, agency.password);
+  await page.goto("/fleet");
+  const sw = page.getByTestId("language-switch").first();
+  if (testInfo.project.name === "phone") {
+    await sw.getByRole("button", { name: "Langue" }).click();
+    await page.getByRole("menuitem", { name: "العربية" }).click();
+  } else {
+    await sw.getByRole("button", { name: "العربية" }).click();
+  }
+  await page.waitForURL(/\/ar\/fleet/);
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expect
+    .poll(async () => (await admin().from("profiles").select("preferred_locale").eq("id", agency.userId).single()).data?.preferred_locale)
+    .toBe("ar");
 });

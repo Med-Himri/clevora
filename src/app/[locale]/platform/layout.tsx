@@ -1,6 +1,5 @@
 import { LogOutIcon, StoreIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import type { ReactNode } from "react";
 import { logoutAction } from "@/app/[locale]/(auth)/actions";
 import { ModeToggle } from "@/components/app/mode-toggle";
 import { ParcoliaLogo } from "@/components/app/parcolia-logo";
@@ -11,6 +10,8 @@ import { requirePlatformAdmin } from "@/lib/auth/platform";
 import { getProfile } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { PlatformNav } from "./components/platform-nav";
+import { LanguageSwitch } from "@/components/app/language-switch";
+import { Suspense, type ReactNode } from "react";
 
 /** Parcolia owner console: every agency, account, payment and plan. Not for agencies. */
 export default async function PlatformLayout({ children }: { children: ReactNode }) {
@@ -37,6 +38,9 @@ export default async function PlatformLayout({ children }: { children: ReactNode
                 </Link>
               </Button>
             ) : null}
+            <Suspense>
+              <LanguageSwitch />
+            </Suspense>
             <ModeToggle />
             <span className="hidden flex-col px-2 text-end text-sm leading-tight sm:flex">
               <span className="font-medium">{profile?.fullName || user.email}</span>

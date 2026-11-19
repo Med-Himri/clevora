@@ -43,7 +43,7 @@ export function UserMenu({
         className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg px-1.5 text-start hover:bg-accent sm:px-2"
         aria-label={t("open")}
       >
-        <span className="flex min-w-0 max-w-[7.5rem] flex-col leading-tight sm:max-w-56">
+        <span className="flex min-w-0 max-w-[5.5rem] flex-col leading-tight sm:max-w-56">
           <span className="truncate text-sm font-semibold" data-testid="header-user-name">
             {name}
           </span>
@@ -57,7 +57,7 @@ export function UserMenu({
         >
           {initials || "?"}
         </span>
-        <ChevronDownIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+        <ChevronDownIcon className="hidden size-4 shrink-0 text-muted-foreground sm:block" aria-hidden />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
