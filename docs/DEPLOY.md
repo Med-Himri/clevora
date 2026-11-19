@@ -146,7 +146,7 @@ the deployment in Vercel (step 5).
    | `NEXT_PUBLIC_MARKETING_URL` | option B only | empty |
    | `SMTP_*`, `EMAIL_FROM` | Resend | Resend |
    | `CRON_SECRET` | a long random string | another one |
-   | `ANTHROPIC_API_KEY` | yes | optional |
+   | `GROQ_API_KEY` (assistant, free models with fallback) or `ANTHROPIC_API_KEY` | yes | optional |
    | `PARCOLIA_*` (legal, bank, privacy) | yes | yes |
    | `NEXT_PUBLIC_SUPPORT_WHATSAPP`, `NEXT_PUBLIC_CNDP_NUMBER` | yes | — |
    | `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | yes | DSN only |

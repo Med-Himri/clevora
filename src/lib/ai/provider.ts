@@ -47,6 +47,13 @@ export async function getProvider(): Promise<AssistantProvider | null> {
     const { MockProvider } = await import("./mock");
     return new MockProvider();
   }
+  // Groq (free models, 3-model fallback) when its key is set; Claude otherwise.
+  // AI_PROVIDER=groq|anthropic forces one when both keys exist.
+  const forced = process.env.AI_PROVIDER;
+  if (process.env.GROQ_API_KEY && forced !== "anthropic") {
+    const { GroqProvider } = await import("./groq");
+    return new GroqProvider(process.env.GROQ_API_KEY);
+  }
   if (!process.env.ANTHROPIC_API_KEY) return null;
   const { AnthropicProvider } = await import("./anthropic");
   return new AnthropicProvider();
