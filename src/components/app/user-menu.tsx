@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRightIcon, ChevronDownIcon, LogOutIcon, UserCogIcon, UsersIcon } from "lucide-react";
+import { ArrowLeftRightIcon, ChevronDownIcon, LayoutDashboardIcon, LogOutIcon, UserCogIcon, UsersIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Can } from "@/components/app/agency-context";
 import {
@@ -21,11 +21,13 @@ export function UserMenu({
   email,
   roleLabel,
   canSwitchAgency,
+  platformAdmin = false,
 }: {
   name: string;
   email: string;
   roleLabel: string;
   canSwitchAgency: boolean;
+  platformAdmin?: boolean;
 }) {
   const t = useTranslations("app.menu");
   const initials = name
@@ -77,6 +79,14 @@ export function UserMenu({
             </Link>
           </DropdownMenuItem>
         </Can>
+        {platformAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link href="/platform" data-testid="menu-platform">
+              <LayoutDashboardIcon aria-hidden />
+              {t("platform")}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         {canSwitchAgency ? (
           <DropdownMenuItem asChild>
             <Link href="/select-agency">

@@ -14,6 +14,7 @@ export function AppHeader({
   userEmail,
   roleLabel,
   canSwitchAgency,
+  platformAdmin = false,
 }: {
   agencyName: string;
   agencyLogoUrl: string | null;
@@ -21,6 +22,8 @@ export function AppHeader({
   userEmail: string;
   roleLabel: string;
   canSwitchAgency: boolean;
+  /** Parcolia owner: a shortcut to the owner console. */
+  platformAdmin?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-30 border-b bg-card/95 backdrop-blur">
@@ -33,7 +36,7 @@ export function AppHeader({
         </Link>
         <div className="flex shrink-0 items-center gap-1">
           <ModeToggle />
-          <UserMenu name={userName} email={userEmail} roleLabel={roleLabel} canSwitchAgency={canSwitchAgency} />
+          <UserMenu name={userName} email={userEmail} roleLabel={roleLabel} canSwitchAgency={canSwitchAgency} platformAdmin={platformAdmin} />
         </div>
       </div>
     </header>

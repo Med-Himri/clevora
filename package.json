@@ -16,7 +16,8 @@
     "db:test:nodocker": "bash scripts/db/run-local-tests.sh",
     "db:types": "bash scripts/db/gen-types.sh",
     "i18n:check": "node scripts/check-messages.mjs",
-    "demo:create": "node scripts/demo/create-demo-agency.mjs"
+    "demo:create": "node scripts/demo/create-demo-agency.mjs",
+    "platform:admin": "node scripts/platform-admin.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

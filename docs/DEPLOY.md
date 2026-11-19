@@ -184,15 +184,15 @@ It creates **one** agency "Agence Démo" (8 cars, 15 fake clients, 3 months of a
 credits) with `demo@parcolia.ma` (admin) and `demo-staff@parcolia.ma` (staff). It refuses to
 run if the agency already exists and never touches other agencies.
 
-## 8. Platform admin account
+## 8. Your owner account (Parcolia console)
 
-Sign up normally with your own email, then in Supabase → SQL Editor (prod):
-
-```sql
-insert into public.platform_admins (user_id)
-select id from public.profiles where email = 'you@example.com';
-```
-
-Then open `/platform`.
+1. Sign up normally on the site with your email and a strong password.
+2. On your computer, with the PRODUCTION keys in `.env.production.local`:
+   ```bash
+   npm run platform:admin -- you@example.com --prod
+   ```
+3. Log in: you land on `/platform` (Tableau de bord, Agences, Utilisateurs, Paiements, Forfaits).
+   If you also run an agency, use the user menu → « Espace Parcolia ».
+4. Turn on two-step login in « Mon compte ». Add other Parcolia admins from /platform/users.
 
 Next: the launch checklist in `docs/LAUNCH.md`.

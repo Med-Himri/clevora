@@ -1448,6 +1448,7 @@ export type Database = {
     Functions: {
       _anonymize_client_row: { Args: { p_client: string }; Returns: undefined };
       _assert_admin: { Args: { p_agency: string }; Returns: undefined };
+      _assert_platform_admin: { Args: Record<PropertyKey, never>; Returns: undefined };
       _create_agency: {
         Args: {
           p_brand_color?: string;
@@ -1542,6 +1543,7 @@ export type Database = {
       mfa_satisfied: { Args: Record<PropertyKey, never>; Returns: boolean };
       next_contract_number: { Args: { p_agency: string }; Returns: string };
       old_clients: { Args: { p_agency: string; p_years: number }; Returns: string[] };
+      platform_agency_activity: { Args: { p_agency: string }; Returns: Json };
       platform_overview: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1562,6 +1564,8 @@ export type Database = {
           writable: boolean;
         }[];
       };
+      platform_set_admin: { Args: { p_email: string; p_on: boolean }; Returns: undefined };
+      platform_stats: { Args: Record<PropertyKey, never>; Returns: Json };
       platform_usage: {
         Args: Record<PropertyKey, never>;
         Returns: {
@@ -1571,6 +1575,20 @@ export type Database = {
           database_bytes: number;
           storage_bytes: number;
           vehicles: number;
+        }[];
+      };
+      platform_users: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          agencies: Json;
+          created_at: string;
+          email: string;
+          email_confirmed: boolean;
+          full_name: string;
+          id: string;
+          last_sign_in_at: string;
+          mfa: boolean;
+          platform_admin: boolean;
         }[];
       };
       preview_contract_number: { Args: { p_agency: string }; Returns: string };

@@ -13,6 +13,8 @@ import { formatPhone } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
 import { PlatformAgencyForm } from "../../components/agency-form";
 import { PaymentActions } from "../../components/payment-actions";
+import { AgencyQuickActions } from "../../components/agency-quick-actions";
+import { MonthBars } from "../../components/month-bars";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("platform");
@@ -26,11 +28,21 @@ export default async function PlatformAgencyPage({ params }: PageProps<"/[locale
   const t = await getTranslations("platform");
   const tr = await getTranslations("roles");
   const supabase = await createClient();
-  const [{ data: overview }, { data: a }, { data: payments }] = await Promise.all([
+  const [{ data: overview }, { data: a }, { data: payments }, { data: activityJson }] = await Promise.all([
     supabase.rpc("platform_overview"),
     supabase.from("agencies").select("name, slug, city, phone, email, created_at, subscription_status, trial_ends_at, current_period_end, plan:plans(code)").eq("id", id).maybeSingle(),
     supabase.from("subscription_payments").select("id, created_at, period, amount, method, reference, status, invoice_number, paid_at, plan:plans(name)").eq("agency_id", id).order("created_at", { ascending: false }),
+    supabase.rpc("platform_agency_activity", { p_agency: id }),
   ]);
+  const activity = activityJson as unknown as {
+    clients: number;
+    reservations_total: number;
+    contracts_month: number;
+    ai_questions_month: number;
+    last_activity: string | null;
+    last_login: string | null;
+    by_month: Array<{ month: string; reservations: number }>;
+  } | null;
   if (!a) notFound();
   const o = (overview ?? []).find((x) => x.id === id);
   // RLS lets platform admins read every membership and profile.
@@ -44,12 +56,42 @@ export default async function PlatformAgencyPage({ params }: PageProps<"/[locale
   return (
     <>
       <Button variant="ghost" size="sm" asChild className="mb-2">
-        <Link href="/platform">
+        <Link href="/platform/agencies">
           <ArrowLeftIcon className="rtl:rotate-180" aria-hidden />
           {t("back")}
         </Link>
       </Button>
-      <PageHeader title={a.name} subtitle={<>{a.city} · <Ltr>/{a.slug}</Ltr> · {t("since", { date: formatDate(a.created_at) })}</>} />
+      <PageHeader
+        title={a.name}
+        subtitle={<>{a.city} · <Ltr>/{a.slug}</Ltr> · {t("since", { date: formatDate(a.created_at) })}</>}
+        action={<AgencyQuickActions id={id} name={a.name} status={a.subscription_status} />}
+      />
+      {activity ? (
+        <Card className="mb-6" data-testid="agency-activity">
+          <CardHeader>
+            <CardTitle>{t("activityTitle")}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+            <dl className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {[
+                [t("activity.clients"), activity.clients],
+                [t("activity.reservations"), activity.reservations_total],
+                [t("activity.contractsMonth"), activity.contracts_month],
+                [t("activity.ai"), activity.ai_questions_month],
+                [t("activity.lastLogin"), activity.last_login ? formatDate(activity.last_login) : "—"],
+                [t("activity.lastActivity"), activity.last_activity ? formatDate(activity.last_activity) : "—"],
+              ].map(([label, value]) => (
+                <div key={String(label)} className="rounded-lg bg-muted/60 p-2">
+                  <dt className="text-xs text-muted-foreground">{label}</dt>
+                  <dd className="text-lg font-bold"><Ltr>{value}</Ltr></dd>
+                </div>
+              ))}
+            </dl>
+            <MonthBars title={t("activity.byMonth")} data={activity.by_month.map((m) => ({ label: m.month.slice(5) + "/" + m.month.slice(2, 4), value: m.reservations }))} format={(n) => String(n)} />
+          </CardContent>
+          <p className="px-6 pb-4 text-xs text-muted-foreground">{t("activity.privacy")}</p>
+        </Card>
+      ) : null}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>

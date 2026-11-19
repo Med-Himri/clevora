@@ -11,6 +11,7 @@ import { ThemeSync } from "@/components/app/theme-sync";
 import { getMemberships, getProfile, requireAgency } from "@/lib/auth/session";
 import { getNavBadges } from "@/lib/nav-badges";
 import { createClient } from "@/lib/supabase/server";
+import { isPlatformAdmin } from "@/lib/auth/platform";
 
 /**
  * The app shell (everything inside an agency):
@@ -44,6 +45,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           userEmail={user.email ?? ""}
           roleLabel={tr(agency.role)}
           canSwitchAgency={activeAgencies > 1}
+          platformAdmin={await isPlatformAdmin()}
         />
         <SubscriptionBanner subscription={agency.subscription} role={agency.role} />
         <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pb-28 pt-4 sm:pt-6 md:pb-8">{children}</main>
