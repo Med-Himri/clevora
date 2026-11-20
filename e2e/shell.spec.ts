@@ -90,18 +90,14 @@ test("light / dark switch in the header is saved in the profile", async ({ page 
   await expect(page.locator("html")).toHaveClass(/dark/);
 });
 
-test("language pill in the header: same page in Arabic (RTL), saved in the profile", async ({ page }, testInfo) => {
+test("language menu in the header: same page in Arabic (RTL), saved in the profile", async ({ page }) => {
   const { createTestAgency, login, admin } = await import("./helpers");
   const agency = await createTestAgency();
   await login(page, agency.email, agency.password);
   await page.goto("/fleet");
   const sw = page.getByTestId("language-switch").first();
-  if (testInfo.project.name === "phone") {
-    await sw.getByRole("button", { name: "Langue" }).click();
-    await page.getByRole("menuitem", { name: "العربية" }).click();
-  } else {
-    await sw.getByRole("button", { name: "العربية" }).click();
-  }
+  await sw.getByRole("button", { name: /Langue/ }).click();
+  await page.getByRole("menuitem", { name: "العربية" }).click();
   await page.waitForURL(/\/ar\/fleet/);
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect

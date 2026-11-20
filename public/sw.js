@@ -36,7 +36,8 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Immutable app files: cache first.
-  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/")) {
+  // Static files and the ID-scan engine (/ocr): cache first, they never change for a build.
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/") || url.pathname.startsWith("/ocr/")) {
     event.respondWith(
       caches.match(req).then(
         (hit) =>

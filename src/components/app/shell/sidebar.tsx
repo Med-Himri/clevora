@@ -76,7 +76,7 @@ export function Sidebar({
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto overscroll-contain p-2 [scrollbar-width:none] xl:px-2 xl:py-1.5 [&::-webkit-scrollbar]:hidden">
+        <nav className="flex-1 overflow-y-auto overscroll-contain p-2 [scrollbar-width:none] xl:px-2 xl:py-1.5 shorter:py-1 [&::-webkit-scrollbar]:hidden">
           {NAV_SECTIONS.map((section, si) => {
             const list = section.items.map((k) => items.find((i) => i.key === k)).filter((i): i is NavItem => Boolean(i));
             if (!list.length) return null;
@@ -85,7 +85,7 @@ export function Sidebar({
                 <p className={cn("px-3 text-[10px] leading-5 font-semibold tracking-wider text-muted-foreground/80 uppercase short:hidden", !open && "hidden xl:block")}>
                   {t(`sections.${section.key}`)}
                 </p>
-                <ul className="flex flex-col gap-0.5 xl:gap-px">
+                <ul className="flex flex-col gap-0.5 shorter:gap-0 xl:gap-px">
                   {list.map((item) => {
                     const active = isActive(pathname, item.href);
                     const badge = badges[item.key];
@@ -97,7 +97,7 @@ export function Sidebar({
                           aria-current={active ? "page" : undefined}
                           title={open ? undefined : t(item.key)}
                           className={cn(
-                            "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors short:min-h-10 shorter:min-h-9 xl:min-h-8 xl:gap-2.5 xl:text-[13px] short:xl:min-h-8 shorter:xl:min-h-8",
+                            "relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-[15px] font-medium transition-colors short:min-h-10 shorter:min-h-[34px] xl:min-h-8 xl:gap-2.5 xl:text-[13px] short:xl:min-h-8 shorter:xl:min-h-8",
                             active
                               ? "bg-primary/10 text-primary before:absolute before:inset-y-2 before:start-0 before:w-1 before:rounded-full before:bg-primary dark:bg-accent dark:text-foreground"
                               : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -123,7 +123,7 @@ export function Sidebar({
           })}
         </nav>
 
-        <p className={cn("border-t px-3 py-2 text-xs text-muted-foreground", !open && "hidden xl:block")}>
+        <p className={cn("border-t px-3 py-2 text-xs text-muted-foreground shorter:py-1", !open && "hidden xl:block")}>
           <PoweredBy label={t("poweredBy")} />
         </p>
       </aside>

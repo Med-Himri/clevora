@@ -19,7 +19,7 @@ function addDays(day: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
-/** New reservation. ?vehicle=…&date=yyyy-mm-dd prefill it (from the planning). */
+/** New reservation. ?vehicle=…&date=yyyy-mm-dd prefill it (from the planning), ?client=… the driver. */
 export default async function NewReservationPage({ searchParams }: PageProps<"/[locale]/reservations/new">) {
   const { agency } = await requireAgency();
   const t = await getTranslations("reservations");
@@ -50,6 +50,34 @@ export default async function NewReservationPage({ searchParams }: PageProps<"/[
     if (data) initialCar = { ...data, daily_rate: Number(data.daily_rate) };
   }
 
+  // From a client's page: ?client=… fills the first driver.
+  let driver1 = { ...EMPTY_DRIVER };
+  if (typeof sp.client === "string" && /^[0-9a-f-]{36}$/.test(sp.client)) {
+    const { data: c } = await supabase
+      .from("clients")
+      .select("id_type, id_number, full_name, phone, nationality, address, birth_date, birth_place, id_expires_on, license_number, license_issued_on, license_issued_place")
+      .eq("agency_id", agency.id)
+      .eq("id", sp.client)
+      .is("anonymized_at", null)
+      .maybeSingle();
+    if (c) {
+      driver1 = {
+        id_type: c.id_type as "cin" | "passport",
+        id_number: c.id_number,
+        full_name: c.full_name,
+        phone: c.phone ?? "",
+        nationality: c.nationality ?? "",
+        address: c.address ?? "",
+        birth_date: c.birth_date ?? "",
+        birth_place: c.birth_place ?? "",
+        id_expires_on: c.id_expires_on ?? "",
+        license_number: c.license_number ?? "",
+        license_issued_on: c.license_issued_on ?? "",
+        license_issued_place: c.license_issued_place ?? "",
+      };
+    }
+  }
+
   const initial: ReservationInput = {
     contract_number: "",
     start_date: startDate,
@@ -58,7 +86,7 @@ export default async function NewReservationPage({ searchParams }: PageProps<"/[
     end_time: startTime,
     vehicle_id: initialCar?.id ?? "",
     car_later: false,
-    driver1: { ...EMPTY_DRIVER },
+    driver1,
     has_driver2: false,
     daily_price: initialCar?.daily_rate ?? 0,
     delivery: false,

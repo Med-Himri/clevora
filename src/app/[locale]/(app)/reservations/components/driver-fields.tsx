@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type * as React from "react";
 import { Controller, useWatch, type UseFormReturn } from "react-hook-form";
 import { toast } from "sonner";
+import { ScanIdButton } from "@/components/app/scan-id-button";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { ChoiceChips } from "@/components/ui/choice-chips";
@@ -94,6 +95,19 @@ export function DriverFields({
 
   return (
     <div className="flex flex-col gap-4">
+      <ScanIdButton
+        className="self-start"
+        onResult={(d) => {
+          // Number first: if this person is already a client, the lookup fills the rest.
+          form.setValue(`${prefix}.id_type`, d.id_type, { shouldDirty: true });
+          form.setValue(`${prefix}.id_number`, d.id_number, { shouldDirty: true, shouldValidate: true });
+          for (const f of ["full_name", "nationality", "birth_date", "id_expires_on"] as const) {
+            if (d[f]) form.setValue(`${prefix}.${f}`, d[f], { shouldDirty: true });
+          }
+          setKnown(null);
+          toast.success(t("scanned"));
+        }}
+      />
       <div className="flex flex-col gap-2">
         <span className="text-sm font-medium">{t("idType")}</span>
         <Controller

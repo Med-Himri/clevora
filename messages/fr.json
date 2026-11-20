@@ -62,7 +62,8 @@
     "confirmName": "Le nom ne correspond pas.",
     "mfaCode": "Tapez les 6 chiffres du code.",
     "mfaWrong": "Code incorrect ou expiré. Tapez le nouveau code affiché.",
-    "oilItems": "Choisissez au moins une pièce changée."
+    "oilItems": "Choisissez au moins une pièce changée.",
+    "clientExists": "Ce numéro est déjà enregistré pour un autre client."
   },
   "errors": {
     "invalidCredentials": "E-mail ou mot de passe incorrect. Vérifiez et réessayez.",
@@ -103,7 +104,9 @@
     "carMissing": "Choisissez d'abord la voiture de cette réservation.",
     "vehicleInsuranceExpired": "L'assurance de cette voiture est expirée à la date du départ. Renouvelez-la ou choisissez une autre voiture.",
     "reservationStarted": "La location a déjà commencé : la voiture ne peut plus changer.",
-    "lastPlatformAdmin": "Il faut garder au moins un admin Parcolia."
+    "lastPlatformAdmin": "Il faut garder au moins un admin Parcolia.",
+    "clientExists": "Ce client existe déjà (même numéro de pièce).",
+    "clientHasRentals": "Ce client a des locations : il ne peut pas être supprimé (vous pouvez l'anonymiser dans Paramètres → Vie privée)."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
@@ -520,7 +523,8 @@
       "agency": "Agence"
     },
     "activity": "Journal d'activité",
-    "balances": "Restes à payer"
+    "balances": "Restes à payer",
+    "clients": "Clients"
   },
   "urgency": {
     "late": "En retard",
@@ -861,7 +865,8 @@
       "licensePlace": "Lieu du permis",
       "tooYoung": "Attention : moins de {age} ans (âge minimum de l'agence).",
       "licenseTooRecent": "Attention : permis de moins de {years, plural, one {# an} other {# ans}}.",
-      "idExpired": "Attention : la pièce d'identité est expirée."
+      "idExpired": "Attention : la pièce d'identité est expirée.",
+      "scanned": "Informations de la pièce ajoutées. Vérifiez-les."
     },
     "wizard": {
       "steps": {
@@ -1955,5 +1960,72 @@
     "call": "Appeler {name}",
     "callShort": "Appeler",
     "collect": "Encaisser"
+  },
+  "scan": {
+    "button": "Scanner la pièce",
+    "title": "Scanner une CIN ou un passeport",
+    "howTo": "Photographiez le DOS de la CIN (nouvelle carte) ou la page photo du passeport, à plat et bien éclairé : les lignes avec des <<< doivent être nettes.",
+    "privacy": "La photo est lue sur ce téléphone et n'est ni envoyée ni gardée.",
+    "photo": "Prendre une photo",
+    "choose": "Choisir une image",
+    "loading": "Préparation du lecteur (une seule fois)…",
+    "reading": "Lecture de la pièce…",
+    "unreadable": "Lecture impossible. Reprenez la photo plus près, à plat, sans reflet, avec les lignes <<< bien visibles. Les anciennes CIN n'ont pas ces lignes : tapez les informations.",
+    "error": "Le lecteur n'a pas pu démarrer. Vérifiez la connexion et réessayez.",
+    "partial": "Lecture incertaine : vérifiez chaque information avant de continuer.",
+    "fullName": "Nom et prénom",
+    "cin": "N° CIN",
+    "passport": "N° passeport",
+    "nationality": "Nationalité",
+    "birthDate": "Né(e) le",
+    "expires": "Valable jusqu'au",
+    "again": "Reprendre",
+    "use": "Utiliser ces informations",
+    "close": "Fermer"
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "{count, plural, =0 {Aucun client} one {# client} other {# clients}} enregistrés. Tapez un CIN dans une réservation : la fiche se remplit toute seule.",
+    "add": "Ajouter un client",
+    "addSubtitle": "Scannez la CIN ou le passeport, ou tapez les informations.",
+    "edit": "Modifier le client",
+    "empty": "Aucun client pour l'instant",
+    "emptyBody": "Ajoutez vos clients ici, ou créez une réservation : le client est enregistré automatiquement.",
+    "search": "Nom, CIN, passeport, téléphone ou permis",
+    "noResult": "Aucun client trouvé",
+    "noResultBody": "Vérifiez l'orthographe ou cherchez par numéro de CIN ou de téléphone.",
+    "limited": "Les {count} clients les plus récents. Cherchez pour trouver les autres.",
+    "anonymized": "Anonymisé",
+    "never": "Jamais",
+    "columns": {
+      "client": "Client",
+      "document": "Pièce",
+      "license": "Permis",
+      "rentals": "Locations",
+      "last": "Dernière location"
+    },
+    "since": "Client depuis le {date} · {count, plural, =0 {aucune location} one {# location} other {# locations}}",
+    "newReservation": "Nouvelle réservation",
+    "details": "Informations",
+    "rentals": "Locations",
+    "noRentals": "Pas encore de location.",
+    "owes": "Doit encore :",
+    "idExpired": "La pièce d'identité de ce client est expirée : demandez une pièce valide avant de louer.",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer {name} ?",
+    "deleteBody": "Ce client n'a aucune location : sa fiche sera effacée définitivement.",
+    "deleted": "Client supprimé.",
+    "form": {
+      "identity": "Pièce d'identité",
+      "contact": "Contact",
+      "license": "Permis et notes",
+      "email": "E-mail (facultatif)",
+      "notes": "Notes (facultatif)",
+      "notesHint": "Visible par l'équipe uniquement. Restez factuel.",
+      "save": "Enregistrer le client",
+      "saved": "Client enregistré.",
+      "exists": "Ce numéro de pièce est déjà enregistré.",
+      "openExisting": "Ouvrir sa fiche"
+    }
   }
 }

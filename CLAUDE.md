@@ -48,7 +48,7 @@ Enforce roles in RLS AND hide forbidden UI. Never rely on UI hiding alone.
 - Every action button has a small icon plus a short label.
 - Use logical CSS properties (ms-, me-, ps-, pe-, start, end) so Arabic RTL works without special cases.
 - Wrap amounts, dates, times, phones, plates, IDs and emails in <Ltr> (components/app/ltr.tsx) so they keep their order in Arabic.
-- Light and dark themes, both polished. The header has a language pill (FR · ع · EN, a compact menu on phones) and a one-tap light/dark button (moon/sun) next to the user's name; both are saved in the profile.
+- Light and dark themes, both polished. The header has a language button (round flag opening Français / English / العربية with flags) and a one-tap light/dark button (moon/sun) next to the user's name; both are saved in the profile.
 - Empty states explain what to do next. Errors say how to fix them. Toasts confirm every save.
 - Accessibility: labels on every input, visible focus, AA contrast, aria on icon-only buttons.
 

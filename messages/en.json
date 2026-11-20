@@ -62,7 +62,8 @@
     "confirmName": "The name does not match.",
     "mfaCode": "Type the 6 digits of the code.",
     "mfaWrong": "Wrong or expired code. Type the new code shown.",
-    "oilItems": "Pick at least one changed part."
+    "oilItems": "Pick at least one changed part.",
+    "clientExists": "This number is already saved for another client."
   },
   "errors": {
     "invalidCredentials": "Wrong email or password. Check and try again.",
@@ -103,7 +104,9 @@
     "carMissing": "Choose the car of this booking first.",
     "vehicleInsuranceExpired": "This car's insurance has expired by departure. Renew it or choose another car.",
     "reservationStarted": "The rental has started: the car can no longer change.",
-    "lastPlatformAdmin": "At least one Parcolia admin must remain."
+    "lastPlatformAdmin": "At least one Parcolia admin must remain.",
+    "clientExists": "This client already exists (same ID number).",
+    "clientHasRentals": "This client has rentals: it cannot be deleted (you can anonymise it in Settings → Privacy)."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
@@ -520,7 +523,8 @@
       "agency": "Agency"
     },
     "activity": "Activity log",
-    "balances": "Balances due"
+    "balances": "Balances due",
+    "clients": "Clients"
   },
   "urgency": {
     "late": "Late",
@@ -861,7 +865,8 @@
       "licensePlace": "Licence place",
       "tooYoung": "Warning: under {age} (agency minimum age).",
       "licenseTooRecent": "Warning: licence held for less than {years, plural, one {# year} other {# years}}.",
-      "idExpired": "Warning: the ID document has expired."
+      "idExpired": "Warning: the ID document has expired.",
+      "scanned": "ID details added. Please check them."
     },
     "wizard": {
       "steps": {
@@ -1955,5 +1960,72 @@
     "call": "Call {name}",
     "callShort": "Call",
     "collect": "Collect"
+  },
+  "scan": {
+    "button": "Scan the ID",
+    "title": "Scan an ID card or passport",
+    "howTo": "Photograph the BACK of the ID card (new model) or the passport photo page, flat and well lit: the lines with <<< must be sharp.",
+    "privacy": "The photo is read on this device; it is neither sent nor kept.",
+    "photo": "Take a photo",
+    "choose": "Choose an image",
+    "loading": "Preparing the reader (once)…",
+    "reading": "Reading the document…",
+    "unreadable": "Could not read it. Take the photo closer, flat, without glare, with the <<< lines clearly visible. Old ID cards have no such lines: type the details.",
+    "error": "The reader could not start. Check the connection and try again.",
+    "partial": "Uncertain reading: check each field before continuing.",
+    "fullName": "Full name",
+    "cin": "ID number",
+    "passport": "Passport number",
+    "nationality": "Nationality",
+    "birthDate": "Born on",
+    "expires": "Valid until",
+    "again": "Retake",
+    "use": "Use these details",
+    "close": "Close"
+  },
+  "clients": {
+    "title": "Clients",
+    "subtitle": "{count, plural, =0 {No client} one {# client} other {# clients}} saved. Type an ID number in a booking: the card fills itself.",
+    "add": "Add a client",
+    "addSubtitle": "Scan the ID card or passport, or type the details.",
+    "edit": "Edit client",
+    "empty": "No client yet",
+    "emptyBody": "Add your clients here, or create a booking: the client is saved automatically.",
+    "search": "Name, ID, passport, phone or licence",
+    "noResult": "No client found",
+    "noResultBody": "Check the spelling or search by ID or phone number.",
+    "limited": "The {count} most recent clients. Search to find the others.",
+    "anonymized": "Anonymised",
+    "never": "Never",
+    "columns": {
+      "client": "Client",
+      "document": "Document",
+      "license": "Licence",
+      "rentals": "Rentals",
+      "last": "Last rental"
+    },
+    "since": "Client since {date} · {count, plural, =0 {no rental} one {# rental} other {# rentals}}",
+    "newReservation": "New booking",
+    "details": "Details",
+    "rentals": "Rentals",
+    "noRentals": "No rental yet.",
+    "owes": "Still owes:",
+    "idExpired": "This client's ID has expired: ask for a valid one before renting.",
+    "delete": "Delete",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "This client has no rental: the card is deleted for good.",
+    "deleted": "Client deleted.",
+    "form": {
+      "identity": "Identity document",
+      "contact": "Contact",
+      "license": "Licence and notes",
+      "email": "Email (optional)",
+      "notes": "Notes (optional)",
+      "notesHint": "Only your team sees it. Stay factual.",
+      "save": "Save client",
+      "saved": "Client saved.",
+      "exists": "This ID number is already saved.",
+      "openExisting": "Open their card"
+    }
   }
 }

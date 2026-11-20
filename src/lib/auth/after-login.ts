@@ -12,7 +12,7 @@ import { safeNextPath } from "./next-path";
  * none → create one), then go to `next` or Aujourd'hui.
  */
 export async function redirectAfterLogin(supabase: ServerSupabase, userId: string, next?: string | null): Promise<never> {
-  const [{ data: profile }, { data: memberships }] = await Promise.all([
+  const [{ data: profile }, { data: memberships, error: membershipsError }] = await Promise.all([
     supabase.from("profiles").select("preferred_locale").eq("id", userId).maybeSingle(),
     supabase.from("agency_members").select("agency_id").eq("user_id", userId).eq("status", "active"),
   ]);
@@ -21,7 +21,12 @@ export async function redirectAfterLogin(supabase: ServerSupabase, userId: strin
   const ids = (memberships ?? []).map((m) => m.agency_id);
   const cookieStore = await cookies();
 
-  if (target.startsWith("/invite/")) {
+  if (membershipsError) {
+    // Could not read the agencies (database busy or restarting): never treat that as
+    // "no agency" (it would send an existing user to the agency signup). Go on;
+    // the app pages check the agency again.
+    redirect({ href: target, locale });
+  } else if (target.startsWith("/invite/")) {
     // Logging in to accept an invitation: go straight back to it.
     redirect({ href: target, locale });
   } else if (ids.length === 0) {
