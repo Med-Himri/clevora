@@ -337,6 +337,20 @@ begin
     (c_agency, v_vehicle[5], v_today - 900,  110000, 'cash',   0, null, null, null, null),
     (c_agency, v_vehicle[6], v_today - 300,  185000, 'cash',   0, null, null, null, null);
 
+  -- Inspection départ / retour of the latest returned rental: a scratch at
+  -- departure, and a new dent found at return (photos are taken in the app).
+  select rr.id into v_res from public.reservations rr
+   where rr.agency_id = c_agency and rr.status = 'returned' order by rr.actual_return_at desc limit 1;
+  if v_res is not null then
+    insert into public.inspections (id, agency_id, reservation_id, kind, completed_at, created_by)
+    values ('00000000-0000-4000-8000-0000000d1d01', c_agency, v_res, 'departure', now() - interval '3 days', c_staff),
+           ('00000000-0000-4000-8000-0000000d1d02', c_agency, v_res, 'return', now() - interval '1 day', c_staff);
+    insert into public.inspection_damages (agency_id, inspection_id, x, y, type, view, note, created_by) values
+      (c_agency, '00000000-0000-4000-8000-0000000d1d01', 0.30, 0.16, 'scratch', 'front', 'Rayure pare-chocs avant gauche', c_staff),
+      (c_agency, '00000000-0000-4000-8000-0000000d1d02', 0.30, 0.16, 'scratch', 'front', 'Rayure pare-chocs avant gauche', c_staff),
+      (c_agency, '00000000-0000-4000-8000-0000000d1d02', 0.86, 0.55, 'dent', 'right', 'Bosse portière arrière droite', c_staff);
+  end if;
+
   -- -------------------------------------------------------------------------
   -- 6 months of charges (current month + 5 previous), only dates up to today
   -- -------------------------------------------------------------------------

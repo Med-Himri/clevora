@@ -1,0 +1,244 @@
+"use client";
+
+import { CameraIcon, CheckIcon, CircleCheckBigIcon, LoaderIcon, Trash2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRef, useState, useTransition } from "react";
+import { toast } from "sonner";
+import { CarDiagram, type DiagramMark } from "@/components/app/car-diagram";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ChoiceChips } from "@/components/ui/choice-chips";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { useRouter } from "@/i18n/navigation";
+import { DAMAGE_TYPES, missingViews, REQUIRED_VIEWS, VIEWS, viewOfPoint, type Damage, type DamageType, type View } from "@/lib/inspections/model";
+import { createClient } from "@/lib/supabase/browser";
+import { cn } from "@/lib/utils";
+import { addDamageAction, completeInspectionAction, savePhotoAction, updateDamageAction } from "../actions";
+import type { InspectionData } from "../queries";
+import type { Kind } from "../schema";
+
+/** Resize a camera photo on the phone (JPEG): a full copy and a small one for the AI. */
+async function shrink(file: Blob, maxWidth: number, quality: number): Promise<Blob> {
+  const img = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const scale = Math.min(1, maxWidth / Math.max(img.width, img.height));
+  const c = document.createElement("canvas");
+  c.width = Math.round(img.width * scale);
+  c.height = Math.round(img.height * scale);
+  c.getContext("2d")!.drawImage(img, 0, 0, c.width, c.height);
+  img.close();
+  return new Promise((resolve, reject) => c.toBlob((b) => (b ? resolve(b) : reject(new Error("jpeg"))), "image/jpeg", quality));
+}
+
+export function InspectionCapture({
+  agencyId,
+  reservationId,
+  kind,
+  inspection,
+  reference,
+}: {
+  agencyId: string;
+  reservationId: string;
+  kind: Kind;
+  inspection: InspectionData;
+  /** At return: the departure damages, shown in grey for comparison. */
+  reference: Damage[];
+}) {
+  const t = useTranslations("inspection");
+  const te = useTranslations("errors");
+  const tc = useTranslations("common");
+  const router = useRouter();
+  const [uploading, setUploading] = useState<View | null>(null);
+  const [pending, start] = useTransition();
+  const [point, setPoint] = useState<{ x: number; y: number } | null>(null);
+  const [type, setType] = useState<DamageType>("scratch");
+  const [note, setNote] = useState("");
+  const [notes, setNotes] = useState(inspection.notes ?? "");
+  const input = useRef<HTMLInputElement>(null);
+  const target = useRef<View | null>(null);
+  const done = Boolean(inspection.completedAt);
+  const photos = new Map(inspection.photos.map((p) => [p.view, p]));
+  const missing = missingViews(photos.keys());
+
+  const takePhoto = (view: View) => {
+    target.current = view;
+    input.current?.click();
+  };
+  const upload = async (file: File | undefined) => {
+    const view = target.current;
+    if (!file || !view) return;
+    setUploading(view);
+    try {
+      const [full, small] = await Promise.all([shrink(file, 1600, 0.82), shrink(file, 768, 0.7)]);
+      const path = `${agencyId}/inspections/${inspection.id}/${view}.jpg`;
+      const sb = createClient();
+      const up = await Promise.all([
+        sb.storage.from("agency-docs").upload(path, full, { contentType: "image/jpeg", upsert: true }),
+        sb.storage.from("agency-docs").upload(path.replace(/\.jpg$/, "-s.jpg"), small, { contentType: "image/jpeg", upsert: true }),
+      ]);
+      if (up.some((u) => u.error)) throw new Error("upload");
+      const r = await savePhotoAction(inspection.id, view, path);
+      if (!r.ok) throw new Error(r.error);
+      toast.success(t("photoSaved", { view: t(`views.${view}`) }));
+      router.refresh();
+    } catch {
+      toast.error(t("photoFailed"));
+    } finally {
+      setUploading(null);
+      if (input.current) input.current.value = "";
+    }
+  };
+
+  const marks: DiagramMark[] = [
+    ...(kind === "return" ? reference.filter((d) => d.confirmed).map((d) => ({ id: `ref-${d.id}`, x: d.x, y: d.y, label: "•", tone: "existing" as const, title: t("atDeparture") })) : []),
+    ...inspection.damages.map((d, i) => ({ id: d.id, x: d.x, y: d.y, label: String(i + 1), tone: d.source === "ai" && !d.confirmed ? ("ai" as const) : kind === "return" ? ("new" as const) : ("plain" as const), title: t(`types.${d.type}`) })),
+  ];
+
+  const addDamage = () =>
+    point &&
+    start(async () => {
+      const r = await addDamageAction(inspection.id, { ...point, type, view: viewOfPoint(point.x, point.y), note });
+      if (!r.ok) return void toast.error(te(r.error));
+      toast.success(t("damageAdded"));
+      setPoint(null);
+      setNote("");
+      router.refresh();
+    });
+  const remove = (id: string) =>
+    start(async () => {
+      const r = await updateDamageAction(id, "remove");
+      if (!r.ok) return void toast.error(te(r.error));
+      router.refresh();
+    });
+  const finish = () =>
+    start(async () => {
+      const r = await completeInspectionAction(inspection.id, notes);
+      if (!r.ok) return void toast.error(r.error === "photosMissing" ? t("photosMissing") : te(r.error));
+      toast.success(t("completed"));
+      router.push(`/contracts/${reservationId}`);
+    });
+
+  return (
+    <div className="flex flex-col gap-4">
+      <input ref={input} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} aria-hidden data-testid="inspection-file" onChange={(e) => upload(e.target.files?.[0])} />
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex flex-wrap items-center gap-2">
+            {t("photosTitle")}
+            <span className="text-sm font-normal text-muted-foreground">{t("photosCount", { done: inspection.photos.length, total: VIEWS.length })}</span>
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">{t("photosHint")}</p>
+        </CardHeader>
+        <CardContent>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4" data-testid="inspection-photos">
+            {VIEWS.map((view) => {
+              const p = photos.get(view);
+              const required = REQUIRED_VIEWS.includes(view);
+              return (
+                <li key={view}>
+                  <button
+                    type="button"
+                    onClick={() => takePhoto(view)}
+                    disabled={uploading !== null || done}
+                    className={cn(
+                      "relative flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl border-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      p ? "border-success/60" : required ? "border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10" : "border-dashed bg-muted/40 hover:bg-muted",
+                    )}
+                    aria-label={p ? t("retake", { view: t(`views.${view}`) }) : t("take", { view: t(`views.${view}`) })}
+                    data-testid={`photo-${view}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- private 1-hour links: never through the image optimizer */}
+                    {p?.thumb ? <img src={p.thumb} alt="" className="absolute inset-0 size-full object-cover" /> : null}
+                    <span className={cn("relative z-10 flex flex-col items-center gap-1 rounded-lg px-2 py-1", p && "bg-black/55 text-white")}>
+                      {uploading === view ? <LoaderIcon className="size-5 animate-spin" aria-hidden /> : p ? <CheckIcon className="size-5" aria-hidden /> : <CameraIcon className="size-5" aria-hidden />}
+                      {t(`views.${view}`)}
+                    </span>
+                    {required && !p ? <Badge variant="info" className="absolute end-1.5 top-1.5">{t("required")}</Badge> : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("damagesTitle")}</CardTitle>
+          <p className="text-sm text-muted-foreground">{done ? t("damagesDone") : t("damagesHint")}</p>
+        </CardHeader>
+        <CardContent className="grid items-start gap-6 md:grid-cols-[240px_1fr]">
+          <div className="flex flex-col items-center gap-2">
+            <CarDiagram marks={marks} onPick={done ? undefined : (x, y) => setPoint({ x, y })} label={t("diagramLabel")} testId="inspection-diagram" />
+            {kind === "return" && reference.length ? (
+              <span className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="inline-block size-3 rounded-full bg-muted-foreground" aria-hidden />
+                {t("legendDeparture")}
+              </span>
+            ) : null}
+          </div>
+          {inspection.damages.length ? (
+            <ol className="flex flex-col divide-y rounded-xl border" data-testid="inspection-damages">
+              {inspection.damages.map((d, i) => (
+                <li key={d.id} className="flex items-center gap-3 px-3 py-2">
+                  <span className={cn("inline-flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white", kind === "return" ? "bg-destructive" : "bg-primary dark:bg-ring")}>{i + 1}</span>
+                  <span className="flex min-w-0 flex-1 flex-col">
+                    <span className="font-medium">{t(`types.${d.type}`)}</span>
+                    <span className="truncate text-xs text-muted-foreground">
+                      {d.view ? t(`views.${d.view}`) : ""}
+                      {d.note ? ` · ${d.note}` : ""}
+                    </span>
+                  </span>
+                  {!done ? (
+                    <Button type="button" variant="ghost" size="icon" onClick={() => remove(d.id)} aria-label={t("removeDamage", { n: i + 1 })} disabled={pending}>
+                      <Trash2Icon aria-hidden />
+                    </Button>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="rounded-xl border border-dashed p-4 text-sm text-muted-foreground">{t("noDamage")}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {!done ? (
+        <Card>
+          <CardContent className="flex flex-col gap-4 pt-6">
+            <Field id="insp-notes" label={t("notes")}>
+              <Input id="insp-notes" value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} />
+            </Field>
+            {missing.length ? <p className="text-sm text-muted-foreground">{t("stillMissing", { views: missing.map((v) => t(`views.${v}`)).join(", ") })}</p> : null}
+            <Button size="lg" onClick={finish} disabled={pending || missing.length > 0} data-testid="inspection-finish">
+              <CircleCheckBigIcon aria-hidden />
+              {t("finish")}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
+
+      <Dialog open={point !== null} onOpenChange={(o) => !o && setPoint(null)}>
+        <DialogContent closeLabel={tc("close")}>
+          <DialogHeader>
+            <DialogTitle>{t("addDamage")}</DialogTitle>
+            <DialogDescription>{point ? t(`views.${viewOfPoint(point.x, point.y)}`) : ""}</DialogDescription>
+          </DialogHeader>
+          <ChoiceChips name="dmg-type" label={t("damageType")} value={type} onChange={(v) => setType(v as DamageType)} className="grid-cols-2 sm:grid-cols-3" options={DAMAGE_TYPES.map((d) => ({ value: d, label: t(`types.${d}`) }))} />
+          <Field id="dmg-note" label={t("damageNote")}>
+            <Input id="dmg-note" value={note} maxLength={300} onChange={(e) => setNote(e.target.value)} placeholder={t("damageNotePlaceholder")} />
+          </Field>
+          <DialogFooter>
+            <Button size="lg" onClick={addDamage} disabled={pending} data-testid="damage-save">
+              <CheckIcon aria-hidden />
+              {t("saveDamage")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

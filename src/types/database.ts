@@ -583,6 +583,195 @@ export type Database = {
           },
         ];
       };
+      inspection_damages: {
+        Row: {
+          agency_id: string;
+          confirmed: boolean;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          inspection_id: string;
+          note: string | null;
+          source: string;
+          type: string;
+          updated_at: string;
+          view: string | null;
+          x: number;
+          y: number;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          confirmed?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          inspection_id: string;
+          note?: string | null;
+          source?: string;
+          type: string;
+          updated_at?: string;
+          view?: string | null;
+          x: number;
+          y: number;
+        };
+        Update: {
+          agency_id?: string;
+          confirmed?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          inspection_id?: string;
+          note?: string | null;
+          source?: string;
+          type?: string;
+          updated_at?: string;
+          view?: string | null;
+          x?: number;
+          y?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "inspection_damages_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "inspection_damages_agency_id_inspection_id_fkey";
+            columns: ["agency_id", "inspection_id"];
+            isOneToOne: false;
+            referencedRelation: "inspections";
+            referencedColumns: ["agency_id", "id"];
+          },
+          {
+            foreignKeyName: "inspection_damages_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      inspection_photos: {
+        Row: {
+          agency_id: string;
+          created_at: string;
+          id: string;
+          inspection_id: string;
+          storage_path: string;
+          updated_at: string;
+          view: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          created_at?: string;
+          id?: string;
+          inspection_id: string;
+          storage_path: string;
+          updated_at?: string;
+          view: string;
+        };
+        Update: {
+          agency_id?: string;
+          created_at?: string;
+          id?: string;
+          inspection_id?: string;
+          storage_path?: string;
+          updated_at?: string;
+          view?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "inspection_photos_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "inspection_photos_agency_id_inspection_id_fkey";
+            columns: ["agency_id", "inspection_id"];
+            isOneToOne: false;
+            referencedRelation: "inspections";
+            referencedColumns: ["agency_id", "id"];
+          },
+        ];
+      };
+      inspections: {
+        Row: {
+          agency_id: string;
+          ai_checked_at: string | null;
+          ai_status: string;
+          completed_at: string | null;
+          created_at: string;
+          created_by: string | null;
+          id: string;
+          kind: string;
+          notes: string | null;
+          reservation_id: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          agency_id: string;
+          ai_checked_at?: string | null;
+          ai_status?: string;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          kind: string;
+          notes?: string | null;
+          reservation_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          agency_id?: string;
+          ai_checked_at?: string | null;
+          ai_status?: string;
+          completed_at?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          id?: string;
+          kind?: string;
+          notes?: string | null;
+          reservation_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "inspections_agency_id_fkey";
+            columns: ["agency_id"];
+            isOneToOne: false;
+            referencedRelation: "agencies";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "inspections_agency_id_reservation_id_fkey";
+            columns: ["agency_id", "reservation_id"];
+            isOneToOne: false;
+            referencedRelation: "reservation_totals";
+            referencedColumns: ["agency_id", "id"];
+          },
+          {
+            foreignKeyName: "inspections_agency_id_reservation_id_fkey";
+            columns: ["agency_id", "reservation_id"];
+            isOneToOne: false;
+            referencedRelation: "reservations";
+            referencedColumns: ["agency_id", "id"];
+          },
+          {
+            foreignKeyName: "inspections_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invitations: {
         Row: {
           accepted_at: string | null;

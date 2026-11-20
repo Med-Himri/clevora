@@ -16,6 +16,7 @@ export const CLIENT_NAMESPACES = [
   "contracts",
   "errors",
   "fleet",
+  "inspection",
   "insurance",
   "nav",
   "notices",

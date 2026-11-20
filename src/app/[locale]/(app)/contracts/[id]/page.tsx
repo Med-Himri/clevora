@@ -15,6 +15,8 @@ import { formatDate, formatDateTime, formatMoney, isoToCasablanca } from "@/lib/
 import { formatPhone } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
 import { ReservationActions } from "../../reservations/components/reservation-actions";
+import { InspectionCard } from "../../inspections/components/inspection-card";
+import { getInspections } from "../../inspections/queries";
 import { ReservationStatusBadge } from "../../reservations/components/status-badge";
 import { ContractShare } from "../components/contract-share";
 import { PoweredBy } from "@/components/app/powered-by";
@@ -51,10 +53,11 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
   const tr = await getTranslations("reservations");
   const tp = await getTranslations("reservations.payment");
   const supabase = await createClient();
-  const [data, { data: payments }, { data: plannedRow }] = await Promise.all([
+  const [data, { data: payments }, { data: plannedRow }, inspections] = await Promise.all([
     getContractData(supabase, active.id, id),
     supabase.from("reservation_payments").select("id, amount, method, kind, paid_at").eq("agency_id", active.id).eq("reservation_id", id).order("paid_at"),
     supabase.from("reservation_totals").select("planned_days").eq("id", id).maybeSingle(),
+    getInspections(supabase, active.id, id),
   ]);
   if (!data) notFound();
   const { reservation: r, totals, agency } = data;
@@ -154,6 +157,8 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
           </Alert>
         ) : null
       ) : null}
+
+      {r.status !== "cancelled" ? <InspectionCard reservationId={id} status={r.status} inspections={inspections} /> : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
         {/* The paper contract */}

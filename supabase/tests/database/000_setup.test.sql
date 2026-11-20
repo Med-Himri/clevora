@@ -39,6 +39,9 @@ as $$
       when 'booking'     then '00000000010c'
       when 'oil'         then '00000000010d'
       when 'finance'     then '00000000010e'
+      when 'inspection'  then '00000000010f'
+      when 'inphoto'     then '000000000110'
+      when 'indamage'    then '000000000111'
     end
   )::uuid
 $$;
@@ -55,7 +58,8 @@ as $$
          ('reservations','agency_id'), ('reservation_payments','agency_id'), ('charges','agency_id'),
          ('ai_documents','agency_id'), ('ai_chunks','agency_id'), ('activity_log','agency_id'),
          ('subscription_payments','agency_id'), ('booking_requests','agency_id'),
-         ('oil_changes','agency_id'), ('vehicle_finance','agency_id')
+         ('oil_changes','agency_id'), ('vehicle_finance','agency_id'),
+         ('inspections','agency_id'), ('inspection_photos','agency_id'), ('inspection_damages','agency_id')
 $$;
 
 -- Act as a logged-in user (like PostgREST does with the JWT)
@@ -181,6 +185,15 @@ begin
     when 'vehicle_finance' then
       insert into public.vehicle_finance (agency_id, vehicle_id, purchase_date, purchase_price, mode)
       values (p_agency, tests.id(x || '_vehicle'), current_date, 100000, 'cash');
+    when 'inspections' then
+      insert into public.inspections (agency_id, reservation_id, kind)
+      values (p_agency, tests.id(x || '_reservation'), 'return');
+    when 'inspection_photos' then
+      insert into public.inspection_photos (agency_id, inspection_id, view, storage_path)
+      values (p_agency, tests.id(x || '_inspection'), 'back', p_agency::text || '/inspections/x/back.jpg');
+    when 'inspection_damages' then
+      insert into public.inspection_damages (agency_id, inspection_id, x, y, type)
+      values (p_agency, tests.id(x || '_inspection'), 0.5, 0.5, 'dent');
     else
       raise exception 'unknown table %', p_table;
   end case;
@@ -278,6 +291,13 @@ begin
 
     insert into public.vehicle_finance (id, agency_id, vehicle_id, purchase_date, purchase_price, mode, down_payment, monthly_payment, months, first_payment_on)
     values (tests.id(x || '_finance'), v_agency, tests.id(x || '_vehicle'), current_date - 400, 150000, 'credit', 30000, 3000, 48, current_date - 370);
+
+    insert into public.inspections (id, agency_id, reservation_id, kind, completed_at)
+    values (tests.id(x || '_inspection'), v_agency, tests.id(x || '_reservation'), 'departure', now());
+    insert into public.inspection_photos (id, agency_id, inspection_id, view, storage_path)
+    values (tests.id(x || '_inphoto'), v_agency, tests.id(x || '_inspection'), 'front', v_agency::text || '/inspections/' || tests.id(x || '_inspection') || '/front.jpg');
+    insert into public.inspection_damages (id, agency_id, inspection_id, x, y, type, view)
+    values (tests.id(x || '_indamage'), v_agency, tests.id(x || '_inspection'), 0.3, 0.2, 'scratch', 'front');
 
     insert into public.ai_chunks (id, agency_id, document_id, content, embedding)
     values (tests.id(x || '_chunk'), v_agency, tests.id(x || '_doc'), 'Caution de l''agence ' || x,
