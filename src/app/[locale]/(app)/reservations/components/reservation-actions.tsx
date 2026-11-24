@@ -38,8 +38,10 @@ type R = {
   id: string;
   status: "reserved" | "on_rental" | "returned" | "cancelled";
   signed: boolean;
-  /** false: the car is chosen later (on this contract, before signing). */
+  /** false: the car is chosen later (on this reservation, before the start). */
   hasCar: boolean;
+  /** « Dacia Logan 12345-A-6 », for the start confirmation. */
+  car: string;
   start_at: string;
   end_at: string;
   daily_price: number;
@@ -55,7 +57,7 @@ type R = {
 /** "yyyy-mm-dd" + "HH:mm" as a naive instant: only differences between two of them are used. */
 const naive = (date: string, time: string) => `${date}T${time || "00:00"}:00Z`;
 
-type Dialogs = "return" | "extend" | "cancel" | "payment" | "car" | null;
+type Dialogs = "start" | "return" | "extend" | "cancel" | "payment" | "car" | null;
 
 export function ReservationActions({ reservation: r, initialAction }: { reservation: R; initialAction: string | null }) {
   const t = useTranslations("reservations.actions");
@@ -67,7 +69,9 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
   const [open, setOpen] = useState<Dialogs>(
     initialAction === "return" && r.status === "on_rental"
       ? "return"
-      : initialAction === "car" && r.status === "reserved"
+      : initialAction === "start" && r.status === "reserved" && r.hasCar
+        ? "start"
+        : initialAction === "car" && r.status === "reserved"
         ? "car"
         : initialAction === "payment" && r.status !== "cancelled"
           ? "payment"
@@ -96,32 +100,17 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
           {t("chooseCar")}
         </Button>
       ) : null}
-      {r.status === "reserved" && !r.signed ? (
-        <Button
-          size="lg"
-          variant={r.hasCar ? "default" : "outline"}
-          disabled={!writable || pending || !r.hasCar}
-          title={r.hasCar ? undefined : t("chooseCarFirst")}
-          onClick={() => run(() => signReservationAction(r.id), t("signed"))}
-        >
-          <PenLineIcon aria-hidden />
-          {t("sign")}
-        </Button>
-      ) : null}
       {r.status === "reserved" ? (
         <Button
           size="lg"
-          variant={r.signed ? "default" : "outline"}
-          disabled={!writable || pending || !r.signed}
-          title={r.signed ? undefined : t("signFirst")}
-          onClick={() => run(() => startRentalAction(r.id), t("started"))}
+          disabled={!writable || pending || !r.hasCar}
+          title={r.hasCar ? undefined : t("chooseCarFirst")}
+          onClick={() => setOpen("start")}
+          data-testid="start-rental"
         >
           <PlayIcon aria-hidden />
           {t("start")}
         </Button>
-      ) : null}
-      {r.status === "reserved" && !r.signed && initialAction === "start" ? (
-        <Alert variant="warning" className="basis-full">{t("signFirst")}</Alert>
       ) : null}
       {r.status === "on_rental" ? (
         <Button size="lg" disabled={!writable} onClick={() => setOpen("return")}>
@@ -162,6 +151,22 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
         </Button>
       ) : null}
 
+      {open === "start" ? (
+        <StartDialog
+          r={r}
+          pending={pending}
+          onClose={close}
+          onSubmit={() =>
+            run(async () => {
+              if (!r.signed) {
+                const signed = await signReservationAction(r.id);
+                if (!signed.ok) return signed;
+              }
+              return startRentalAction(r.id);
+            }, t("started"))
+          }
+        />
+      ) : null}
       {open === "return" ? <ReturnDialog r={r} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
       {open === "extend" ? <ExtendDialog r={r} pending={pending} onClose={close} onSubmit={(d, tm) => run(() => extendReservationAction(r.id, d, tm), t("extended"))} /> : null}
       {open === "cancel" ? <CancelDialog pending={pending} onClose={close} onSubmit={(reason) => run(() => cancelReservationAction(r.id, reason), t("cancelled"))} /> : null}
@@ -173,6 +178,45 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
 
 function useDialogTexts() {
   return { t: useTranslations("reservations.actions"), tp: useTranslations("reservations.payment"), tc: useTranslations("common") };
+}
+
+/** « Démarrer » : one confirmation; an unsigned contract is signed at the same time. */
+function StartDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolean; onClose: () => void; onSubmit: () => void }) {
+  const { t, tc } = useDialogTexts();
+  const [signed, setSigned] = useState<boolean | null>(r.signed ? true : null);
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent closeLabel={tc("close")} data-testid="start-dialog">
+        <DialogHeader>
+          <DialogTitle>{t("startTitle")}</DialogTitle>
+          <DialogDescription>{r.car}</DialogDescription>
+        </DialogHeader>
+        {!r.signed ? (
+          <div className="flex flex-col gap-2">
+            <span className="font-medium">{t("signedQuestion")}</span>
+            <YesNo label={t("signedQuestion")} value={signed} onChange={setSigned} />
+            {signed === false ? (
+              <Alert variant="warning" className="flex flex-col gap-2">
+                {t("signFirst")}
+                <Button variant="outline" asChild>
+                  <Link href={`/contracts/${r.id}`}>
+                    <PenLineIcon aria-hidden />
+                    {t("openContract")}
+                  </Link>
+                </Button>
+              </Alert>
+            ) : null}
+          </div>
+        ) : null}
+        <DialogFooter>
+          <Button size="lg" onClick={onSubmit} disabled={pending || signed !== true} data-testid="start-confirm">
+            <PlayIcon aria-hidden />
+            {t("start")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 function ReturnDialog({

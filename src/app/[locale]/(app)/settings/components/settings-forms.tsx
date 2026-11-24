@@ -25,6 +25,7 @@ import {
   alertSettingsSchema,
   assistantSettingsSchema,
   contractSettingsSchema,
+  inspectionSettingsSchema,
   legalSettingsSchema,
   type SettingsInput,
   type SettingsSection,
@@ -321,6 +322,45 @@ export function AssistantForm({ values, inPlan }: { values: SettingsInput<"assis
       {!inPlan ? <p className="rounded-lg border border-dashed p-3 text-sm text-muted-foreground">{t("notInPlan")}</p> : null}
       <Controller control={form.control} name="ai_enabled" render={({ field }) => <YesNo id="s-ai" label={t("enabled")} value={field.value} onChange={field.onChange} />} />
       <p className="text-sm text-muted-foreground">{t("hint")}</p>
+    </SectionForm>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Inspection on/off + photos or video
+// ---------------------------------------------------------------------------
+export function InspectionForm({ values }: { values: SettingsInput<"inspection"> }) {
+  const t = useTranslations("settings.inspection");
+  const form = useForm<z.input<typeof inspectionSettingsSchema>, unknown, z.output<typeof inspectionSettingsSchema>>({ resolver: zodResolver(inspectionSettingsSchema), defaultValues: values });
+  const enabled = useWatch({ control: form.control, name: "inspection_enabled" });
+  return (
+    <SectionForm section="inspection" form={form}>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium">{t("enabled")}</span>
+        <Controller control={form.control} name="inspection_enabled" render={({ field }) => <YesNo id="s-inspection" label={t("enabled")} value={field.value} onChange={field.onChange} />} />
+      </div>
+      <p className="text-sm text-muted-foreground">{t("hint")}</p>
+      {enabled ? (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium">{t("mode")}</span>
+          <Controller
+            control={form.control}
+            name="inspection_mode"
+            render={({ field }) => (
+              <ChoiceChips
+                name="inspection_mode"
+                label={t("mode")}
+                value={field.value}
+                onChange={(v) => field.onChange(v)}
+                options={[
+                  { value: "photos", label: t("photos"), description: t("photosHint") },
+                  { value: "video", label: t("video"), description: t("videoHint") },
+                ]}
+              />
+            )}
+          />
+        </div>
+      ) : null}
     </SectionForm>
   );
 }

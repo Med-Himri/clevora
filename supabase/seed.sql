@@ -341,6 +341,7 @@ begin
   -- departure, and a new dent found at return (photos are taken in the app).
   select rr.id into v_res from public.reservations rr
    where rr.agency_id = c_agency and rr.status = 'returned' order by rr.actual_return_at desc limit 1;
+  update public.agencies set inspection_enabled = true where id = c_agency;
   if v_res is not null then
     insert into public.inspections (id, agency_id, reservation_id, kind, completed_at, created_by)
     values ('00000000-0000-4000-8000-0000000d1d01', c_agency, v_res, 'departure', now() - interval '3 days', c_staff),

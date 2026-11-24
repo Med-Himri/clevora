@@ -86,7 +86,7 @@ export default async function ActivityPage({ searchParams }: PageProps<"/[locale
     let href: string | null = null;
     if (r.entity === "reservation" && r.entity_id) {
       what = contract.get(r.entity_id) ?? String(get(d, "new", "contract_number") ?? get(d, "old", "contract_number") ?? "");
-      href = contract.has(r.entity_id) ? `/contracts/${r.entity_id}` : null;
+      href = contract.has(r.entity_id) ? `/reservations/${r.entity_id}` : null;
     } else if (r.entity === "vehicle" && r.entity_id) {
       what = car.get(r.entity_id) ?? String(get(d, "old", "plate") ?? get(d, "new", "plate") ?? "");
       href = car.has(r.entity_id) ? `/fleet/${r.entity_id}` : null;

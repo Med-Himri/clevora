@@ -112,7 +112,9 @@
     "aiUnavailable": "L'IA ne répond pas pour le moment. Réessayez dans quelques minutes.",
     "aiNotConfigured": "L'IA n'est pas encore branchée (clé GROQ_API_KEY). Contactez l'équipe Parcolia.",
     "aiNotInPlan": "L'IA n'est pas incluse dans votre forfait.",
-    "aiDisabled": "L'IA est désactivée pour votre agence (Paramètres)."
+    "aiDisabled": "L'IA est désactivée pour votre agence (Paramètres).",
+    "inspectionOff": "L'inspection n'est pas activée dans Paramètres.",
+    "videoMissing": "Filmez d'abord la voiture."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
@@ -530,7 +532,8 @@
     },
     "activity": "Journal d'activité",
     "balances": "Restes à payer",
-    "clients": "Clients"
+    "clients": "Clients",
+    "inspections": "Inspection"
   },
   "urgency": {
     "late": "En retard",
@@ -826,7 +829,8 @@
       "open": "Ouvrir le contrat",
       "menu": "Actions pour {name}",
       "chooseCar": "Choisir la voiture",
-      "carToChoose": "À choisir"
+      "carToChoose": "À choisir",
+      "sign": "Signer"
     },
     "status": {
       "late": "En retard",
@@ -982,7 +986,13 @@
       "franchise": "Franchise",
       "deposit": "Caution",
       "noDeposit": "Pas de caution",
-      "checklist": "Équipements, documents et notes"
+      "checklist": "Équipements, documents et notes",
+      "back": "Réservations",
+      "title": "Réservation",
+      "number": "Réservation",
+      "call": "Appeler",
+      "seeContract": "Voir le contrat",
+      "inspection": "Inspection"
     },
     "actions": {
       "signed": "Contrat marqué comme signé.",
@@ -1041,7 +1051,10 @@
       "priceChoice": "Prix par jour",
       "keepPrice": "Garder {price}",
       "carPrice": "Prix de la voiture {price}",
-      "confirmCar": "Valider la voiture"
+      "confirmCar": "Valider la voiture",
+      "startTitle": "Démarrer la location ?",
+      "signedQuestion": "Le client a-t-il signé le contrat ?",
+      "openContract": "Ouvrir le contrat (imprimer, signer)"
     },
     "bulk": {
       "select": "Sélectionner {contract} · {client}",
@@ -1147,7 +1160,8 @@
       "arabic": "PDF avec l'arabe",
       "whatsapp": "Envoyer par WhatsApp",
       "whatsappMessage": "Bonjour {name}, voici le récapitulatif de votre location chez {agency} : contrat {number}, {car}, du {start} au {end}. Reste à payer : {balance}. Merci et bonne route !"
-    }
+    },
+    "seeReservation": "Voir la réservation"
   },
   "planning": {
     "title": "Planning",
@@ -1426,7 +1440,8 @@
       "alerts": "Alertes",
       "assistant": "Assistant IA",
       "display": "Affichage",
-      "data": "Données"
+      "data": "Données",
+      "inspection": "Inspection"
     },
     "descriptions": {
       "agency": "Nom, logo, couleur et coordonnées : affichés dans l'application et sur les contrats.",
@@ -1435,7 +1450,8 @@
       "alerts": "Quand prévenir pour l'assurance, la visite technique et la vidange, et qui reçoit les e-mails.",
       "assistant": "Autoriser ou non l'assistant IA dans votre agence.",
       "display": "Langue et thème, pour vous seulement.",
-      "data": "Télécharger toutes vos données ou supprimer l'agence."
+      "data": "Télécharger toutes vos données ou supprimer l'agence.",
+      "inspection": "Photographier ou filmer les voitures au départ et au retour, pour comparer les dégâts."
     },
     "agency": {
       "name": "Nom de l'agence",
@@ -1525,6 +1541,15 @@
       "confirmOldTitle": "Anonymiser {count, plural, one {# client} other {# clients}} ?",
       "confirmOldBody": "Leurs noms, pièces d'identité et coordonnées seront effacés. Les locations et paiements restent. C'est définitif.",
       "retentionDone": "{count, plural, =0 {Aucun client anonymisé.} one {# client anonymisé.} other {# clients anonymisés.}}"
+    },
+    "inspection": {
+      "enabled": "Utiliser l'inspection des voitures ?",
+      "hint": "Oui : une section « Inspection » apparaît dans le menu pour tous les membres. Non : elle est cachée, rien d'autre ne change.",
+      "mode": "Comment travailler ?",
+      "photos": "Photos",
+      "photosHint": "8 photos (4 faces obligatoires). L'IA peut comparer le départ et le retour.",
+      "video": "Vidéo",
+      "videoHint": "Une vidéo du tour de la voiture (1 min environ). Vous comparez les 2 vidéos vous-même."
     }
   },
   "platform": {
@@ -2116,6 +2141,53 @@
       "removeN": "Retirer le repère {n}",
       "confirmed": "Dégât confirmé.",
       "removed": "Suggestion retirée."
+    },
+    "list": {
+      "off": "L'inspection n'est pas activée",
+      "offAdmin": "Activez-la dans Paramètres pour photographier ou filmer les voitures au départ et au retour.",
+      "offStaff": "Demandez à un administrateur de l'activer dans Paramètres.",
+      "turnOn": "Activer dans Paramètres",
+      "car": "Voiture",
+      "client": "Client · contrat",
+      "when": "Départ → retour",
+      "state": "Inspection",
+      "see": "Voir",
+      "doDeparture": "Inspection départ",
+      "doReturn": "Inspection retour",
+      "modePhotos": "Mode photos",
+      "modeVideo": "Mode vidéo",
+      "search": "Rechercher : client, matricule, n° de contrat",
+      "noResult": "Aucune voiture trouvée.",
+      "empty": "Rien à inspecter pour le moment",
+      "emptyBody": "Les voitures apparaîtront ici dès qu'une réservation a sa voiture.",
+      "returns": "À inspecter au retour",
+      "departures": "À inspecter au départ",
+      "finished": "Inspections terminées"
+    },
+    "done": "faite",
+    "backToInspection": "Retour à l'inspection",
+    "seeContract": "Contrat {number}",
+    "documentedVideo": "Documenté · vidéo",
+    "videosSideBySide": "Vidéos départ / retour",
+    "videoNoAi": "Regardez les deux vidéos, puis notez chaque nouveau dégât sur le dessin de l'inspection retour. (L'IA compare seulement en mode photos.)",
+    "noVideo": "Pas de vidéo",
+    "video": {
+      "title": "Vidéo du tour de la voiture",
+      "hint": "Filmez lentement tout le tour de la voiture, puis l'intérieur et le coffre.",
+      "empty": "Pas encore de vidéo.",
+      "uploading": "Envoi de la vidéo…",
+      "record": "Filmer la voiture",
+      "again": "Refilmer",
+      "pick": "Choisir une vidéo",
+      "limit": "{s} secondes maximum, pour garder un petit fichier.",
+      "howTo": "Commencez par l'avant, tournez autour de la voiture, puis filmez l'intérieur et le coffre. Touchez « Arrêter » à la fin.",
+      "start": "Commencer",
+      "stop": "Arrêter et envoyer",
+      "tooBig": "Vidéo trop lourde (10 Mo maximum). Filmez avec « Filmer la voiture » ou faites une vidéo plus courte.",
+      "saved": "Vidéo enregistrée.",
+      "failed": "La vidéo n'a pas pu être envoyée. Vérifiez la connexion et réessayez.",
+      "noCamera": "L'appareil photo n'est pas accessible. Autorisez-le dans le navigateur, ou utilisez « Choisir une vidéo ».",
+      "missing": "Filmez d'abord la voiture."
     }
   }
 }

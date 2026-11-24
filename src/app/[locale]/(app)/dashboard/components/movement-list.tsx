@@ -71,11 +71,11 @@ export async function MovementList({
                   const place = kind === "departure" ? (r.delivery ? r.delivery_place : null) : r.return_place;
                   const main =
                     kind === "return"
-                      ? { href: `/contracts/${r.id}?do=return`, label: t("return"), icon: CornerDownLeftIcon, primary: true }
+                      ? { href: `/reservations/${r.id}?do=return`, label: t("return"), icon: CornerDownLeftIcon, primary: true }
                       : !r.vehicle
-                        ? { href: `/contracts/${r.id}?do=car`, label: t("chooseCar"), icon: CarIcon, primary: true }
+                        ? { href: `/reservations/${r.id}?do=car`, label: t("chooseCar"), icon: CarIcon, primary: true }
                         : r.signed_at
-                        ? { href: `/contracts/${r.id}`, label: t("open"), icon: FolderOpenIcon, primary: false }
+                        ? { href: `/reservations/${r.id}`, label: t("open"), icon: FolderOpenIcon, primary: false }
                         : { href: `/contracts/${r.id}`, label: t("sign"), icon: FileSignatureIcon, primary: false };
                   const MainIcon = main.icon;
                   return (
@@ -84,7 +84,7 @@ export async function MovementList({
                         <Ltr className={cn("text-base font-bold tabular-nums", late && "text-destructive")}>{formatTime(when)}</Ltr>
                         <Ltr className="text-xs text-muted-foreground">{formatDate(when).slice(0, 5)}</Ltr>
                       </span>
-                      <Link href={`/contracts/${r.id}`} className="flex min-w-0 flex-1 flex-col rounded-md leading-tight hover:underline-offset-4">
+                      <Link href={`/reservations/${r.id}`} className="flex min-w-0 flex-1 flex-col rounded-md leading-tight hover:underline-offset-4">
                         <span className="truncate font-semibold">{r.client.full_name}</span>
                         <span className="truncate text-sm text-muted-foreground">
                           {r.vehicle ? (

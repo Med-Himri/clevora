@@ -112,7 +112,9 @@
     "aiUnavailable": "The AI is not answering right now. Try again in a few minutes.",
     "aiNotConfigured": "AI is not connected yet (GROQ_API_KEY). Contact the Parcolia team.",
     "aiNotInPlan": "AI is not included in your plan.",
-    "aiDisabled": "AI is turned off for your agency (Settings)."
+    "aiDisabled": "AI is turned off for your agency (Settings).",
+    "inspectionOff": "Inspection is not turned on in Settings.",
+    "videoMissing": "Film the car first."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
@@ -530,7 +532,8 @@
     },
     "activity": "Activity log",
     "balances": "Balances due",
-    "clients": "Clients"
+    "clients": "Clients",
+    "inspections": "Inspection"
   },
   "urgency": {
     "late": "Late",
@@ -826,7 +829,8 @@
       "open": "Open the contract",
       "menu": "Actions for {name}",
       "chooseCar": "Choose the car",
-      "carToChoose": "To choose"
+      "carToChoose": "To choose",
+      "sign": "Sign"
     },
     "status": {
       "late": "Late",
@@ -982,7 +986,13 @@
       "franchise": "Excess",
       "deposit": "Deposit",
       "noDeposit": "No deposit",
-      "checklist": "Equipment, documents and notes"
+      "checklist": "Equipment, documents and notes",
+      "back": "Reservations",
+      "title": "Reservation",
+      "number": "Reservation",
+      "call": "Call",
+      "seeContract": "View the contract",
+      "inspection": "Inspection"
     },
     "actions": {
       "signed": "Contract marked as signed.",
@@ -1041,7 +1051,10 @@
       "priceChoice": "Daily price",
       "keepPrice": "Keep {price}",
       "carPrice": "Car price {price}",
-      "confirmCar": "Confirm car"
+      "confirmCar": "Confirm car",
+      "startTitle": "Start the rental?",
+      "signedQuestion": "Has the client signed the contract?",
+      "openContract": "Open the contract (print, sign)"
     },
     "bulk": {
       "select": "Select {contract} · {client}",
@@ -1147,7 +1160,8 @@
       "arabic": "PDF with Arabic",
       "whatsapp": "Send by WhatsApp",
       "whatsappMessage": "Hello {name}, here is the summary of your rental with {agency}: contract {number}, {car}, from {start} to {end}. Left to pay: {balance}. Thank you and safe travels!"
-    }
+    },
+    "seeReservation": "View the reservation"
   },
   "planning": {
     "title": "Planning",
@@ -1426,7 +1440,8 @@
       "alerts": "Alerts",
       "assistant": "AI assistant",
       "display": "Display",
-      "data": "Data"
+      "data": "Data",
+      "inspection": "Inspection"
     },
     "descriptions": {
       "agency": "Name, logo, colour and contact details: shown in the app and on contracts.",
@@ -1435,7 +1450,8 @@
       "alerts": "When to warn about insurance, technical inspection and oil changes, and who gets the emails.",
       "assistant": "Allow the AI assistant in your agency or not.",
       "display": "Language and theme, for you only.",
-      "data": "Download all your data or delete the agency."
+      "data": "Download all your data or delete the agency.",
+      "inspection": "Photograph or film the cars at departure and return, to compare damages."
     },
     "agency": {
       "name": "Agency name",
@@ -1525,6 +1541,15 @@
       "confirmOldTitle": "Anonymize {count, plural, one {# client} other {# clients}}?",
       "confirmOldBody": "Their names, IDs and contact details will be erased. Rentals and payments stay. This cannot be undone.",
       "retentionDone": "{count, plural, =0 {No client anonymized.} one {# client anonymized.} other {# clients anonymized.}}"
+    },
+    "inspection": {
+      "enabled": "Use car inspection?",
+      "hint": "Yes: an \"Inspection\" section appears in the menu for every member. No: it is hidden, nothing else changes.",
+      "mode": "How do you want to work?",
+      "photos": "Photos",
+      "photosHint": "8 photos (4 sides required). The AI can compare departure and return.",
+      "video": "Video",
+      "videoHint": "One video around the car (about 1 min). You compare the 2 videos yourself."
     }
   },
   "platform": {
@@ -2116,6 +2141,53 @@
       "removeN": "Remove mark {n}",
       "confirmed": "Damage confirmed.",
       "removed": "Suggestion removed."
+    },
+    "list": {
+      "off": "Inspection is not turned on",
+      "offAdmin": "Turn it on in Settings to photograph or film the cars at departure and return.",
+      "offStaff": "Ask an admin to turn it on in Settings.",
+      "turnOn": "Turn on in Settings",
+      "car": "Car",
+      "client": "Client · contract",
+      "when": "Departure → return",
+      "state": "Inspection",
+      "see": "View",
+      "doDeparture": "Departure inspection",
+      "doReturn": "Return inspection",
+      "modePhotos": "Photo mode",
+      "modeVideo": "Video mode",
+      "search": "Search: client, plate, contract no.",
+      "noResult": "No car found.",
+      "empty": "Nothing to inspect right now",
+      "emptyBody": "Cars show up here as soon as a reservation has its car.",
+      "returns": "To inspect at return",
+      "departures": "To inspect at departure",
+      "finished": "Finished inspections"
+    },
+    "done": "done",
+    "backToInspection": "Back to the inspection",
+    "seeContract": "Contract {number}",
+    "documentedVideo": "Documented · video",
+    "videosSideBySide": "Departure / return videos",
+    "videoNoAi": "Watch both videos, then mark each new damage on the drawing of the return inspection. (The AI compares in photo mode only.)",
+    "noVideo": "No video",
+    "video": {
+      "title": "Video around the car",
+      "hint": "Slowly film all around the car, then the inside and the trunk.",
+      "empty": "No video yet.",
+      "uploading": "Sending the video…",
+      "record": "Film the car",
+      "again": "Film again",
+      "pick": "Choose a video",
+      "limit": "{s} seconds max, to keep the file small.",
+      "howTo": "Start at the front, walk around the car, then film the inside and the trunk. Tap \"Stop\" at the end.",
+      "start": "Start",
+      "stop": "Stop and send",
+      "tooBig": "Video too large (10 MB max). Use \"Film the car\" or make a shorter video.",
+      "saved": "Video saved.",
+      "failed": "The video could not be sent. Check the connection and try again.",
+      "noCamera": "The camera cannot be used. Allow it in the browser, or use \"Choose a video\".",
+      "missing": "Film the car first."
     }
   }
 }

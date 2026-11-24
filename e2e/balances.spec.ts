@@ -54,7 +54,7 @@ test("Restes à payer: who owes what, returned rentals first, collect in one tap
   await expectNoHorizontalScroll(page);
 
   await rows.nth(0).getByRole("link", { name: "Encaisser" }).click();
-  await page.waitForURL(new RegExp(`/contracts/${s.returned}\\?do=payment`));
+  await page.waitForURL(new RegExp(`/reservations/${s.returned}\\?do=payment`));
   await expect(page.getByRole("dialog")).toBeVisible();
 
   // Admin: the same total on Statistiques, linking back here

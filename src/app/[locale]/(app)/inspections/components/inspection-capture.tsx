@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { addDamageAction, completeInspectionAction, savePhotoAction, updateDamageAction } from "../actions";
 import type { InspectionData } from "../queries";
 import type { Kind } from "../schema";
+import { VideoCapture } from "./video-capture";
 
 /** Resize a camera photo on the phone (JPEG): a full copy and a small one for the AI. */
 async function shrink(file: Blob, maxWidth: number, quality: number): Promise<Blob> {
@@ -60,7 +61,9 @@ export function InspectionCapture({
   const target = useRef<View | null>(null);
   const done = Boolean(inspection.completedAt);
   const photos = new Map(inspection.photos.map((p) => [p.view, p]));
-  const missing = missingViews(photos.keys());
+  const video = inspection.mode === "video";
+  const missing = video ? [] : missingViews(photos.keys());
+  const blocked = video ? !inspection.videoUrl : missing.length > 0;
 
   const takePhoto = (view: View) => {
     target.current = view;
@@ -117,11 +120,15 @@ export function InspectionCapture({
       const r = await completeInspectionAction(inspection.id, notes);
       if (!r.ok) return void toast.error(r.error === "photosMissing" ? t("photosMissing") : te(r.error));
       toast.success(t("completed"));
-      router.push(`/contracts/${reservationId}`);
+      router.push(`/inspections/${reservationId}`);
     });
 
   return (
     <div className="flex flex-col gap-4">
+      {video ? (
+        <VideoCapture agencyId={agencyId} inspectionId={inspection.id} videoUrl={inspection.videoUrl} done={done} />
+      ) : (
+      <>
       <input ref={input} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} aria-hidden data-testid="inspection-file" onChange={(e) => upload(e.target.files?.[0])} />
 
       <Card>
@@ -164,6 +171,8 @@ export function InspectionCapture({
           </ul>
         </CardContent>
       </Card>
+      </>
+      )}
 
       <Card>
         <CardHeader>
@@ -213,7 +222,8 @@ export function InspectionCapture({
               <Input id="insp-notes" value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} />
             </Field>
             {missing.length ? <p className="text-sm text-muted-foreground">{t("stillMissing", { views: missing.map((v) => t(`views.${v}`)).join(", ") })}</p> : null}
-            <Button size="lg" onClick={finish} disabled={pending || missing.length > 0} data-testid="inspection-finish">
+            {video && blocked ? <p className="text-sm text-muted-foreground">{t("video.missing")}</p> : null}
+            <Button size="lg" onClick={finish} disabled={pending || blocked} data-testid="inspection-finish">
               <CircleCheckBigIcon aria-hidden />
               {t("finish")}
             </Button>

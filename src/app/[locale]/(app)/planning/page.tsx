@@ -140,7 +140,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           <ul className="flex flex-wrap gap-2">
             {carless.map((b) => (
               <li key={b.id}>
-                <Link href={`/contracts/${b.id}?do=car`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border bg-card px-3 text-sm hover:bg-accent">
+                <Link href={`/reservations/${b.id}?do=car`} className="inline-flex min-h-11 items-center gap-2 rounded-lg border bg-card px-3 text-sm hover:bg-accent">
                   <Ltr className="font-semibold">{formatDate(b.start_at).slice(0, 5)}</Ltr>
                   {b.client?.full_name}
                   <span className="font-semibold text-primary">{t("chooseCar")}</span>
@@ -173,7 +173,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           <DayList title={t("leaving", { count: leaving.length })} icon={<LogOutIcon className="size-5" aria-hidden />}>
             {leaving.map((b) => (
               <li key={b.id}>
-                <Link href={`/contracts/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
+                <Link href={`/reservations/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
                   <span className="font-semibold"><Ltr>{formatTime(b.start_at)}</Ltr> · {b.client?.full_name}</span>
                   <span className="text-sm text-muted-foreground">{carName(b.vehicle_id)}{b.delivery ? ` · ${t("delivery")}` : ""}</span>
                 </Link>
@@ -183,7 +183,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           <DayList title={t("returning", { count: returning.length })} icon={<CornerDownLeftIcon className="size-5" aria-hidden />}>
             {returning.map((b) => (
               <li key={b.id}>
-                <Link href={`/contracts/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
+                <Link href={`/reservations/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
                   <span className="font-semibold"><Ltr>{formatTime(b.end_at)}</Ltr> · {b.client?.full_name}</span>
                   <span className="text-sm text-muted-foreground">{carName(b.vehicle_id)}</span>
                 </Link>
@@ -193,7 +193,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           <DayList title={t("outAllDay", { count: outOn(selectedDay).length })}>
             {outOn(selectedDay).map((b) => (
               <li key={b.id}>
-                <Link href={`/contracts/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
+                <Link href={`/reservations/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
                   <span className="font-semibold">{carName(b.vehicle_id)}</span>
                   <span className="text-sm text-muted-foreground">{b.client?.full_name}</span>
                 </Link>
@@ -268,7 +268,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
                     return (
                       <Link
                         key={b.id}
-                        href={`/contracts/${b.id}`}
+                        href={`/reservations/${b.id}`}
                         style={{ gridColumn: `${sp2.start} / ${sp2.end}`, gridRow: 1 }}
                         className={cn("z-10 m-1 flex min-w-0 items-center gap-1 rounded-md border px-2 text-xs font-semibold shadow-xs", STATUS_STYLE[b.status])}
                         data-testid="planning-booking"

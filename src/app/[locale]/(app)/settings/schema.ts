@@ -54,12 +54,18 @@ export const alertSettingsSchema = z.object({
 
 export const assistantSettingsSchema = z.object({ ai_enabled: z.boolean() });
 
+export const inspectionSettingsSchema = z.object({
+  inspection_enabled: z.boolean(),
+  inspection_mode: z.enum(["photos", "video"]),
+});
+
 export const SETTINGS_SCHEMAS = {
   agency: agencySettingsSchema,
   legal: legalSettingsSchema,
   contract: contractSettingsSchema,
   alerts: alertSettingsSchema,
   assistant: assistantSettingsSchema,
+  inspection: inspectionSettingsSchema,
 } as const;
 
 export type SettingsSection = keyof typeof SETTINGS_SCHEMAS;

@@ -49,6 +49,8 @@ export type ActiveAgency = {
   brandForeground: string;
   role: Role;
   subscription: SubscriptionState;
+  /** Inspection section turned on in Paramètres, and how it works. */
+  inspection: { enabled: boolean; mode: "photos" | "video" };
 };
 
 /** The logged-in user, verified with the auth server (cached per request). */
@@ -122,7 +124,7 @@ export const getActiveAgency = cache(async (): Promise<ActiveAgency | null> => {
   const supabase = await createClient();
   const { data: agency } = await supabase
     .from("agencies")
-    .select("id, name, slug, logo_path, brand_color, subscription_status, trial_ends_at, current_period_end")
+    .select("id, name, slug, logo_path, brand_color, subscription_status, trial_ends_at, current_period_end, inspection_enabled, inspection_mode")
     .eq("id", agencyId)
     .maybeSingle();
   if (!agency) return null;
@@ -142,6 +144,7 @@ export const getActiveAgency = cache(async (): Promise<ActiveAgency | null> => {
       trialEndsAt: agency.trial_ends_at,
       currentPeriodEnd: agency.current_period_end,
     }),
+    inspection: { enabled: agency.inspection_enabled, mode: agency.inspection_mode === "video" ? "video" : "photos" },
   };
 });
 

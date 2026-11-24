@@ -79,6 +79,8 @@ export type Database = {
           ice: string | null;
           id: string;
           if_number: string | null;
+          inspection_enabled: boolean;
+          inspection_mode: string;
           logo_path: string | null;
           min_driver_age: number;
           min_license_years: number;
@@ -119,6 +121,8 @@ export type Database = {
           ice?: string | null;
           id?: string;
           if_number?: string | null;
+          inspection_enabled?: boolean;
+          inspection_mode?: string;
           logo_path?: string | null;
           min_driver_age?: number;
           min_license_years?: number;
@@ -158,6 +162,8 @@ export type Database = {
           ice?: string | null;
           id?: string;
           if_number?: string | null;
+          inspection_enabled?: boolean;
+          inspection_mode?: string;
           logo_path?: string | null;
           min_driver_age?: number;
           min_license_years?: number;
@@ -710,9 +716,11 @@ export type Database = {
           created_by: string | null;
           id: string;
           kind: string;
+          mode: string;
           notes: string | null;
           reservation_id: string;
           updated_at: string;
+          video_path: string | null;
         };
         ComputedFields: never;
         Insert: {
@@ -724,9 +732,11 @@ export type Database = {
           created_by?: string | null;
           id?: string;
           kind: string;
+          mode?: string;
           notes?: string | null;
           reservation_id: string;
           updated_at?: string;
+          video_path?: string | null;
         };
         Update: {
           agency_id?: string;
@@ -737,9 +747,11 @@ export type Database = {
           created_by?: string | null;
           id?: string;
           kind?: string;
+          mode?: string;
           notes?: string | null;
           reservation_id?: string;
           updated_at?: string;
+          video_path?: string | null;
         };
         Relationships: [
           {

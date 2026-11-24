@@ -82,7 +82,7 @@ export default async function ContractsPage({ searchParams }: PageProps<"/[local
         </div>
       </div>
       {rows.length ? (
-        <ReservationTable testId="contract-list" rows={rows.map((r) => ({ ...r, balance: balance.get(r.id) ?? 0 }))} now={now} />
+        <ReservationTable testId="contract-list" kind="contract" rows={rows.map((r) => ({ ...r, balance: balance.get(r.id) ?? 0 }))} now={now} />
       ) : q ? (
         <EmptyState icon={SearchXIcon} title={t("noResult")} />
       ) : (

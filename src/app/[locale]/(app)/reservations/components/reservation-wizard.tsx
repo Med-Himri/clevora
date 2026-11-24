@@ -185,7 +185,7 @@ export function ReservationWizard({
       }
       if (!reservationId) clearDraft();
       toast.success(reservationId ? t("updated") : t("created"));
-      router.push(`/contracts/${result.data.id}`);
+      router.push(`/reservations/${result.data.id}`);
     });
   };
 

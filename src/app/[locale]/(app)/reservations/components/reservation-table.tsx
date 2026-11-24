@@ -21,6 +21,7 @@ export async function ReservationTable({
   groupBy,
   testId,
   selectable = false,
+  kind = "reservation",
 }: {
   rows: Row[];
   now: Date;
@@ -29,6 +30,8 @@ export async function ReservationTable({
   testId?: string;
   /** Tick boxes for bulk actions (needs a SelectionProvider around the page). */
   selectable?: boolean;
+  /** Réservations: rows open the reservation (the work). Contrats: the document. */
+  kind?: "reservation" | "contract";
 }) {
   const t = await getTranslations("reservations");
   const tu = await getTranslations("urgency");
@@ -110,7 +113,7 @@ export async function ReservationTable({
   const common = {
     columns,
     rowKey: (r: Row) => r.id,
-    rowHref: (r: Row) => `/contracts/${r.id}`,
+    rowHref: (r: Row) => (kind === "contract" ? `/contracts/${r.id}` : `/reservations/${r.id}`),
     rowTestId: "reservation-row",
     select: selectable
       ? {
@@ -121,7 +124,7 @@ export async function ReservationTable({
     testId,
     caption: t("title"),
     actions: (r: Row, mode: "table" | "card") => (
-      <ReservationRowActions id={r.id} status={r.status} hasCar={Boolean(r.vehicle)} clientName={r.client.full_name} phone={r.client.phone} compact={mode === "table"} />
+      <ReservationRowActions id={r.id} status={r.status} hasCar={Boolean(r.vehicle)} signed={Boolean(r.signed_at)} clientName={r.client.full_name} phone={r.client.phone} compact={mode === "table"} kind={kind} />
     ),
   };
 

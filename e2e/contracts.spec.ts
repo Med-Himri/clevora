@@ -47,6 +47,10 @@ test("contract page: missing information blocks nothing but is listed with links
   await login(page, c.staff.email, c.staff.password);
   await page.goto("/contracts");
   await expect(page.getByRole("link", { name: /^À signer/ })).toContainText("1");
+  // Contrats = the document: rows offer Signer / PDF, never Démarrer or Retour (those are in Réservations)
+  const list = page.getByTestId("contract-list");
+  await expect(list.getByRole("link", { name: "Signer" }).first()).toBeVisible();
+  await expect(list.getByRole("link", { name: /^(Démarrer|Retour)$/ })).toHaveCount(0);
   await page.getByTestId("contract-list").getByRole("link", { name: new RegExp(c.contractNumber) }).click();
   await page.waitForURL(/\/contracts\/[0-9a-f-]{36}/);
 

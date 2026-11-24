@@ -8,11 +8,11 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import { NavBadge } from "./nav-badge";
-import { BOTTOM_KEYS, isActive, NEW_RESERVATION_HREF, navItemsFor, type NavBadges } from "./nav-config";
+import { BOTTOM_KEYS, isActive, NEW_RESERVATION_HREF, navItemsFor, type NavBadges, type NavKey } from "./nav-config";
 import { PoweredBy } from "@/components/app/powered-by";
 
 /** Phones (< 768 px): Aujourd'hui, Réservations, big +, Parc auto, Plus. */
-export function BottomNav({ role, badges }: { role: Role; badges: NavBadges }) {
+export function BottomNav({ role, hidden = [], badges }: { role: Role; hidden?: NavKey[]; badges: NavBadges }) {
   const t = useTranslations("nav");
   const tc = useTranslations("common");
   const pathname = usePathname();
@@ -20,7 +20,7 @@ export function BottomNav({ role, badges }: { role: Role; badges: NavBadges }) {
   const [moreOpenOn, setMoreOpenOn] = useState<string | null>(null);
   const moreOpen = moreOpenOn === pathname;
   const setMoreOpen = (value: boolean) => setMoreOpenOn(value ? pathname : null);
-  const items = navItemsFor(role);
+  const items = navItemsFor(role, hidden);
   const main = BOTTOM_KEYS.map((k) => items.find((i) => i.key === k)!).filter(Boolean);
   const more = items.filter((i) => !BOTTOM_KEYS.includes(i.key));
   const moreBadge = more.reduce((n, i) => n + (badges[i.key]?.count ?? 0), 0);

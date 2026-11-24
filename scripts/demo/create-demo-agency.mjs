@@ -73,6 +73,7 @@ async function main() {
         plan_id: plan?.id ?? null,
         subscription_status: "active",
         current_period_end: iso(now + 3650 * DAY),
+        inspection_enabled: true,
       })
       .eq("id", agencyId),
     "agency details",

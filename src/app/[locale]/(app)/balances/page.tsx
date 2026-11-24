@@ -143,7 +143,7 @@ export default async function BalancesPage({ searchParams }: PageProps<"/[locale
               caption={t("title")}
               columns={columns}
               rowKey={(r) => r.id}
-              rowHref={(r) => `/contracts/${r.id}`}
+              rowHref={(r) => `/reservations/${r.id}`}
               groups={groups.filter((g) => g.rows.length)}
               actions={(r, mode) => (
                 <span className={cn("flex items-center gap-1.5", mode === "card" && "w-full flex-wrap")}>
@@ -162,7 +162,7 @@ export default async function BalancesPage({ searchParams }: PageProps<"/[locale
                     </>
                   ) : null}
                   <Button size="sm" asChild className={cn(mode === "card" && "flex-1")}>
-                    <Link href={`/contracts/${r.id}?do=payment`}>
+                    <Link href={`/reservations/${r.id}?do=payment`}>
                       <CoinsIcon aria-hidden />
                       {t("collect")}
                     </Link>

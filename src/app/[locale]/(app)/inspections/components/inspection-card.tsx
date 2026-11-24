@@ -12,14 +12,15 @@ import type { InspectionData } from "../queries";
 import type { Kind } from "../schema";
 import { AiCompareButton, ReviewSuggestion } from "./ai-compare";
 
-/** « Inspection départ et retour » on the contract page. */
+/** « Inspection départ et retour » of one rental (Inspection section). */
 export async function InspectionCard({ reservationId, status, inspections }: { reservationId: string; status: string; inspections: Record<Kind, InspectionData | null> }) {
   const t = await getTranslations("inspection");
   const dep = inspections.departure;
   const ret = inspections.return;
   const fresh = dep && ret ? newDamages(dep.damages, ret.damages) : [];
   const suggestions = ret?.damages.filter((d) => d.source === "ai" && !d.confirmed) ?? [];
-  const canCompare = Boolean(dep?.completedAt && ret?.photos.length && visionConfigured());
+  const video = dep?.mode === "video" || ret?.mode === "video";
+  const canCompare = Boolean(!video && dep?.completedAt && ret?.photos.length && visionConfigured());
   const numbering = new Map((ret?.damages ?? []).map((d, i) => [d.id, i + 1]));
 
   const side = (kind: Kind, data: InspectionData | null) => {
@@ -39,14 +40,14 @@ export async function InspectionCard({ reservationId, status, inspections }: { r
         {data?.completedAt ? (
           <Badge variant="success" className="max-w-full whitespace-normal text-center">
             <CircleCheckBigIcon aria-hidden />
-            {t("documented", { count: data.photos.length })}
+            {data.mode === "video" ? t("documentedVideo") : t("documented", { count: data.photos.length })}
           </Badge>
         ) : (
           <Badge variant="neutral">{data ? t("inProgress") : t("toDo")}</Badge>
         )}
         {allowed ? (
           <Button size="sm" variant={data?.completedAt ? "outline" : "default"} asChild className="h-auto min-h-11 w-full whitespace-normal py-2 text-center">
-            <Link href={`/contracts/${reservationId}/inspection/${kind}`}>
+            <Link href={`/inspections/${reservationId}/${kind}`}>
               <CameraIcon aria-hidden />
               {data?.completedAt ? t("open") : kind === "departure" ? t("startDeparture") : t("startReturn")}
             </Link>
@@ -59,7 +60,7 @@ export async function InspectionCard({ reservationId, status, inspections }: { r
   };
 
   return (
-    <Card className="mb-4" data-testid="inspection-card">
+    <Card data-testid="inspection-card">
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
         <CardTitle className="flex items-center gap-2">
           <CarFrontIcon className="size-5 text-muted-foreground" aria-hidden />
@@ -126,7 +127,28 @@ export async function InspectionCard({ reservationId, status, inspections }: { r
           </div>
         ) : null}
 
-        {dep && ret ? (
+        {video && (dep?.videoUrl || ret?.videoUrl) ? (
+          <section aria-labelledby="ins-videos" className="flex flex-col gap-2" data-testid="inspection-videos">
+            <h3 id="ins-videos" className="font-semibold">{t("videosSideBySide")}</h3>
+            <p className="text-sm text-muted-foreground">{t("videoNoAi")}</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              {[dep, ret].map((d, i) => (
+                <figure key={i} className="flex min-w-0 flex-col gap-1">
+                  <figcaption className="text-sm font-medium">{i === 0 ? t("departure") : t("return")}</figcaption>
+                  {d?.videoUrl ? (
+                    <video src={d.videoUrl} controls playsInline preload="metadata" className="aspect-video w-full rounded-lg border bg-black">
+                      <track kind="captions" />
+                    </video>
+                  ) : (
+                    <span className="flex aspect-video items-center justify-center rounded-lg border border-dashed text-xs text-muted-foreground">{t("noVideo")}</span>
+                  )}
+                </figure>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {!video && dep && ret ? (
           <details className="rounded-xl border p-3">
             <summary className="min-h-11 cursor-pointer content-center font-medium">{t("photosSideBySide")}</summary>
             <ul className="mt-2 flex flex-col gap-3">

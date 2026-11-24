@@ -5,6 +5,7 @@ import { AppHeader } from "@/components/app/app-header";
 import { BrandStyle } from "@/components/app/brand-style";
 import { NoticeToast } from "@/components/app/notice-toast";
 import { BottomNav } from "@/components/app/shell/bottom-nav";
+import type { NavKey } from "@/components/app/shell/nav-config";
 import { Sidebar } from "@/components/app/shell/sidebar";
 import { SubscriptionBanner } from "@/components/app/subscription-banner";
 import { ThemeSync } from "@/components/app/theme-sync";
@@ -28,6 +29,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     getNavBadges(supabase, agency.id),
     getTranslations("roles"),
   ]);
+  const hidden: NavKey[] = agency.inspection.enabled ? [] : ["inspections"];
   const activeAgencies = memberships.filter((m) => m.status === "active").length;
 
   return (
@@ -36,7 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     >
       <BrandStyle brand={agency.brandColor} foreground={agency.brandForeground} />
       <ThemeSync theme={profile?.preferredTheme ?? "system"} />
-      <Sidebar role={agency.role} badges={badges} agencyName={agency.name} agencyLogoUrl={agency.logoUrl} />
+      <Sidebar role={agency.role} hidden={hidden} badges={badges} agencyName={agency.name} agencyLogoUrl={agency.logoUrl} />
       <div className="flex min-h-dvh flex-col md:ps-16 xl:ps-64">
         <AppHeader
           agencyName={agency.name}
@@ -50,7 +52,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <SubscriptionBanner subscription={agency.subscription} role={agency.role} />
         <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pb-28 pt-4 sm:pt-6 md:pb-8">{children}</main>
       </div>
-      <BottomNav role={agency.role} badges={badges} />
+      <BottomNav role={agency.role} hidden={hidden} badges={badges} />
       <Suspense>
         <NoticeToast />
       </Suspense>

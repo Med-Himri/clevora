@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /** Page title + subtitle + primary action (button with an icon and a short label). */
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: ReactNode; action?: ReactNode }) {
+export function PageHeader({ title, subtitle, action }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode }) {
   return (
     <div className="mb-4 flex flex-wrap items-end justify-between gap-3 sm:mb-6">
       <div className="min-w-0">

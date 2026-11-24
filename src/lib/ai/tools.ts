@@ -54,7 +54,7 @@ type ResRow = {
 };
 
 function resSource(r: { id: string; contract_number: string | null; client?: { full_name: string } | null }): Source {
-  return { label: `${r.contract_number ?? "Réservation"}${r.client ? ` · ${r.client.full_name}` : ""}`, href: `/contracts/${r.id}` };
+  return { label: `${r.contract_number ?? "Réservation"}${r.client ? ` · ${r.client.full_name}` : ""}`, href: `/reservations/${r.id}` };
 }
 
 export const TOOLS: AssistantTool[] = [

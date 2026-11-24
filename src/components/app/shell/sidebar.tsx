@@ -8,7 +8,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import type { Role } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 import { NavBadge } from "./nav-badge";
-import { isActive, NAV_SECTIONS, navItemsFor, type NavBadges, type NavItem } from "./nav-config";
+import { isActive, NAV_SECTIONS, navItemsFor, type NavBadges, type NavItem, type NavKey } from "./nav-config";
 import { PoweredBy } from "@/components/app/powered-by";
 
 /**
@@ -18,11 +18,13 @@ import { PoweredBy } from "@/components/app/powered-by";
  */
 export function Sidebar({
   role,
+  hidden = [],
   badges,
   agencyName,
   agencyLogoUrl,
 }: {
   role: Role;
+  hidden?: NavKey[];
   badges: NavBadges;
   agencyName: string;
   agencyLogoUrl: string | null;
@@ -34,7 +36,7 @@ export function Sidebar({
   const open = openOn === pathname;
   const setOpen = (value: boolean | ((v: boolean) => boolean)) =>
     setOpenOn((typeof value === "function" ? value(open) : value) ? pathname : null);
-  const items = navItemsFor(role);
+  const items = navItemsFor(role, hidden);
 
   // Escape closes the expanded rail
   useEffect(() => {

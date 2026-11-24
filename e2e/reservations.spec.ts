@@ -59,6 +59,11 @@ test("new reservation: an existing CIN fills the client, the car list only shows
   // Step 4 — check-out, then save
   await expect(page.getByText("Étape 4 sur 4")).toBeVisible();
   await page.getByRole("button", { name: "Enregistrer la réservation" }).click();
+  // The new reservation opens on its own page (the work), with a link to the contract
+  await page.waitForURL(/\/reservations\/[0-9a-f-]{36}$/);
+  await expect(page.getByTestId("reservation-title")).toHaveText("Karim Connu");
+  await expect(page.getByTestId("reservation-balance")).toContainText("200 MAD");
+  await page.getByTestId("open-contract").click();
   await page.waitForURL(/\/contracts\/[0-9a-f-]{36}$/);
   await expect(page.getByTestId("contract-title")).toHaveText(/^Contrat C-\d+$/);
   await expect(page.getByTestId("contract-balance")).toContainText("200 MAD");
@@ -115,12 +120,25 @@ test("sign, start, return: the car km is updated and the infraction finder knows
     .single();
 
   await login(page, s.staff.email, s.staff.password);
+  // The contract is the document only: sign, PDF, WhatsApp — never Démarrer / Retour
+  await page.goto(`/contracts/${r!.id}`);
+  await expect(page.getByTestId("sign-contract")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Démarrer la location" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Retour" })).toHaveCount(0);
+
+  // The reservation does the work: Démarrer asks if the contract is signed
   await page.goto(`/reservations/${r!.id}`);
-  await expect(page.getByRole("button", { name: "Démarrer la location" })).toBeDisabled();
-  await page.getByRole("button", { name: "Marquer comme signé" }).click();
-  await expect(page.getByText("Contrat marqué comme signé.")).toBeVisible();
-  await page.getByRole("button", { name: "Démarrer la location" }).click();
+  await page.getByTestId("start-rental").click();
+  const startDialog = page.getByTestId("start-dialog");
+  await expect(startDialog.getByTestId("start-confirm")).toBeDisabled();
+  await startDialog.getByRole("radio", { name: "Non" }).click();
+  await expect(startDialog.getByRole("link", { name: /Ouvrir le contrat/ })).toBeVisible();
+  await startDialog.getByRole("radio", { name: "Oui" }).click();
+  await startDialog.getByTestId("start-confirm").click();
   await expect(page.getByText("Location démarrée.")).toBeVisible();
+  const { data: started } = await admin().from("reservations").select("status, signed_at").eq("id", r!.id).single();
+  expect(started!.status).toBe("on_rental");
+  expect(started!.signed_at).not.toBeNull();
 
   // From the list, "Retour" opens the return dialog directly
   await page.goto("/reservations");
@@ -152,7 +170,7 @@ test("search finds a reservation by phone, CIN or plate", async ({ page }) => {
   }
 });
 
-test("car later: book without a car, choose it on the contract, then sign", async ({ page }) => {
+test("car later: book without a car, choose it on the reservation, then start", async ({ page }) => {
   const s = await setupAgency();
   await login(page, s.staff.email, s.staff.password);
   await page.goto("/reservations/new");
@@ -172,11 +190,11 @@ test("car later: book without a car, choose it on the contract, then sign", asyn
   await goNext(page);
   await expect(page.getByText("Le kilométrage et le carburant seront notés")).toBeVisible();
   await page.getByRole("button", { name: "Enregistrer la réservation" }).click();
-  await page.waitForURL(/\/contracts\/[0-9a-f-]{36}$/);
+  await page.waitForURL(/\/reservations\/[0-9a-f-]{36}$/);
 
-  // The contract asks for the car; signing waits for it
+  // The reservation asks for the car; the start waits for it
   const actions = page.getByTestId("reservation-actions");
-  await expect(actions.getByRole("button", { name: "Marquer comme signé" })).toBeDisabled();
+  await expect(actions.getByRole("button", { name: "Démarrer la location" })).toBeDisabled();
   await actions.getByRole("button", { name: "Choisir la voiture" }).click();
   const dialog = page.getByTestId("assign-car-dialog");
   await dialog.getByRole("radio", { name: /Dacia Sandero/ }).click();
@@ -184,7 +202,7 @@ test("car later: book without a car, choose it on the contract, then sign", asyn
   await dialog.getByRole("radio", { name: /Garder/ }).click();
   await dialog.getByRole("button", { name: "Valider la voiture" }).click();
   await expect(page.getByText("Voiture enregistrée")).toBeVisible();
-  await expect(actions.getByRole("button", { name: "Marquer comme signé" })).toBeEnabled();
+  await expect(actions.getByRole("button", { name: "Démarrer la location" })).toBeEnabled();
   await expect(actions.getByRole("button", { name: "Changer de voiture" })).toBeVisible();
 
   const id = page.url().split("/").pop()!;

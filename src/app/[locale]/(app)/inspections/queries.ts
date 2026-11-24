@@ -3,9 +3,13 @@ import type { ServerSupabase } from "@/lib/supabase/server";
 import type { Kind } from "./schema";
 
 export type InspectionPhoto = { view: View; url: string | null; thumb: string | null };
+export type InspectionMode = "photos" | "video";
 export type InspectionData = {
   id: string;
   kind: Kind;
+  mode: InspectionMode;
+  /** Walk-around video (video mode), private 1-hour link. */
+  videoUrl: string | null;
   completedAt: string | null;
   notes: string | null;
   aiStatus: "none" | "running" | "done" | "failed";
@@ -18,11 +22,11 @@ export type InspectionData = {
 export async function getInspections(supabase: ServerSupabase, agencyId: string, reservationId: string): Promise<Record<Kind, InspectionData | null>> {
   const { data } = await supabase
     .from("inspections")
-    .select("id, kind, completed_at, notes, ai_status, ai_checked_at, photos:inspection_photos(view, storage_path), damages:inspection_damages(id, x, y, type, view, note, source, confirmed, created_at)")
+    .select("id, kind, mode, video_path, completed_at, notes, ai_status, ai_checked_at, photos:inspection_photos(view, storage_path), damages:inspection_damages(id, x, y, type, view, note, source, confirmed, created_at)")
     .eq("agency_id", agencyId)
     .eq("reservation_id", reservationId);
   const rows = data ?? [];
-  const paths = rows.flatMap((r) => (r.photos ?? []).flatMap((p) => [p.storage_path, p.storage_path.replace(/\.jpg$/, "-s.jpg")]));
+  const paths = rows.flatMap((r) => [...(r.photos ?? []).flatMap((p) => [p.storage_path, p.storage_path.replace(/\.jpg$/, "-s.jpg")]), ...(r.video_path ? [r.video_path] : [])]);
   const signed = new Map<string, string>();
   if (paths.length) {
     const { data: urls } = await supabase.storage.from("agency-docs").createSignedUrls(paths, 3600);
@@ -33,6 +37,8 @@ export async function getInspections(supabase: ServerSupabase, agencyId: string,
     out[r.kind as Kind] = {
       id: r.id,
       kind: r.kind as Kind,
+      mode: r.mode === "video" ? "video" : "photos",
+      videoUrl: r.video_path ? (signed.get(r.video_path) ?? null) : null,
       completedAt: r.completed_at,
       notes: r.notes,
       aiStatus: r.ai_status as InspectionData["aiStatus"],
@@ -44,4 +50,11 @@ export async function getInspections(supabase: ServerSupabase, agencyId: string,
     };
   }
   return out;
+}
+
+/** The mode of a new inspection: the return follows its departure, otherwise the agency setting. */
+export async function modeFor(supabase: ServerSupabase, agencyId: string, reservationId: string, kind: Kind, fallback: InspectionMode): Promise<InspectionMode> {
+  if (kind !== "return") return fallback;
+  const { data } = await supabase.from("inspections").select("mode").eq("agency_id", agencyId).eq("reservation_id", reservationId).eq("kind", "departure").maybeSingle();
+  return data?.mode === "video" || data?.mode === "photos" ? data.mode : fallback;
 }

@@ -6,32 +6,42 @@ import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
 import { compareView, visionConfigured } from "@/lib/ai/vision";
 import { missingViews, photoPointToDiagram, VIEWS, type View } from "@/lib/inspections/model";
+import { modeFor } from "./queries";
 import { damageSchema, KINDS, type DamageInput, type Kind } from "./schema";
 
 const uuid = z.uuid();
 
 function refresh(reservationId: string) {
-  revalidatePath(`/[locale]/contracts/${reservationId}`, "page");
-  revalidatePath(`/[locale]/contracts/${reservationId}/inspection/[kind]`, "page");
+  revalidatePath("/[locale]/inspections", "page");
+  revalidatePath(`/[locale]/inspections/${reservationId}`, "page");
+  revalidatePath(`/[locale]/inspections/${reservationId}/[kind]`, "page");
+}
+
+/** Every inspection action: logged in, in an agency, and the section is turned on in Paramètres. */
+async function context() {
+  const guard = await requireActionContext();
+  if (guard.ok && !guard.ctx.agency.inspection.enabled) return fail("inspectionOff");
+  return guard;
 }
 
 /** Open (or create) the departure / return inspection of a reservation. */
 export async function startInspectionAction(reservationId: string, kind: Kind): Promise<ActionResult<{ id: string }>> {
   if (!uuid.safeParse(reservationId).success || !KINDS.includes(kind)) return fail("forbidden");
-  const guard = await requireActionContext();
+  const guard = await context();
   if (!guard.ok) return guard;
   const { supabase, agency } = guard.ctx;
   const { data: existing } = await supabase.from("inspections").select("id").eq("agency_id", agency.id).eq("reservation_id", reservationId).eq("kind", kind).maybeSingle();
   if (existing) return ok({ id: existing.id });
-  const { data, error } = await supabase.from("inspections").insert({ agency_id: agency.id, reservation_id: reservationId, kind }).select("id").single();
+  const mode = await modeFor(supabase, agency.id, reservationId, kind, agency.inspection.mode);
+  const { data, error } = await supabase.from("inspections").insert({ agency_id: agency.id, reservation_id: reservationId, kind, mode }).select("id").single();
   if (error) return fail(dbErrorKey(error));
   return ok({ id: data.id });
 }
 
 async function inspectionOf(id: string) {
-  const guard = await requireActionContext();
+  const guard = await context();
   if (!guard.ok) return { guard, row: null };
-  const { data: row } = await guard.ctx.supabase.from("inspections").select("id, reservation_id, kind, completed_at").eq("agency_id", guard.ctx.agency.id).eq("id", id).maybeSingle();
+  const { data: row } = await guard.ctx.supabase.from("inspections").select("id, reservation_id, kind, completed_at, mode, video_path").eq("agency_id", guard.ctx.agency.id).eq("id", id).maybeSingle();
   return { guard, row };
 }
 
@@ -42,10 +52,24 @@ export async function savePhotoAction(inspectionId: string, view: View, path: st
   if (!guard.ok) return guard;
   if (!row) return fail("notFound");
   const { supabase, agency } = guard.ctx;
-  if (path !== `${agency.id}/inspections/${inspectionId}/${view}.jpg`) return fail("forbidden");
+  if (row.mode !== "photos" || path !== `${agency.id}/inspections/${inspectionId}/${view}.jpg`) return fail("forbidden");
   const { error } = await supabase
     .from("inspection_photos")
     .upsert({ agency_id: agency.id, inspection_id: inspectionId, view, storage_path: path }, { onConflict: "inspection_id,view" });
+  if (error) return fail(dbErrorKey(error));
+  refresh(row.reservation_id);
+  return ok();
+}
+
+/** The video was uploaded by the browser to {agency}/inspections/{id}/video: record it. */
+export async function saveVideoAction(inspectionId: string, path: string): Promise<ActionResult> {
+  if (!uuid.safeParse(inspectionId).success) return fail("forbidden");
+  const { guard, row } = await inspectionOf(inspectionId);
+  if (!guard.ok) return guard;
+  if (!row) return fail("notFound");
+  const { supabase, agency } = guard.ctx;
+  if (row.mode !== "video" || path !== `${agency.id}/inspections/${inspectionId}/video`) return fail("forbidden");
+  const { error } = await supabase.from("inspections").update({ video_path: path }).eq("agency_id", agency.id).eq("id", inspectionId);
   if (error) return fail(dbErrorKey(error));
   refresh(row.reservation_id);
   return ok();
@@ -72,7 +96,7 @@ export async function addDamageAction(inspectionId: string, input: DamageInput):
 /** Remove a mark, or confirm an AI suggestion. */
 export async function updateDamageAction(id: string, change: "remove" | "confirm"): Promise<ActionResult> {
   if (!uuid.safeParse(id).success || !["remove", "confirm"].includes(change)) return fail("forbidden");
-  const guard = await requireActionContext();
+  const guard = await context();
   if (!guard.ok) return guard;
   const { supabase, agency } = guard.ctx;
   const { data: dmg } = await supabase.from("inspection_damages").select("id, inspection:inspections(reservation_id)").eq("agency_id", agency.id).eq("id", id).maybeSingle();
@@ -85,7 +109,7 @@ export async function updateDamageAction(id: string, change: "remove" | "confirm
   return ok();
 }
 
-/** Finish: the four faces must be photographed. */
+/** Finish: the four faces must be photographed (photos), or the walk-around filmed (video). */
 export async function completeInspectionAction(inspectionId: string, notes: string): Promise<ActionResult> {
   if (!uuid.safeParse(inspectionId).success) return fail("forbidden");
   const cleanNotes = String(notes ?? "").trim().slice(0, 1000);
@@ -93,9 +117,13 @@ export async function completeInspectionAction(inspectionId: string, notes: stri
   if (!guard.ok) return guard;
   if (!row) return fail("notFound");
   const { supabase, agency } = guard.ctx;
-  const { data: photos } = await supabase.from("inspection_photos").select("view").eq("agency_id", agency.id).eq("inspection_id", inspectionId);
-  const missing = missingViews((photos ?? []).map((p) => p.view));
-  if (missing.length) return fail("photosMissing", { photos: missing.join(",") });
+  if (row.mode === "video") {
+    if (!row.video_path) return fail("videoMissing");
+  } else {
+    const { data: photos } = await supabase.from("inspection_photos").select("view").eq("agency_id", agency.id).eq("inspection_id", inspectionId);
+    const missing = missingViews((photos ?? []).map((p) => p.view));
+    if (missing.length) return fail("photosMissing", { photos: missing.join(",") });
+  }
   const { error } = await supabase.from("inspections").update({ completed_at: new Date().toISOString(), notes: cleanNotes || null }).eq("agency_id", agency.id).eq("id", inspectionId);
   if (error) return fail(dbErrorKey(error));
   refresh(row.reservation_id);
@@ -105,7 +133,7 @@ export async function completeInspectionAction(inspectionId: string, notes: stri
 /** Views that can be compared by the AI: photographed at departure AND at return. */
 export async function aiViewsAction(reservationId: string): Promise<ActionResult<View[]>> {
   if (!uuid.safeParse(reservationId).success) return fail("forbidden");
-  const guard = await requireActionContext();
+  const guard = await context();
   if (!guard.ok) return guard;
   if (!visionConfigured()) return fail("aiNotConfigured");
   const { supabase, agency } = guard.ctx;
@@ -129,7 +157,7 @@ export async function aiViewsAction(reservationId: string): Promise<ActionResult
  */
 export async function compareViewAction(reservationId: string, view: View, last: boolean): Promise<ActionResult<{ found: number; retryAfter?: number }>> {
   if (!uuid.safeParse(reservationId).success || !VIEWS.includes(view)) return fail("forbidden");
-  const guard = await requireActionContext();
+  const guard = await context();
   if (!guard.ok) return guard;
   const { supabase, agency, user } = guard.ctx;
   const { data: ins } = await supabase

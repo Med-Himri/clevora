@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, CircleAlertIcon, CircleCheckIcon, WalletIcon } from "lucide-react";
+import { ArrowLeftIcon, CalendarCheckIcon, CircleAlertIcon, CircleCheckIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
@@ -7,18 +7,17 @@ import { AgencyLogo } from "@/components/app/agency-logo";
 import { Arrow, Ltr } from "@/components/app/ltr";
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { getContractData, missingInfo, type ContractDriver } from "@/lib/contracts/data";
-import { formatDate, formatDateTime, formatMoney, isoToCasablanca } from "@/lib/format";
+import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
-import { ReservationActions } from "../../reservations/components/reservation-actions";
-import { InspectionCard } from "../../inspections/components/inspection-card";
-import { getInspections } from "../../inspections/queries";
 import { ReservationStatusBadge } from "../../reservations/components/status-badge";
 import { ContractShare } from "../components/contract-share";
+import { SignButton } from "../components/sign-button";
 import { PoweredBy } from "@/components/app/powered-by";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -44,20 +43,17 @@ function Item({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-/** The contract, laid out like the agency's paper contract, with its actions. */
-export default async function ContractPage({ params, searchParams }: PageProps<"/[locale]/contracts/[id]">) {
+/** The contract: the document only (sign, PDF, WhatsApp). The work is on the reservation page. */
+export default async function ContractPage({ params }: PageProps<"/[locale]/contracts/[id]">) {
   const { id } = await params;
-  const sp = await searchParams;
   const { agency: active } = await requireAgency();
   const t = await getTranslations("contracts");
   const tr = await getTranslations("reservations");
   const tp = await getTranslations("reservations.payment");
   const supabase = await createClient();
-  const [data, { data: payments }, { data: plannedRow }, inspections] = await Promise.all([
+  const [data, { data: payments }] = await Promise.all([
     getContractData(supabase, active.id, id),
     supabase.from("reservation_payments").select("id, amount, method, kind, paid_at").eq("agency_id", active.id).eq("reservation_id", id).order("paid_at"),
-    supabase.from("reservation_totals").select("planned_days").eq("id", id).maybeSingle(),
-    getInspections(supabase, active.id, id),
   ]);
   if (!data) notFound();
   const { reservation: r, totals, agency } = data;
@@ -98,24 +94,17 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
           <ReservationStatusBadge status={r.status} late={late} signed={Boolean(r.signed_at)} />
           {r.signed_at ? <span className="text-sm text-muted-foreground">{tr("detail.signedOn", { date: formatDateTime(r.signed_at) })}</span> : null}
         </div>
-        <ReservationActions
-          reservation={{
-            id: r.id,
-            status: r.status as "reserved" | "on_rental" | "returned" | "cancelled",
-            signed: Boolean(r.signed_at),
-            hasCar: Boolean(r.vehicle),
-            start_at: r.start_at,
-            end_at: r.end_at,
-            daily_price: Number(r.daily_price),
-            km_out: r.km_out,
-            deposit_taken: r.deposit_taken,
-            deposit_amount: Number(r.deposit_amount),
-            balance: totals.balance,
-            planned_days: plannedRow?.planned_days ?? totals.days,
-            local: { start: isoToCasablanca(r.start_at), end: isoToCasablanca(r.end_at), now: isoToCasablanca(new Date().toISOString()) },
-          }}
-          initialAction={typeof sp.do === "string" ? sp.do : null}
-        />
+        <div className="flex flex-wrap gap-2">
+          {r.status === "reserved" && !r.signed_at ? (
+            <SignButton id={r.id} disabled={!r.vehicle} title={r.vehicle ? undefined : tr("actions.chooseCarFirst")} />
+          ) : null}
+          <Button variant="outline" size="lg" asChild>
+            <Link href={`/reservations/${r.id}`} data-testid="open-reservation">
+              <CalendarCheckIcon aria-hidden />
+              {t("seeReservation")}
+            </Link>
+          </Button>
+        </div>
         <ContractShare
           id={r.id}
           contractNumber={r.contract_number}
@@ -139,7 +128,7 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
                 {missing.map((m) => (
                   <li key={m.key}>
                     {r.status === "reserved" ? (
-                      <Link href={m.key === "car" ? `/contracts/${r.id}?do=car` : `/reservations/${r.id}/edit?step=${m.step}`} className="font-medium underline underline-offset-4">
+                      <Link href={m.key === "car" ? `/reservations/${r.id}?do=car` : `/reservations/${r.id}/edit?step=${m.step}`} className="font-medium underline underline-offset-4">
                         {t(`missing.${m.key}`)}
                       </Link>
                     ) : (
@@ -157,8 +146,6 @@ export default async function ContractPage({ params, searchParams }: PageProps<"
           </Alert>
         ) : null
       ) : null}
-
-      {r.status !== "cancelled" ? <InspectionCard reservationId={id} status={r.status} inspections={inspections} /> : null}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
         {/* The paper contract */}

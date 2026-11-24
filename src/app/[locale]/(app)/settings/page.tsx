@@ -1,4 +1,4 @@
-import { BellIcon, BuildingIcon, DatabaseIcon, FileTextIcon, MonitorIcon, ScaleIcon, SparklesIcon, type LucideIcon } from "lucide-react";
+import { BellIcon, BuildingIcon, ClipboardCheckIcon, DatabaseIcon, FileTextIcon, MonitorIcon, ScaleIcon, SparklesIcon, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/app/page-header";
@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { PreferencesForm } from "../account/account-forms";
 import { DataSection } from "./components/data-section";
-import { AgencyForm, AlertsForm, AssistantForm, ContractForm, LegalForm } from "./components/settings-forms";
+import { AgencyForm, AlertsForm, AssistantForm, ContractForm, InspectionForm, LegalForm } from "./components/settings-forms";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("nav");
@@ -23,6 +23,7 @@ const SECTIONS = [
   { key: "legal", icon: ScaleIcon, admin: true },
   { key: "contract", icon: FileTextIcon, admin: true },
   { key: "alerts", icon: BellIcon, admin: true },
+  { key: "inspection", icon: ClipboardCheckIcon, admin: true },
   { key: "assistant", icon: SparklesIcon, admin: true },
   { key: "display", icon: MonitorIcon, admin: false },
   { key: "data", icon: DatabaseIcon, admin: true },
@@ -76,6 +77,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
       ),
       alerts: <AlertsForm values={{ alert_days_before: a.alert_days_before, alert_km_before: a.alert_km_before, alert_roles: a.alert_roles as Array<"admin" | "staff"> }} />,
       assistant: <AssistantForm values={{ ai_enabled: a.ai_enabled }} inPlan={Boolean(quota?.[0]?.plan_allows)} />,
+      inspection: <InspectionForm values={{ inspection_enabled: a.inspection_enabled, inspection_mode: a.inspection_mode === "video" ? "video" : "photos" }} />,
       data: <DataSection agencyName={a.name} />,
     }[section];
   }
