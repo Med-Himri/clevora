@@ -2,14 +2,28 @@ import { expect, test, type Page } from "@playwright/test";
 import { addMember, addVehicle, admin, createTestAgency, expectNoHorizontalScroll, login, uid } from "./helpers";
 
 const PHOTO = "e2e/fixtures/car-photo.jpg";
-const VIDEO = "e2e/fixtures/car-video.mp4";
+const VIDEO = "e2e/fixtures/car-video.webm";
 
+/** "Prendre les photos": one tap per side (the camera opens; here a file stands in for it). */
 async function photographFaces(page: Page) {
+  await page.getByTestId("source-camera").click();
   for (const view of ["front", "back", "left", "right"]) {
+    const chooser = page.waitForEvent("filechooser");
     await page.getByTestId(`photo-${view}`).click();
-    await page.getByTestId("inspection-file").setInputFiles(PHOTO);
+    await (await chooser).setFiles(PHOTO);
     await expect(page.getByTestId(`photo-${view}`).locator("img")).toBeVisible({ timeout: 20_000 });
   }
+}
+
+/** "Importer des photos": several files at once fill the empty boxes in order. */
+async function importFaces(page: Page) {
+  await page.getByTestId("source-files").click();
+  const chooser = page.waitForEvent("filechooser");
+  await page.getByTestId("import-many").click();
+  await (await chooser).setFiles([PHOTO, PHOTO, PHOTO, PHOTO]);
+  await expect(page.getByText("4 photos importées.").first()).toBeVisible({ timeout: 40_000 });
+  for (const view of ["front", "back", "left", "right"]) await expect(page.getByTestId(`photo-${view}`).locator("img")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByTestId("photo-wheels").locator("img")).toHaveCount(0);
 }
 
 /** An agency with one car out on rental, inspection turned on (photos or video). */
@@ -67,7 +81,7 @@ test("inspection départ / retour: photos, marks, AI suggestion confirmed, new d
   // Return: same scratch (already there) + a new dent on the right side
   await card.getByTestId("inspection-return").getByRole("link", { name: "Faire l'inspection" }).click();
   await page.waitForURL(/\/inspections\/[0-9a-f-]{36}\/return$/);
-  await photographFaces(page);
+  await importFaces(page);
   await markDamage(page, 0.3, 0.12, "Rayure");
   await markDamage(page, 0.85, 0.55, "Bosse / choc");
   await page.getByTestId("inspection-finish").click();
@@ -124,8 +138,14 @@ test("video mode: one video at departure and at return, shown side by side, no A
     await page.goto(`/inspections/${id}/${kind}`);
     await expect(page.getByTestId("inspection-photos")).toHaveCount(0);
     await expect(page.getByTestId("inspection-finish")).toBeDisabled();
-    await page.getByTestId("inspection-video-file").setInputFiles(VIDEO);
+    // Departure filmed with "Filmer maintenant" would need a real camera: both use "Importer une vidéo" here
+    await page.getByTestId("source-files").click();
+    const chooser = page.waitForEvent("filechooser");
+    await page.getByTestId("video-pick").click();
+    await (await chooser).setFiles(VIDEO);
     await expect(page.getByTestId("inspection-video-player")).toBeVisible({ timeout: 20_000 });
+    // It really plays (the security rules allow private video links)
+    await expect.poll(() => page.getByTestId("inspection-video-player").evaluate((v: HTMLVideoElement) => (v.error ? -1 : v.readyState)), { timeout: 15_000 }).toBeGreaterThanOrEqual(1);
     await expectNoHorizontalScroll(page);
     await page.getByTestId("inspection-finish").click();
     await page.waitForURL(new RegExp(`/inspections/${id}$`));

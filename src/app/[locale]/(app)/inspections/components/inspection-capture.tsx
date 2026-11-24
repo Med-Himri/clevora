@@ -1,6 +1,6 @@
 "use client";
 
-import { CameraIcon, CheckIcon, CircleCheckBigIcon, LoaderIcon, Trash2Icon } from "lucide-react";
+import { CameraIcon, CheckIcon, CircleCheckBigIcon, ImagePlusIcon, LoaderIcon, Trash2Icon, UploadIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ import { cn } from "@/lib/utils";
 import { addDamageAction, completeInspectionAction, savePhotoAction, updateDamageAction } from "../actions";
 import type { InspectionData } from "../queries";
 import type { Kind } from "../schema";
+import { SourceSwitch, useDefaultSource } from "./source-switch";
 import { VideoCapture } from "./video-capture";
 
 /** Resize a camera photo on the phone (JPEG): a full copy and a small one for the AI. */
@@ -58,6 +59,10 @@ export function InspectionCapture({
   const [note, setNote] = useState("");
   const [notes, setNotes] = useState(inspection.notes ?? "");
   const input = useRef<HTMLInputElement>(null);
+  const picker = useRef<HTMLInputElement>(null);
+  const many = useRef<HTMLInputElement>(null);
+  const [source, setSource] = useDefaultSource();
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const target = useRef<View | null>(null);
   const done = Boolean(inspection.completedAt);
   const photos = new Map(inspection.photos.map((p) => [p.view, p]));
@@ -67,31 +72,63 @@ export function InspectionCapture({
 
   const takePhoto = (view: View) => {
     target.current = view;
-    input.current?.click();
+    (source === "camera" ? input : picker).current?.click();
+  };
+  /** One photo for one view: shrink on the device, upload both copies, record it. */
+  const sendPhoto = async (file: File, view: View) => {
+    const [full, small] = await Promise.all([shrink(file, 1600, 0.82), shrink(file, 768, 0.7)]);
+    const path = `${agencyId}/inspections/${inspection.id}/${view}.jpg`;
+    const sb = createClient();
+    const up = await Promise.all([
+      sb.storage.from("agency-docs").upload(path, full, { contentType: "image/jpeg", upsert: true }),
+      sb.storage.from("agency-docs").upload(path.replace(/\.jpg$/, "-s.jpg"), small, { contentType: "image/jpeg", upsert: true }),
+    ]);
+    if (up.some((u) => u.error)) throw new Error("upload");
+    const r = await savePhotoAction(inspection.id, view, path);
+    if (!r.ok) throw new Error(r.error);
+  };
+  const resetInputs = () => {
+    for (const el of [input.current, picker.current, many.current]) if (el) el.value = "";
   };
   const upload = async (file: File | undefined) => {
     const view = target.current;
     if (!file || !view) return;
     setUploading(view);
     try {
-      const [full, small] = await Promise.all([shrink(file, 1600, 0.82), shrink(file, 768, 0.7)]);
-      const path = `${agencyId}/inspections/${inspection.id}/${view}.jpg`;
-      const sb = createClient();
-      const up = await Promise.all([
-        sb.storage.from("agency-docs").upload(path, full, { contentType: "image/jpeg", upsert: true }),
-        sb.storage.from("agency-docs").upload(path.replace(/\.jpg$/, "-s.jpg"), small, { contentType: "image/jpeg", upsert: true }),
-      ]);
-      if (up.some((u) => u.error)) throw new Error("upload");
-      const r = await savePhotoAction(inspection.id, view, path);
-      if (!r.ok) throw new Error(r.error);
+      await sendPhoto(file, view);
       toast.success(t("photoSaved", { view: t(`views.${view}`) }));
       router.refresh();
     } catch {
       toast.error(t("photoFailed"));
     } finally {
       setUploading(null);
-      if (input.current) input.current.value = "";
+      resetInputs();
     }
+  };
+  /** Several photos at once: they fill the empty boxes in order (front, back, left, right…). */
+  const uploadMany = async (list: FileList | null) => {
+    const files = [...(list ?? [])].filter((f) => f.type.startsWith("image/")).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    if (!files.length) return;
+    const empty = VIEWS.filter((v) => !photos.has(v));
+    const plan = files.slice(0, empty.length).map((f, i) => [f, empty[i]] as const);
+    let sent = 0;
+    for (const [file, view] of plan) {
+      setUploading(view);
+      setProgress({ done: sent, total: plan.length });
+      try {
+        await sendPhoto(file, view);
+        sent++;
+      } catch {
+        toast.error(t("photoFailed"));
+        break;
+      }
+    }
+    setUploading(null);
+    setProgress(null);
+    resetInputs();
+    if (sent) toast.success(t("photosImported", { count: sent }));
+    if (files.length > empty.length) toast.info(t("photosExtra", { count: files.length - empty.length }));
+    router.refresh();
   };
 
   const marks: DiagramMark[] = [
@@ -129,7 +166,10 @@ export function InspectionCapture({
         <VideoCapture agencyId={agencyId} inspectionId={inspection.id} videoUrl={inspection.videoUrl} done={done} />
       ) : (
       <>
-      <input ref={input} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} aria-hidden data-testid="inspection-file" onChange={(e) => upload(e.target.files?.[0])} />
+      {/* camera (opens the phone camera directly), one file, several files */}
+      <input ref={input} type="file" accept="image/*" capture="environment" className="sr-only" tabIndex={-1} aria-hidden data-testid="inspection-camera" onChange={(e) => upload(e.target.files?.[0])} />
+      <input ref={picker} type="file" accept="image/*" className="sr-only" tabIndex={-1} aria-hidden data-testid="inspection-file" onChange={(e) => upload(e.target.files?.[0])} />
+      <input ref={many} type="file" accept="image/*" multiple className="sr-only" tabIndex={-1} aria-hidden data-testid="inspection-files" onChange={(e) => uploadMany(e.target.files)} />
 
       <Card>
         <CardHeader>
@@ -137,9 +177,27 @@ export function InspectionCapture({
             {t("photosTitle")}
             <span className="text-sm font-normal text-muted-foreground">{t("photosCount", { done: inspection.photos.length, total: VIEWS.length })}</span>
           </CardTitle>
-          <p className="text-sm text-muted-foreground">{t("photosHint")}</p>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex flex-col gap-4">
+          {!done ? (
+            <SourceSwitch
+              value={source}
+              onChange={setSource}
+              disabled={uploading !== null}
+              label={t("source.label")}
+              camera={t("source.camera")}
+              cameraHint={t("source.cameraHint")}
+              files={t("source.files")}
+              filesHint={t("source.filesHint")}
+            />
+          ) : null}
+          {!done && source === "files" ? (
+            <Button size="lg" variant="outline" className="h-auto min-h-12 whitespace-normal py-2" onClick={() => many.current?.click()} disabled={uploading !== null || photos.size === VIEWS.length} data-testid="import-many">
+              {progress ? <LoaderIcon className="animate-spin" aria-hidden /> : <ImagePlusIcon aria-hidden />}
+              {progress ? t("importing", { done: progress.done + 1, total: progress.total }) : t("importMany")}
+            </Button>
+          ) : null}
+          {!done ? <p className="text-sm text-muted-foreground">{source === "camera" ? t("photosHint") : t("photosHintFiles")}</p> : null}
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4" data-testid="inspection-photos">
             {VIEWS.map((view) => {
               const p = photos.get(view);
@@ -154,13 +212,13 @@ export function InspectionCapture({
                       "relative flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl border-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       p ? "border-success/60" : required ? "border-dashed border-primary/50 bg-primary/5 hover:bg-primary/10" : "border-dashed bg-muted/40 hover:bg-muted",
                     )}
-                    aria-label={p ? t("retake", { view: t(`views.${view}`) }) : t("take", { view: t(`views.${view}`) })}
+                    aria-label={source === "camera" ? (p ? t("retake", { view: t(`views.${view}`) }) : t("take", { view: t(`views.${view}`) })) : t("choose", { view: t(`views.${view}`) })}
                     data-testid={`photo-${view}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- private 1-hour links: never through the image optimizer */}
                     {p?.thumb ? <img src={p.thumb} alt="" className="absolute inset-0 size-full object-cover" /> : null}
                     <span className={cn("relative z-10 flex flex-col items-center gap-1 rounded-lg px-2 py-1", p && "bg-black/55 text-white")}>
-                      {uploading === view ? <LoaderIcon className="size-5 animate-spin" aria-hidden /> : p ? <CheckIcon className="size-5" aria-hidden /> : <CameraIcon className="size-5" aria-hidden />}
+                      {uploading === view ? <LoaderIcon className="size-5 animate-spin" aria-hidden /> : p ? <CheckIcon className="size-5" aria-hidden /> : source === "camera" ? <CameraIcon className="size-5" aria-hidden /> : <UploadIcon className="size-5" aria-hidden />}
                       {t(`views.${view}`)}
                     </span>
                     {required && !p ? <Badge variant="info" className="absolute end-1.5 top-1.5">{t("required")}</Badge> : null}

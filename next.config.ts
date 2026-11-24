@@ -27,6 +27,8 @@ const csp = [
   `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${supabaseUrl.origin}`,
+  // Inspection videos: private Supabase links, and blob: while a gallery video is made smaller
+  `media-src 'self' blob: ${supabaseUrl.origin}`,
   "font-src 'self' data:",
   `connect-src 'self' ${supabaseUrl.origin}${sentryOrigin ? ` ${sentryOrigin}` : ""}${isDev ? " ws: http://localhost:*" : ""}`,
   "frame-src 'self' blob:",

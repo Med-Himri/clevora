@@ -2187,7 +2187,30 @@
       "saved": "Vidéo enregistrée.",
       "failed": "La vidéo n'a pas pu être envoyée. Vérifiez la connexion et réessayez.",
       "noCamera": "L'appareil photo n'est pas accessible. Autorisez-le dans le navigateur, ou utilisez « Choisir une vidéo ».",
-      "missing": "Filmez d'abord la voiture."
-    }
+      "missing": "Filmez d'abord la voiture.",
+      "sourceLabel": "Comment ajouter la vidéo ?",
+      "sourceCamera": "Filmer maintenant",
+      "sourceCameraHint": "Avec la caméra du téléphone",
+      "sourceFiles": "Importer une vidéo",
+      "sourceFilesHint": "Déjà dans le téléphone ou l'ordinateur",
+      "pickAgain": "Choisir une autre vidéo",
+      "notVideo": "Ce fichier n'est pas une vidéo.",
+      "tooLong": "Vidéo trop longue : {min} minutes maximum.",
+      "shrinking": "Réduction de la vidéo avant l'envoi… {pct} %",
+      "limitFiles": "Vidéo de {min} minutes maximum. Une grosse vidéo est réduite sur l'appareil avant l'envoi (cela prend la durée de la vidéo)."
+    },
+    "source": {
+      "label": "Comment ajouter les photos ?",
+      "camera": "Prendre les photos",
+      "cameraHint": "Avec l'appareil photo du téléphone, maintenant",
+      "files": "Importer des photos",
+      "filesHint": "Déjà dans le téléphone ou l'ordinateur"
+    },
+    "photosHintFiles": "Choisissez plusieurs photos d'un coup : elles remplissent les cases vides dans l'ordre (avant, arrière, gauche, droite…). Touchez une case pour changer une photo.",
+    "importMany": "Choisir les photos (plusieurs d'un coup)",
+    "importing": "Envoi de la photo {done} / {total}…",
+    "photosImported": "{count, plural, one {# photo importée.} other {# photos importées.}}",
+    "photosExtra": "{count, plural, one {# photo en trop n'a pas été utilisée.} other {# photos en trop n'ont pas été utilisées.}}",
+    "choose": "Choisir la photo : {view}"
   }
 }

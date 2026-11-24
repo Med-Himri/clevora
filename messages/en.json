@@ -2187,7 +2187,30 @@
       "saved": "Video saved.",
       "failed": "The video could not be sent. Check the connection and try again.",
       "noCamera": "The camera cannot be used. Allow it in the browser, or use \"Choose a video\".",
-      "missing": "Film the car first."
-    }
+      "missing": "Film the car first.",
+      "sourceLabel": "How to add the video?",
+      "sourceCamera": "Film now",
+      "sourceCameraHint": "With the phone camera",
+      "sourceFiles": "Upload a video",
+      "sourceFilesHint": "Already on the phone or computer",
+      "pickAgain": "Choose another video",
+      "notVideo": "This file is not a video.",
+      "tooLong": "Video too long: {min} minutes max.",
+      "shrinking": "Making the video smaller before sending… {pct} %",
+      "limitFiles": "Video of {min} minutes max. A large video is made smaller on the device before sending (it takes the length of the video)."
+    },
+    "source": {
+      "label": "How to add the photos?",
+      "camera": "Take the photos",
+      "cameraHint": "With the phone camera, now",
+      "files": "Upload photos",
+      "filesHint": "Already on the phone or computer"
+    },
+    "photosHintFiles": "Choose several photos at once: they fill the empty boxes in order (front, back, left, right…). Tap a box to change one photo.",
+    "importMany": "Choose the photos (several at once)",
+    "importing": "Sending photo {done} / {total}…",
+    "photosImported": "{count, plural, one {# photo uploaded.} other {# photos uploaded.}}",
+    "photosExtra": "{count, plural, one {# extra photo was not used.} other {# extra photos were not used.}}",
+    "choose": "Choose the photo: {view}"
   }
 }
