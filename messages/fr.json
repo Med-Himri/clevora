@@ -2206,11 +2206,26 @@
       "files": "Importer des photos",
       "filesHint": "Déjà dans le téléphone ou l'ordinateur"
     },
-    "photosHintFiles": "Choisissez plusieurs photos d'un coup : elles remplissent les cases vides dans l'ordre (avant, arrière, gauche, droite…). Touchez une case pour changer une photo.",
+    "photosHintFiles": "Choisissez plusieurs photos d'un coup : une photo nommée « avant », « coffre », « roue »… va dans sa case ; les autres remplissent les cases vides dans l'ordre. Touchez une case pour changer une photo.",
     "importMany": "Choisir les photos (plusieurs d'un coup)",
     "importing": "Envoi de la photo {done} / {total}…",
     "photosImported": "{count, plural, one {# photo importée.} other {# photos importées.}}",
     "photosExtra": "{count, plural, one {# photo en trop n'a pas été utilisée.} other {# photos en trop n'ont pas été utilisées.}}",
-    "choose": "Choisir la photo : {view}"
+    "choose": "Choisir la photo : {view}",
+    "report": {
+      "title": "État des lieux (PDF)",
+      "hint": "Le rapport avec les deux dessins, les dégâts et les photos, à signer par le client ou à lui envoyer.",
+      "share": "Partager le PDF",
+      "print": "Imprimer",
+      "download": "Télécharger",
+      "arabic": "PDF avec l'arabe",
+      "whatsapp": "Message WhatsApp",
+      "downloaded": "PDF téléchargé : joignez-le dans WhatsApp ou un e-mail.",
+      "failed": "Le PDF n'a pas pu être préparé. Réessayez.",
+      "message": "Bonjour {name}, voici l'état des lieux de la voiture {car} (contrat {number}) — {agency}. {result}",
+      "resultDeparture": "{count, plural, =0 {Au départ : aucun dégât.} one {Au départ : # dégât noté.} other {Au départ : # dégâts notés.}}",
+      "resultNone": "Au retour : aucun nouveau dégât. Merci !",
+      "resultNew": "{count, plural, one {Au retour : # nouveau dégât : {list}.} other {Au retour : # nouveaux dégâts : {list}.}}"
+    }
   }
 }

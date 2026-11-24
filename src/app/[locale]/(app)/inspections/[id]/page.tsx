@@ -9,7 +9,9 @@ import { Link, redirect } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { formatDateTime } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+import { newDamages } from "@/lib/inspections/model";
 import { InspectionCard } from "../components/inspection-card";
+import { ReportShare } from "../components/report-share";
 import { getInspections } from "../queries";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,13 +30,14 @@ export default async function InspectionPage({ params }: PageProps<"/[locale]/in
   const [{ data: r }, inspections] = await Promise.all([
     supabase
       .from("reservations")
-      .select("id, contract_number, status, start_at, end_at, actual_return_at, vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(plate, brand_model), client:clients!reservations_agency_id_client_id_fkey(full_name)")
+      .select("id, contract_number, status, start_at, end_at, actual_return_at, vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(plate, brand_model), client:clients!reservations_agency_id_client_id_fkey(full_name, phone)")
       .eq("agency_id", agency.id)
       .eq("id", id)
       .maybeSingle(),
     getInspections(supabase, agency.id, id),
   ]);
   if (!r || r.status === "cancelled") notFound();
+  const fresh = inspections.departure && inspections.return ? newDamages(inspections.departure.damages, inspections.return.damages) : [];
 
   return (
     <>
@@ -60,7 +63,27 @@ export default async function InspectionPage({ params }: PageProps<"/[locale]/in
           </Button>
         }
       />
-      <InspectionCard reservationId={id} status={r.status} inspections={inspections} />
+      <div className="flex flex-col gap-4">
+        <InspectionCard reservationId={id} status={r.status} inspections={inspections} />
+        {inspections.departure?.completedAt ? (
+          <ReportShare
+            id={id}
+            filename={`etat-des-lieux-${r.contract_number.replace(/[^A-Za-z0-9_-]+/g, "_")}.pdf`}
+            clientPhone={r.client?.phone ?? null}
+            message={t("report.message", {
+              name: r.client?.full_name ?? "",
+              agency: agency.name,
+              car: r.vehicle ? `${r.vehicle.brand_model} ${r.vehicle.plate}` : "",
+              number: r.contract_number,
+              result: !inspections.return?.completedAt
+                ? t("report.resultDeparture", { count: inspections.departure.damages.filter((d) => d.confirmed).length })
+                : fresh.length
+                  ? t("report.resultNew", { count: fresh.length, list: fresh.map((d) => t(`types.${d.type}`) + (d.view ? ` (${t(`views.${d.view}`)})` : "")).join(", ") })
+                  : t("report.resultNone"),
+            })}
+          />
+        ) : null}
+      </div>
     </>
   );
 }

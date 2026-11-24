@@ -165,7 +165,7 @@ export function ContractDocument({ data, arabic, logo }: { data: ContractData; a
             <Line s={s} k="plate" ar={arabic} value={r.vehicle?.plate} />
             <Line s={s} k="kmOut" ar={arabic} value={r.km_out === null ? null : `${r.km_out} km`} />
             {r.km_in !== null ? <Line s={s} k="kmIn" ar={arabic} value={`${r.km_in} km`} /> : null}
-            <Line s={s} k="fuel" ar={arabic} value={`${fuel(r.fuel_out)}${r.fuel_in !== null ? ` → ${fuel(r.fuel_in)}` : ""}`} />
+            <Line s={s} k="fuel" ar={arabic} value={`${fuel(r.fuel_out)}${r.fuel_in !== null ? ` » ${fuel(r.fuel_in)}` : ""}`} />
           </View>
         </View>
 
@@ -254,7 +254,7 @@ export function ContractDocument({ data, arabic, logo }: { data: ContractData; a
 }
 
 /** Downloads the agency logo for the PDF (PNG/JPG only; SVG/WEBP fall back to the initial). */
-async function fetchLogo(url: string | null): Promise<Buffer | null> {
+export async function fetchLogo(url: string | null): Promise<Buffer | null> {
   if (!url || !/\.(png|jpe?g)$/i.test(url)) return null;
   try {
     const res = await fetch(url, { cache: "no-store" });

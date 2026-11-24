@@ -77,3 +77,40 @@ export function missingViews(photoViews: Iterable<string>): View[] {
   const have = new Set(photoViews);
   return REQUIRED_VIEWS.filter((v) => !have.has(v));
 }
+
+const NAME_HINTS: Array<[View, RegExp]> = [
+  ["interior", /int[eé]rieur|interior|inside|dakhil|داخل/i],
+  ["trunk", /coffre|trunk|boot|sendouk|صندوق/i],
+  ["wheels", /roue|wheel|pneu|tyre|tire|jante|عجل/i],
+  ["roof", /toit|roof|سقف/i],
+  ["front", /avant|front|devant|أمام/i],
+  ["back", /arri[eè]re|back|rear|خلف/i],
+  ["left", /gauche|left|يسار/i],
+  ["right", /droit|right|يمين/i],
+];
+
+/** A photo file named "avant.jpg", "3-left.jpg", "roue AV.jpg"… → its view (null: unknown). */
+export function viewFromName(name: string): View | null {
+  const base = name.replace(/\.[a-z0-9]+$/i, "");
+  return NAME_HINTS.find(([, re]) => re.test(base))?.[0] ?? null;
+}
+
+/**
+ * Several photos chosen at once: a file whose name says its side goes there; the
+ * others fill the still-empty sides in order (front, back, left, right…).
+ */
+export function planPhotoImport<T extends { name: string }>(files: T[], filled: Iterable<View>): Array<[T, View]> {
+  const taken = new Set<View>(filled);
+  const plan: Array<[T, View]> = [];
+  const rest: T[] = [];
+  for (const f of files) {
+    const v = viewFromName(f.name);
+    if (v && !plan.some(([, pv]) => pv === v)) {
+      plan.push([f, v]);
+      taken.add(v);
+    } else rest.push(f);
+  }
+  const empty = VIEWS.filter((v) => !taken.has(v));
+  rest.slice(0, empty.length).forEach((f, i) => plan.push([f, empty[i]]));
+  return plan;
+}

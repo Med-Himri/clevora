@@ -47,5 +47,22 @@ export const LABELS = {
   noTerms: ["Conditions générales à compléter dans Paramètres › Contrat.", "الشروط العامة تُكمَّل في الإعدادات › العقد."],
   poweredBy: ["Propulsé par Parcolia", "بدعم من Parcolia"],
   page: ["Page", "صفحة"],
+  // Inspection report (état des lieux)
+  reportTitle: ["État des lieux du véhicule", "محضر حالة السيارة"],
+  contract: ["Contrat", "العقد"],
+  client: ["Client", "الزبون"],
+  departureInspection: ["Inspection au départ", "المعاينة عند الخروج"],
+  returnInspection: ["Inspection au retour", "المعاينة عند الرجوع"],
+  doneOn: ["Faite le", "أُنجزت في"],
+  notDone: ["Pas encore faite", "لم تُنجز بعد"],
+  noDamage: ["Aucun dégât noté", "لا توجد أضرار"],
+  newDamages: ["Nouveaux dégâts au retour", "أضرار جديدة عند الرجوع"],
+  noNewDamage: ["Aucun nouveau dégât noté au retour.", "لم تُسجل أي أضرار جديدة عند الرجوع."],
+  existing: ["déjà là au départ", "موجود عند الخروج"],
+  isNew: ["nouveau", "جديد"],
+  photos: ["Photos départ / retour", "صور الخروج / الرجوع"],
+  noPhoto: ["Pas de photo", "لا توجد صورة"],
+  video: ["Inspection filmée : les vidéos sont gardées dans Parcolia.", "معاينة مصورة بالفيديو: الفيديوهات محفوظة في Parcolia."],
+  clientAgrees: ["Le client reconnaît l'état du véhicule décrit ci-dessus.", "يقر الزبون بحالة السيارة الموصوفة أعلاه."],
 } as const;
 export type LabelKey = keyof typeof LABELS;

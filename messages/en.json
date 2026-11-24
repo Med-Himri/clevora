@@ -2206,11 +2206,26 @@
       "files": "Upload photos",
       "filesHint": "Already on the phone or computer"
     },
-    "photosHintFiles": "Choose several photos at once: they fill the empty boxes in order (front, back, left, right…). Tap a box to change one photo.",
+    "photosHintFiles": "Choose several photos at once: a photo named \"front\", \"trunk\", \"wheel\"… goes to its box; the others fill the empty boxes in order. Tap a box to change one photo.",
     "importMany": "Choose the photos (several at once)",
     "importing": "Sending photo {done} / {total}…",
     "photosImported": "{count, plural, one {# photo uploaded.} other {# photos uploaded.}}",
     "photosExtra": "{count, plural, one {# extra photo was not used.} other {# extra photos were not used.}}",
-    "choose": "Choose the photo: {view}"
+    "choose": "Choose the photo: {view}",
+    "report": {
+      "title": "Inspection report (PDF)",
+      "hint": "The report with both drawings, the damages and the photos, for the client to sign or to send them.",
+      "share": "Share the PDF",
+      "print": "Print",
+      "download": "Download",
+      "arabic": "PDF with Arabic",
+      "whatsapp": "WhatsApp message",
+      "downloaded": "PDF downloaded: attach it in WhatsApp or an e-mail.",
+      "failed": "The PDF could not be prepared. Try again.",
+      "message": "Hello {name}, here is the inspection report of the car {car} (contract {number}) — {agency}. {result}",
+      "resultDeparture": "{count, plural, =0 {At departure: no damage.} one {At departure: # damage noted.} other {At departure: # damages noted.}}",
+      "resultNone": "At return: no new damage. Thank you!",
+      "resultNew": "{count, plural, one {At return: # new damage: {list}.} other {At return: # new damages: {list}.}}"
+    }
   }
 }

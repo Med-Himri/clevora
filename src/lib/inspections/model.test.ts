@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { missingViews, newDamages, photoPointToDiagram, viewOfPoint, type Damage } from "./model";
+import { missingViews, newDamages, photoPointToDiagram, planPhotoImport, viewFromName, viewOfPoint, type Damage } from "./model";
 
 const d = (x: number, y: number, extra: Partial<Damage> = {}): Damage => ({ id: `${x}-${y}`, x, y, type: "scratch", view: null, note: null, source: "staff", confirmed: true, ...extra });
 
@@ -31,5 +31,27 @@ describe("inspection model", () => {
   it("required photos", () => {
     expect(missingViews(["front", "left", "roof"])).toEqual(["back", "right"]);
     expect(missingViews(["front", "back", "left", "right"])).toEqual([]);
+  });
+});
+
+describe("photo import by file name", () => {
+  it("reads the side from the file name, in French, English or Arabic", () => {
+    expect(viewFromName("avant.jpg")).toBe("front");
+    expect(viewFromName("3-left.jpg")).toBe("left");
+    expect(viewFromName("Arrière voiture.HEIC")).toBe("back");
+    expect(viewFromName("roue arriere droite.jpg")).toBe("wheels");
+    expect(viewFromName("intérieur.png")).toBe("interior");
+    expect(viewFromName("صندوق.jpg")).toBe("trunk");
+    expect(viewFromName("IMG_2041.jpg")).toBeNull();
+  });
+
+  it("named files go to their side, the others fill the empty sides in order", () => {
+    const files = [{ name: "IMG_1.jpg" }, { name: "interieur.jpg" }, { name: "IMG_2.jpg" }];
+    expect(planPhotoImport(files, ["front"]).map(([f, v]) => `${f.name}>${v}`)).toEqual(["interieur.jpg>interior", "IMG_1.jpg>back", "IMG_2.jpg>left"]);
+  });
+
+  it("never uses more photos than empty sides", () => {
+    const files = Array.from({ length: 10 }, (_, i) => ({ name: `IMG_${i}.jpg` }));
+    expect(planPhotoImport(files, [])).toHaveLength(8);
   });
 });

@@ -97,6 +97,24 @@ test("inspection départ / retour: photos, marks, AI suggestion confirmed, new d
   await expect(page.getByTestId("inspection-result")).toContainText("2 nouveaux dégâts au retour");
   await expectNoHorizontalScroll(page);
 
+  // État des lieux PDF: report page + photos page; another agency cannot get it
+  await expect(page.getByTestId("inspection-report")).toBeVisible();
+  await expect(page.getByTestId("report-pdf")).toHaveAttribute("href", `/api/inspections/${r.id}/pdf`);
+  for (const lang of ["fr", "ar"]) {
+    const res = await page.request.get(`/api/inspections/${r.id}/pdf?lang=${lang}`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toBe("application/pdf");
+    const body = await res.body();
+    expect(body.subarray(0, 5).toString()).toBe("%PDF-");
+    expect(body.toString("latin1")).toMatch(/\/Count 2\b/);
+  }
+  const other = await createTestAgency();
+  const otherCtx = await page.context().browser()!.newContext({ baseURL: test.info().project.use.baseURL });
+  const otherPage = await otherCtx.newPage();
+  await login(otherPage, other.email, other.password);
+  expect((await otherPage.request.get(`/api/inspections/${r.id}/pdf`)).status()).toBe(404);
+  await otherCtx.close();
+
   // Photos are private: the database only holds paths inside this agency's folder
   const { data: photos } = await sb.from("inspection_photos").select("storage_path").eq("agency_id", agency.agencyId);
   expect(photos).toHaveLength(8);

@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "@/i18n/navigation";
-import { DAMAGE_TYPES, missingViews, REQUIRED_VIEWS, VIEWS, viewOfPoint, type Damage, type DamageType, type View } from "@/lib/inspections/model";
+import { DAMAGE_TYPES, missingViews, planPhotoImport, REQUIRED_VIEWS, VIEWS, viewOfPoint, type Damage, type DamageType, type View } from "@/lib/inspections/model";
 import { createClient } from "@/lib/supabase/browser";
 import { cn } from "@/lib/utils";
 import { addDamageAction, completeInspectionAction, savePhotoAction, updateDamageAction } from "../actions";
@@ -109,8 +109,7 @@ export function InspectionCapture({
   const uploadMany = async (list: FileList | null) => {
     const files = [...(list ?? [])].filter((f) => f.type.startsWith("image/")).sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     if (!files.length) return;
-    const empty = VIEWS.filter((v) => !photos.has(v));
-    const plan = files.slice(0, empty.length).map((f, i) => [f, empty[i]] as const);
+    const plan = planPhotoImport(files, photos.keys());
     let sent = 0;
     for (const [file, view] of plan) {
       setUploading(view);
@@ -127,7 +126,7 @@ export function InspectionCapture({
     setProgress(null);
     resetInputs();
     if (sent) toast.success(t("photosImported", { count: sent }));
-    if (files.length > empty.length) toast.info(t("photosExtra", { count: files.length - empty.length }));
+    if (files.length > plan.length) toast.info(t("photosExtra", { count: files.length - plan.length }));
     router.refresh();
   };
 
