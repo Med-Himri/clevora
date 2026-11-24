@@ -1,6 +1,6 @@
 "use client";
 
-import { CameraIcon, UploadIcon, VideoIcon } from "lucide-react";
+import { CameraIcon, CheckIcon, UploadIcon, VideoIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -54,17 +54,18 @@ export function SourceSwitch({
         onClick={() => onChange(v)}
         data-testid={`source-${v}`}
         className={cn(
-          "flex min-h-16 items-center gap-3 rounded-xl border-2 p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50",
-          selected ? "border-primary bg-primary/5 dark:border-ring" : "border-border bg-card hover:bg-accent",
+          "relative flex min-h-16 items-center gap-3 rounded-xl border-2 p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50",
+          selected ? "border-primary bg-primary/10 dark:border-ring dark:bg-ring/15" : "border-border bg-card text-muted-foreground hover:bg-accent",
         )}
       >
         <span className={cn("inline-flex size-10 shrink-0 items-center justify-center rounded-full", selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>
           <Icon className="size-5" aria-hidden />
         </span>
-        <span className="flex min-w-0 flex-col">
-          <span className="font-semibold">{title}</span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className={cn("font-semibold", selected && "text-foreground")}>{title}</span>
           <span className="text-xs text-muted-foreground">{hint}</span>
         </span>
+        {selected ? <CheckIcon className="size-5 shrink-0 text-primary dark:text-ring" aria-hidden /> : null}
       </button>
     );
   };
