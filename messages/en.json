@@ -1329,7 +1329,21 @@
     "noResult": "No expense matches the search.",
     "detail": "Details",
     "menu": "Actions for this expense",
-    "countLine": "{count, plural, one {# expense} other {# expenses}}"
+    "countLine": "{count, plural, one {# expense} other {# expenses}}",
+    "period": {
+      "month": "Month",
+      "year": "Year",
+      "range": "Dates"
+    },
+    "periodLabel": "Period",
+    "from": "From",
+    "to": "To",
+    "show": "Show",
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "rangeLabel": "From {from} to {to}",
+    "byMonth": "By month",
+    "seeMonth": "See the expenses of {month}"
   },
   "statistics": {
     "title": "Statistics",

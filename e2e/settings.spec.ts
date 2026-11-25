@@ -7,7 +7,12 @@ test("admin: agency name, logo, legal numbers, contract lists and alerts are sav
   await login(page, agency.email, agency.password);
   await page.goto("/settings");
   const form = page.getByTestId("settings-agency");
-  await form.getByLabel("Nom de l'agence").fill("Atlas Cars Test");
+  // Typing before the page is interactive can append to the old name: retry until the field holds exactly the new one
+  const name = form.getByLabel("Nom de l'agence");
+  await expect(async () => {
+    await name.fill("Atlas Cars Test");
+    await expect(name).toHaveValue("Atlas Cars Test", { timeout: 1000 });
+  }).toPass();
   await form.getByLabel("Ville").fill("Marrakech");
   await form.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText("Modifications enregistrées.").last()).toBeVisible();

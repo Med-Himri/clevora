@@ -60,3 +60,42 @@ test("staff can see neither charges nor statistics (page, PDF or database)", asy
   }
   expect((await page.request.get("/api/statistics/pdf")).status()).toBe(403);
 });
+
+test("charges: see a month, a whole year (with each month's total) or any dates", async ({ page }) => {
+  const agency = await createTestAgency();
+  const year = new Date().getFullYear() - 1; // last year: nothing else there
+  await admin()
+    .from("charges")
+    .insert([
+      { agency_id: agency.agencyId, date: `${year}-01-10`, category: "loyer", amount: 3000 },
+      { agency_id: agency.agencyId, date: `${year}-03-05`, category: "lavage", amount: 200 },
+      { agency_id: agency.agencyId, date: `${year}-03-20`, category: "lavage", amount: 300 },
+      { agency_id: agency.agencyId, date: `${year}-11-02`, category: "loyer", amount: 3000 },
+    ]);
+  await login(page, agency.email, agency.password);
+
+  await page.goto(`/charges?month=${year}-03`);
+  await expect(page.getByTestId("charges-total")).toContainText("500 MAD");
+
+  // Whole year: 6 500 MAD, and the March tile opens March
+  await page.getByTestId("period-year").click();
+  await page.waitForURL(new RegExp(`year=${year}`));
+  await expect(page.getByTestId("charges-total")).toContainText("6 500 MAD");
+  await expect(page.getByTestId("charge-row").filter({ visible: true })).toHaveCount(4);
+  const months = page.getByTestId("charges-by-month");
+  await expectNoHorizontalScroll(page);
+  await months.getByRole("link").nth(2).click();
+  await page.waitForURL(new RegExp(`month=${year}-03`));
+  await expect(page.getByTestId("charges-total")).toContainText("500 MAD");
+
+  // Any dates: 15 January → 31 March
+  await page.getByTestId("period-range").click();
+  const form = page.getByTestId("period-form");
+  await form.getByLabel("Du").fill(`${year}-01-15`);
+  await form.getByLabel("Au").fill(`${year}-03-31`);
+  await form.getByRole("button", { name: "Voir" }).click();
+  await page.waitForURL(new RegExp(`from=${year}-01-15&to=${year}-03-31`));
+  await expect(page.getByTestId("charges-total")).toContainText("500 MAD");
+  await expect(page.getByText(`Du 15/01/${year} au 31/03/${year}`)).toBeVisible();
+  await expectNoHorizontalScroll(page);
+});

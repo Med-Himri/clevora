@@ -1329,7 +1329,21 @@
     "noResult": "لا توجد مصاريف مطابقة للبحث.",
     "detail": "التفاصيل",
     "menu": "إجراءات هذا المصروف",
-    "countLine": "{count, plural, one {مصروف واحد} two {مصروفان} few {# مصاريف} other {# مصروف}}"
+    "countLine": "{count, plural, one {مصروف واحد} two {مصروفان} few {# مصاريف} other {# مصروف}}",
+    "period": {
+      "month": "الشهر",
+      "year": "السنة",
+      "range": "تواريخ"
+    },
+    "periodLabel": "الفترة",
+    "from": "من",
+    "to": "إلى",
+    "show": "عرض",
+    "previousYear": "السنة السابقة",
+    "nextYear": "السنة التالية",
+    "rangeLabel": "من {from} إلى {to}",
+    "byMonth": "حسب الشهر",
+    "seeMonth": "عرض مصاريف {month}"
   },
   "statistics": {
     "title": "الإحصائيات",

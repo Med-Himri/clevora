@@ -1329,7 +1329,21 @@
     "noResult": "Aucune charge ne correspond à la recherche.",
     "detail": "Détail",
     "menu": "Actions pour cette charge",
-    "countLine": "{count, plural, one {# charge} other {# charges}}"
+    "countLine": "{count, plural, one {# charge} other {# charges}}",
+    "period": {
+      "month": "Mois",
+      "year": "Année",
+      "range": "Dates"
+    },
+    "periodLabel": "Période",
+    "from": "Du",
+    "to": "Au",
+    "show": "Voir",
+    "previousYear": "Année précédente",
+    "nextYear": "Année suivante",
+    "rangeLabel": "Du {from} au {to}",
+    "byMonth": "Par mois",
+    "seeMonth": "Voir les charges de {month}"
   },
   "statistics": {
     "title": "Statistiques",
