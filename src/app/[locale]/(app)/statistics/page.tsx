@@ -9,7 +9,7 @@ import { StatTile } from "@/components/app/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/fields";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { requireRole } from "@/lib/auth/session";
@@ -174,11 +174,11 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
             <input type="hidden" name="period" value="custom" />
             <div className="flex flex-col gap-2">
               <Label htmlFor="stats-from">{t("from")}</Label>
-              <Input id="stats-from" name="from" type="date" defaultValue={from} required className="w-44" />
+              <DateInput id="stats-from" name="from" defaultValue={from} required className="w-44" />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="stats-to">{t("to")}</Label>
-              <Input id="stats-to" name="to" type="date" defaultValue={to} required className="w-44" />
+              <DateInput id="stats-to" name="to" defaultValue={to} required className="w-44" />
             </div>
             <Button type="submit" size="lg">
               <CalendarDaysIcon aria-hidden />

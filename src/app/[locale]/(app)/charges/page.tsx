@@ -10,7 +10,7 @@ import { SearchBar } from "@/components/app/search-bar";
 import { StatTile } from "@/components/app/stat-tile";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { DateInput } from "@/components/ui/fields";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { requireRole } from "@/lib/auth/session";
@@ -185,11 +185,11 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
             <form method="get" className="flex flex-wrap items-end gap-2" data-testid="period-form">
               <div className="flex flex-col gap-1">
                 <Label htmlFor="ch-from">{t("from")}</Label>
-                <Input id="ch-from" name="from" type="date" defaultValue={from} required className="w-44" />
+                <DateInput id="ch-from" name="from" defaultValue={from} required className="w-44" />
               </div>
               <div className="flex flex-col gap-1">
                 <Label htmlFor="ch-to">{t("to")}</Label>
-                <Input id="ch-to" name="to" type="date" defaultValue={to} required className="w-44" />
+                <DateInput id="ch-to" name="to" defaultValue={to} required className="w-44" />
               </div>
               {q ? <input type="hidden" name="q" value={q} /> : null}
               <Button type="submit" size="lg">

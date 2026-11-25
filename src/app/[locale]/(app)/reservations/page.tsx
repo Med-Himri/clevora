@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { SelectAllBox, SelectionProvider } from "@/components/app/selection";
 import { SearchBar } from "@/components/app/search-bar";
 import { Button } from "@/components/ui/button";
+import { DateInput } from "@/components/ui/fields";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
@@ -68,7 +69,7 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="inf-date">{t("infraction.date")}</Label>
-              <Input id="inf-date" name="date" type="date" defaultValue={date} required />
+              <DateInput id="inf-date" name="date" defaultValue={date} required />
             </div>
             <div className="flex flex-col gap-2">
               <Label htmlFor="inf-time">{t("infraction.time")}</Label>

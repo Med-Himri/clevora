@@ -17,21 +17,75 @@ type Base = Omit<React.ComponentProps<"input">, "value" | "onChange" | "type">;
 const PICKER =
   "relative pe-11 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-y-0 [&::-webkit-calendar-picker-indicator]:end-0 [&::-webkit-calendar-picker-indicator]:h-auto [&::-webkit-calendar-picker-indicator]:w-11 [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0";
 
-/** Date (yyyy-mm-dd value). The phone's own date picker; shown as dd/mm/yyyy in French. */
-export function DateField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+/**
+ * Date (yyyy-mm-dd value), always SHOWN as dd/mm/yyyy: browsers draw the date box
+ * in the phone's language (mm/dd/yyyy on an English phone), so our text sits on top
+ * of it. Tapping still opens the phone's own calendar; while typing on a computer,
+ * the browser's box shows.
+ */
+export function DateField({ value, onChange, className, onFocus, onBlur, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+  const [focused, setFocused] = useState(false);
+  const shown = /^\d{4}-\d{2}-\d{2}$/.test(value) && !focused ? value.split("-").reverse().join("/") : null;
   return (
     <div className="relative">
-      <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} className={cn(PICKER, className)} {...props} />
+      <Input
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={(e) => {
+          setFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur?.(e);
+        }}
+        className={cn(PICKER, shown && "text-transparent [&::-webkit-datetime-edit]:text-transparent", className)}
+        {...props}
+      />
+      {shown ? (
+        <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-base md:text-sm" dir="ltr" aria-hidden data-testid="date-shown">
+          {shown}
+        </span>
+      ) : null}
       <CalendarIcon className="pointer-events-none absolute end-3 top-3 size-5 text-muted-foreground" aria-hidden />
     </div>
   );
 }
 
-/** Time (HH:mm, 24 h). */
-export function TimeField({ value, onChange, className, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+/** The same date box inside a plain (GET) form: keeps its own value and submits it under `name`. */
+export function DateInput({ name, defaultValue, ...props }: Base & { name: string; defaultValue: string }) {
+  const [value, setValue] = useState(defaultValue);
+  return <DateField name={name} value={value} onChange={setValue} {...props} />;
+}
+
+/** Time (HH:mm value), always SHOWN as 24 h (an English phone would draw "09:00 PM"). */
+export function TimeField({ value, onChange, className, onFocus, onBlur, ...props }: Base & { value: string; onChange: (v: string) => void }) {
+  const [focused, setFocused] = useState(false);
+  const shown = /^\d{2}:\d{2}/.test(value) && !focused ? value.slice(0, 5) : null;
   return (
     <div className="relative">
-      <Input type="time" step={300} value={value} onChange={(e) => onChange(e.target.value)} className={cn(PICKER, className)} {...props} />
+      <Input
+        type="time"
+        step={300}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={(e) => {
+          setFocused(true);
+          onFocus?.(e);
+        }}
+        onBlur={(e) => {
+          setFocused(false);
+          onBlur?.(e);
+        }}
+        className={cn(PICKER, shown && "text-transparent [&::-webkit-datetime-edit]:text-transparent", className)}
+        {...props}
+      />
+      {shown ? (
+        <span className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-base md:text-sm" dir="ltr" aria-hidden>
+          {shown}
+        </span>
+      ) : null}
       <ClockIcon className="pointer-events-none absolute end-3 top-3 size-5 text-muted-foreground" aria-hidden />
     </div>
   );
