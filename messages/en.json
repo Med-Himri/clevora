@@ -1284,7 +1284,7 @@
     },
     "otherWhat": "Other: what?",
     "pricesTitle": "Prices (added to Charges)",
-    "pricesHint": "Each price becomes a \"Vidange\" charge for this car. Leave empty if you don't know.",
+    "pricesHint": "The prices make one « Vidange » expense for this car (the total, with the details). Leave empty if you do not know.",
     "pricesTotal": "Total:",
     "chargeNote": "Vidange at {km} km"
   },

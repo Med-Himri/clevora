@@ -1284,7 +1284,7 @@
     },
     "otherWhat": "Autre : quoi ?",
     "pricesTitle": "Prix (ajoutés aux Charges)",
-    "pricesHint": "Chaque prix devient une charge « Vidange » pour cette voiture. Laissez vide si vous ne savez pas.",
+    "pricesHint": "Les prix forment une seule charge « Vidange » pour cette voiture (le total, avec le détail). Laissez vide si vous ne savez pas.",
     "pricesTotal": "Total :",
     "chargeNote": "Vidange à {km} km"
   },

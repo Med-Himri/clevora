@@ -60,7 +60,7 @@ test("vidange: the last interval is only a suggestion; saving updates km left", 
   await expect(page.getByTestId("oil-row").filter({ hasText: "Fiat Tipo", visible: true }).getByTestId("oil-last-items")).toHaveText("Huile moteur, Filtre à huile");
 });
 
-test("vidange by an admin: several parts, each price becomes a Vidange charge", async ({ page }) => {
+test("vidange by an admin: several parts become ONE Vidange charge with the details", async ({ page }) => {
   const agency = await createTestAgency();
   const id = await addVehicle(agency.agencyId, { plate: `VC${uid().slice(-4).toUpperCase()}-A-6`, brand_model: "Renault Clio" });
   await admin().from("vehicles").update({ current_km: 60000, oil_last_km: 50000, oil_next_km: 60000 }).eq("id", id);
@@ -81,12 +81,8 @@ test("vidange by an admin: several parts, each price becomes a Vidange charge", 
   await dialog.getByRole("button", { name: "Enregistrer" }).click();
   await expect(page.getByText("Vidange enregistrée.")).toBeVisible();
 
-  const { data: charges } = await admin().from("charges").select("category, amount, note").eq("vehicle_id", id).order("amount");
-  expect(charges).toEqual([
-    { category: "vidange", amount: 80, note: "Vidange à 60 000 km · Filtre à huile" },
-    { category: "vidange", amount: 120, note: "Vidange à 60 000 km · Filtre à air" },
-    { category: "vidange", amount: 300, note: "Vidange à 60 000 km · Huile moteur" },
-  ]);
+  const { data: charges } = await admin().from("charges").select("category, amount, note").eq("vehicle_id", id);
+  expect(charges).toEqual([{ category: "vidange", amount: 500, note: "Vidange à 60 000 km · Huile moteur 300 MAD, Filtre à huile 80 MAD, Filtre à air 120 MAD" }]);
   const { data: hist } = await admin().from("oil_changes").select("km, next_km, items").eq("vehicle_id", id);
   expect(hist).toEqual([{ km: 60000, next_km: 70000, items: ["huile", "filtre_huile", "filtre_air"] }]);
 
