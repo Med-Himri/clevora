@@ -3,10 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
+import { getTranslations } from "next-intl/server";
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
+import { formatDate } from "@/lib/format";
 import { compareView, visionConfigured } from "@/lib/ai/vision";
 import { missingViews, photoPointToDiagram, VIEWS, type View } from "@/lib/inspections/model";
-import { modeFor } from "./queries";
+import { carryOverDamages, modeFor } from "./queries";
 import { damageSchema, KINDS, type DamageInput, type Kind } from "./schema";
 
 const uuid = z.uuid();
@@ -35,6 +37,10 @@ export async function startInspectionAction(reservationId: string, kind: Kind): 
   const mode = await modeFor(supabase, agency.id, reservationId, kind, agency.inspection.mode);
   const { data, error } = await supabase.from("inspections").insert({ agency_id: agency.id, reservation_id: reservationId, kind, mode }).select("id").single();
   if (error) return fail(dbErrorKey(error));
+  if (kind === "departure") {
+    const t = await getTranslations("inspection");
+    await carryOverDamages(supabase, agency.id, reservationId, data.id, (k) => t("carried", { number: k.contractNumber, date: formatDate(k.completedAt) }));
+  }
   return ok({ id: data.id });
 }
 

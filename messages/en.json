@@ -2258,6 +2258,14 @@
       "resultDeparture": "{count, plural, =0 {At departure: no damage.} one {At departure: # damage noted.} other {At departure: # damages noted.}}",
       "resultNone": "At return: no new damage. Thank you!",
       "resultNew": "{count, plural, one {At return: # new damage: {list}.} other {At return: # new damages: {list}.}}"
-    }
+    },
+    "carried": "Already there · contract {number} of {date}",
+    "carriedStart": "Already there",
+    "carriedHint": "The damages this car already had are copied from its last inspection. Remove the ones that were repaired, then add the new ones.",
+    "knownTitle": "Known damages",
+    "knownFrom": "Last inspection: contract {number} of",
+    "knownNone": "No known damage.",
+    "knownEmpty": "No finished inspection for this car yet.",
+    "knownOpen": "See the inspection"
   }
 }

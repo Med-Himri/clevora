@@ -2258,6 +2258,14 @@
       "resultDeparture": "{count, plural, =0 {Au départ : aucun dégât.} one {Au départ : # dégât noté.} other {Au départ : # dégâts notés.}}",
       "resultNone": "Au retour : aucun nouveau dégât. Merci !",
       "resultNew": "{count, plural, one {Au retour : # nouveau dégât : {list}.} other {Au retour : # nouveaux dégâts : {list}.}}"
-    }
+    },
+    "carried": "Déjà là · contrat {number} du {date}",
+    "carriedStart": "Déjà là",
+    "carriedHint": "Les dégâts déjà connus de cette voiture sont repris de sa dernière inspection. Retirez ceux qui ont été réparés, puis ajoutez les nouveaux.",
+    "knownTitle": "Dégâts connus",
+    "knownFrom": "Dernière inspection : contrat {number} du",
+    "knownNone": "Aucun dégât connu.",
+    "knownEmpty": "Pas encore d'inspection terminée pour cette voiture.",
+    "knownOpen": "Voir l'inspection"
   }
 }

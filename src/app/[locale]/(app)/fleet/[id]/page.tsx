@@ -20,6 +20,8 @@ import { VehicleStatusBadge } from "../components/status-badge";
 import { VehicleActions } from "../components/vehicle-actions";
 import { getProfitability } from "@/lib/fleet/finance-query";
 import { FinanceCard } from "../components/finance-card";
+import { getKnownDamages } from "../../inspections/queries";
+import { KnownDamagesCard } from "../components/known-damages-card";
 import { getVehicle } from "../queries";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -39,6 +41,8 @@ export default async function VehicleDetailPage({ params }: PageProps<"/[locale]
 
   // Achat et crédit (admins only: the function refuses staff)
   const finance = isAdmin ? ((await getProfitability(supabase, agency.id)).find((p) => p.vehicle_id === v.id) ?? null) : null;
+  // Inspection turned on: the car's damages as last seen
+  const known = agency.inspection.enabled ? await getKnownDamages(supabase, agency.id, v.id) : null;
   const { data: alertCfg } = await supabase.from("agencies").select("alert_days_before, alert_km_before").eq("id", agency.id).single();
   const today = dayKey(new Date());
   const dateState = (d: string | null) => {
@@ -93,6 +97,7 @@ export default async function VehicleDetailPage({ params }: PageProps<"/[locale]
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-2">
+        {agency.inspection.enabled ? <KnownDamagesCard known={known} /> : null}
         <Card>
           <CardHeader>
             <CardTitle>{t("detail.info")}</CardTitle>

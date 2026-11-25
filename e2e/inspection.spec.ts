@@ -261,3 +261,42 @@ test("Retour with a new damage: the fee is kept from the caution, the rest is st
   expect(pays!.some((p) => p.kind === "deposit_refund")).toBe(false);
   await expect(page.getByText("Frais de dégâts").first()).toBeVisible();
 });
+
+test("a new departure starts with the car's known damages; the car page shows them", async ({ page }) => {
+  const agency = await createTestAgency();
+  const staff = await addMember(agency.agencyId, "staff");
+  const car = await addVehicle(agency.agencyId, { plate: `K${uid().slice(-5).toUpperCase()}-A-6`, brand_model: "Seat Ibiza" });
+  const sb = admin();
+  await sb.from("agencies").update({ inspection_enabled: true }).eq("id", agency.agencyId);
+  const { data: client } = await sb.from("clients").insert({ agency_id: agency.agencyId, full_name: "Client Connu", id_type: "cin", id_number: `KC${Math.floor(100000 + Math.random() * 899999)}` }).select("id").single();
+  const day = 86_400_000;
+  // Last rental of this car: returned, its return inspection found a dent
+  const { data: old } = await sb
+    .from("reservations")
+    .insert({ agency_id: agency.agencyId, vehicle_id: car, client_id: client!.id, daily_price: 300, status: "returned", signed_at: new Date(Date.now() - 6 * day).toISOString(), start_at: new Date(Date.now() - 6 * day).toISOString(), end_at: new Date(Date.now() - 3 * day).toISOString(), actual_return_at: new Date(Date.now() - 3 * day).toISOString() })
+    .select("id, contract_number")
+    .single();
+  const { data: ret } = await sb.from("inspections").insert({ agency_id: agency.agencyId, reservation_id: old!.id, kind: "return", completed_at: new Date(Date.now() - 3 * day).toISOString() }).select("id").single();
+  await sb.from("inspection_damages").insert({ agency_id: agency.agencyId, inspection_id: ret!.id, x: 0.85, y: 0.55, type: "dent", view: "right", note: "Bosse portière" });
+  // Next rental of the same car
+  const { data: next } = await sb
+    .from("reservations")
+    .insert({ agency_id: agency.agencyId, vehicle_id: car, client_id: client!.id, daily_price: 300, signed_at: new Date().toISOString(), start_at: new Date(Date.now() + day).toISOString(), end_at: new Date(Date.now() + 3 * day).toISOString() })
+    .select("id")
+    .single();
+
+  await login(page, staff.email, staff.password);
+  await page.goto(`/inspections/${next!.id}/departure`);
+  await expect(page.getByTestId("carried-hint")).toBeVisible();
+  const list = page.getByTestId("inspection-damages");
+  await expect(list.locator("li")).toHaveCount(1);
+  await expect(list).toContainText("Bosse / choc");
+  await expect(list).toContainText(`Déjà là · contrat ${old!.contract_number}`);
+  await expect(list).toContainText("Bosse portière");
+
+  await page.goto(`/fleet/${car}`);
+  const known = page.getByTestId("known-damages");
+  await expect(known).toContainText("Bosse / choc");
+  await expect(known).toContainText(old!.contract_number);
+  await expectNoHorizontalScroll(page);
+});

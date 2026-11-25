@@ -236,6 +236,11 @@ export function InspectionCapture({
         <CardHeader>
           <CardTitle>{t("damagesTitle")}</CardTitle>
           <p className="text-sm text-muted-foreground">{done ? t("damagesDone") : t("damagesHint")}</p>
+          {!done && kind === "departure" && inspection.damages.some((d) => d.note?.startsWith(t("carriedStart"))) ? (
+            <p className="rounded-lg bg-muted/60 p-3 text-sm" data-testid="carried-hint">
+              {t("carriedHint")}
+            </p>
+          ) : null}
         </CardHeader>
         <CardContent className="grid items-start gap-6 md:grid-cols-[240px_1fr]">
           <div className="flex flex-col items-center gap-2">

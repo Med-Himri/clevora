@@ -7,9 +7,10 @@ import { PageHeader } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Link, redirect } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
+import { formatDate } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { InspectionCapture } from "../../components/inspection-capture";
-import { getInspections, modeFor } from "../../queries";
+import { carryOverDamages, getInspections, modeFor } from "../../queries";
 import { KINDS, type Kind } from "../../schema";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -44,7 +45,9 @@ export default async function InspectionCapturePage({ params, searchParams }: Pa
     const mode = all.departure && kind === "return" ? all.departure.mode : await modeFor(supabase, agency.id, id, kind as Kind, agency.inspection.mode);
     const { data: created } = await supabase.from("inspections").insert({ agency_id: agency.id, reservation_id: id, kind, mode }).select("id").single();
     if (!created) notFound();
-    inspection = { id: created.id, kind: kind as Kind, mode, videoUrl: null, completedAt: null, notes: null, aiStatus: "none", aiCheckedAt: null, photos: [], damages: [] };
+    // Departure: start from the damages the car already had (its last finished inspection)
+    const damages = kind === "departure" ? await carryOverDamages(supabase, agency.id, id, created.id, (k) => t("carried", { number: k.contractNumber, date: formatDate(k.completedAt) })) : [];
+    inspection = { id: created.id, kind: kind as Kind, mode, videoUrl: null, completedAt: null, notes: null, aiStatus: "none", aiCheckedAt: null, photos: [], damages };
   }
 
   return (

@@ -58,3 +58,59 @@ export async function modeFor(supabase: ServerSupabase, agencyId: string, reserv
   const { data } = await supabase.from("inspections").select("mode").eq("agency_id", agencyId).eq("reservation_id", reservationId).eq("kind", "departure").maybeSingle();
   return data?.mode === "video" || data?.mode === "photos" ? data.mode : fallback;
 }
+
+export type KnownDamages = { damages: Damage[]; completedAt: string; contractNumber: string; reservationId: string };
+
+/**
+ * The car's damages as last seen: the most recent FINISHED inspection (departure or
+ * return) of another rental of this car. Confirmed marks only.
+ */
+export async function getKnownDamages(supabase: ServerSupabase, agencyId: string, vehicleId: string, exceptReservation?: string): Promise<KnownDamages | null> {
+  let q = supabase
+    .from("inspections")
+    .select(
+      "reservation_id, completed_at, reservation:reservations!inspections_agency_id_reservation_id_fkey!inner(vehicle_id, contract_number), damages:inspection_damages(id, x, y, type, view, note, source, confirmed, created_at)",
+    )
+    .eq("agency_id", agencyId)
+    .eq("reservation.vehicle_id", vehicleId)
+    .not("completed_at", "is", null)
+    .order("completed_at", { ascending: false })
+    .limit(1);
+  if (exceptReservation) q = q.neq("reservation_id", exceptReservation);
+  const { data } = await q;
+  const row = data?.[0];
+  if (!row?.completed_at) return null;
+  return {
+    completedAt: row.completed_at,
+    contractNumber: (row.reservation as unknown as { contract_number: string }).contract_number,
+    reservationId: row.reservation_id,
+    damages: (row.damages ?? [])
+      .filter((d) => d.confirmed)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at))
+      .map((d) => ({ id: d.id, x: Number(d.x), y: Number(d.y), type: d.type as Damage["type"], view: d.view as View | null, note: d.note, source: "staff" as const, confirmed: true })),
+  };
+}
+
+/**
+ * A new departure inspection starts with the damages the car already had (last
+ * finished inspection): staff only remove what was repaired and add what is new.
+ * Returns the copied marks (the caller builds the page from them).
+ */
+export async function carryOverDamages(supabase: ServerSupabase, agencyId: string, reservationId: string, inspectionId: string, note: (k: KnownDamages) => string): Promise<Damage[]> {
+  const { data: r } = await supabase.from("reservations").select("vehicle_id").eq("agency_id", agencyId).eq("id", reservationId).maybeSingle();
+  if (!r?.vehicle_id) return [];
+  const known = await getKnownDamages(supabase, agencyId, r.vehicle_id, reservationId);
+  if (!known?.damages.length) return [];
+  const prefix = note(known);
+  const { data } = await supabase
+    .from("inspection_damages")
+    .insert(
+      known.damages.map((d) => {
+        // Carried again: keep only the original words after the previous "… du dd/mm/yyyy"
+        const original = (d.note ?? "").replace(/^.*\d{2}\/\d{2}\/\d{4}(?: · )?/, "");
+        return { agency_id: agencyId, inspection_id: inspectionId, x: d.x, y: d.y, type: d.type, view: d.view, note: `${prefix}${original ? ` · ${original}` : ""}`.slice(0, 300) };
+      }),
+    )
+    .select("id, x, y, type, view, note");
+  return (data ?? []).map((d) => ({ id: d.id, x: Number(d.x), y: Number(d.y), type: d.type as Damage["type"], view: d.view as View | null, note: d.note, source: "staff" as const, confirmed: true }));
+}
