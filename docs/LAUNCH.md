@@ -9,7 +9,8 @@ Tick every line before opening Parcolia to real agencies. How-tos are in `docs/D
 - [ ] Resend domain **verified**; a test email shows SPF, DKIM and DMARC = PASS.
 - [ ] Vercel production variables set (compare with `.env.example`); no test-only variable on Vercel.
 - [ ] Vercel Cron visible (Settings → Cron Jobs) and one manual run returned 200.
-- [ ] GitHub secrets set; `production` environment needs your approval; `main` requires CI.
+- [ ] GitHub secrets set (the migrations job says « secrets are not set yet: skipping » until then); `production` environment needs your approval; `main` requires CI.
+- [ ] CI green on the last commit of `main` (GitHub → Actions → CI).
 
 ## Safety
 - [ ] RLS tests green in CI (`npx supabase test db`): 400+ tests, 0 failures.
@@ -30,10 +31,12 @@ Tick every line before opening Parcolia to real agencies. How-tos are in `docs/D
 - [ ] Platform admin account created (`platform_admins`), with two-step login turned on.
 - [ ] Demo agency ready (`npm run demo:create`); demo logins tested on phone and laptop.
 - [ ] Support WhatsApp number on the site (`NEXT_PUBLIC_SUPPORT_WHATSAPP`).
-- [ ] `ANTHROPIC_API_KEY` set and one assistant question answered in production.
+- [ ] `GROQ_API_KEY` set on Vercel (a NEW key: the one pasted in a chat must be deleted on console.groq.com), one assistant question answered in production. Optional: `ANTHROPIC_API_KEY`.
 
 ## Last check (30 minutes, on a phone and on a laptop)
 - [ ] Sign up a new agency → confirm email → add a car → reservation → contract PDF → return → payment.
 - [ ] Invite a staff member by email and WhatsApp; staff cannot see Charges, Statistiques or money.
 - [ ] Arabic: menu on the right, dates and amounts in the right order, contract PDF readable.
+- [ ] Inspection (if you sell it): turn it on in Paramètres, do a departure and a return on a phone (photos and video), open the état des lieux PDF.
+- [ ] Scan a real CIN and a real passport in Clients (the text must fill the form).
 - [ ] Light and dark themes look right; no sideways scrolling.
