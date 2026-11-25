@@ -58,6 +58,9 @@ export type Profitability = {
   revenue_month: number;
   charges_month: number;
   credit_month: number;
+  /** Damage fees kept at return (income, shown on their own): since purchase / this month. */
+  damages: number;
+  damages_month: number;
 };
 
 /** "2026-03-05" + 3 months => "2026-06-05" (same day, clamped to the month end). */
@@ -82,7 +85,7 @@ export type FinanceSummary = {
   paidBack: boolean;
   /** Since purchase: revenue − charges − what was really paid for the car. */
   result: number;
-  /** This month: rent − charges − this month's credit payment. */
+  /** This month: rent + damage fees − charges − this month's credit payment. */
   monthResult: number;
 };
 
@@ -98,6 +101,6 @@ export function summarize(p: Profitability): FinanceSummary {
     paybackPct,
     paidBack: p.gain >= p.total_cost,
     result: p.gain - p.paid_so_far,
-    monthResult: p.revenue_month - p.charges_month - p.credit_month,
+    monthResult: p.revenue_month + p.damages_month - p.charges_month - p.credit_month,
   };
 }

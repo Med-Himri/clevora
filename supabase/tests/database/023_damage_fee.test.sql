@@ -1,7 +1,7 @@
 -- Damages at return: kept from the caution, never more than the franchise.
 begin;
 set local search_path = public, extensions, tests;
-select plan(8);
+select plan(11);
 
 select tests.create_fixture();
 -- 250 / day, advance 200; caution 2 000, franchise 5 000; the car is out
@@ -26,6 +26,14 @@ select is((select damage_note from public.reservations where id = tests.id('a_re
 select is((select amount from public.reservation_payments where reservation_id = tests.id('a_reservation') and kind = 'extra'), 2000.00, 'the whole caution (2 000) is kept for the damages');
 select is((select total from public.reservation_totals where id = tests.id('a_reservation')), 3750.00, 'total = 250 rental + 3 500 damages');
 select is((select balance from public.reservation_totals where id = tests.id('a_reservation')), 1550.00, 'still owed: 50 rental + 1 500 damages the caution did not cover');
+
+-- Statistiques: the fee is income on the day the car came back (admins only)
+select throws_ok($$
+  select * from public.stats_daily(tests.id('a_agency'), current_date - 1, current_date + 1)
+$$, '42501', null, 'staff cannot read the statistics');
+select tests.authenticate_as(tests.id('a_admin'));
+select is((select sum(damages) from public.stats_daily(tests.id('a_agency'), current_date - 1, current_date + 1)), 3500.00, 'stats_daily: 3 500 of damage fees');
+select is((select damages from public.stats_by_vehicle(tests.id('a_agency'), current_date - 1, current_date + 1) where vehicle_id = tests.id('a_vehicle')), 3500.00, 'stats_by_vehicle: on the car');
 
 select * from finish();
 rollback;

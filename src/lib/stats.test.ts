@@ -23,3 +23,19 @@ describe("statistics buckets", () => {
     expect(occupancy(5, 0, 30)).toBe(0);
   });
 });
+
+describe("damage fees in the statistics", () => {
+  it("are kept apart from rent and added to the profit", () => {
+    // 3 months → one bar per month; both days fall in November
+    const b = toBuckets(
+      [
+        { day: "2026-11-02", revenue: 300, charges: 100, rented_days: 1, damages: 0 },
+        { day: "2026-11-03", revenue: 300, charges: 0, rented_days: 1, damages: 1500 },
+      ],
+      "2026-09-01",
+      "2026-11-30",
+      "2026-11-30",
+    ).find((x) => x.key === "2026-11");
+    expect(b).toMatchObject({ revenue: 600, damages: 1500, charges: 100, net: 2000 });
+  });
+});

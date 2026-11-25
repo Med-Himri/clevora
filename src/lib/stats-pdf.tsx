@@ -12,7 +12,7 @@ export async function renderStatsPdf(input: {
   brand: string;
   from: string;
   to: string;
-  totals: { revenue: number; charges: number; rentedDays: number; occupancy: number };
+  totals: { revenue: number; charges: number; damages: number; rentedDays: number; occupancy: number };
   buckets: Array<Bucket & { label: string }>;
   cars: Car[];
 }): Promise<Buffer> {
@@ -31,7 +31,7 @@ export async function renderStatsPdf(input: {
     cN: { flex: 1, textAlign: "right" },
     footer: { position: "absolute", bottom: 16, left: 30, right: 30, flexDirection: "row", justifyContent: "space-between", fontSize: 7, color: "#94A3B8" },
   });
-  const net = input.totals.revenue - input.totals.charges;
+  const net = input.totals.revenue + input.totals.damages - input.totals.charges;
   return renderToBuffer(
     <Document title={`Statistiques ${input.agencyName}`} author={input.agencyName} creator="Parcolia" producer="Parcolia">
       <Page size="A4" style={s.page}>
@@ -42,6 +42,7 @@ export async function renderStatsPdf(input: {
         <View style={s.tiles}>
           {[
             ["Chiffre d'affaires", formatMoney(input.totals.revenue)],
+            ["Frais de dégâts", formatMoney(input.totals.damages)],
             ["Charges", formatMoney(input.totals.charges)],
             ["Bénéfice net", formatMoney(net)],
             ["Jours loués", String(input.totals.rentedDays)],

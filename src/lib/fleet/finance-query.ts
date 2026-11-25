@@ -16,6 +16,8 @@ export async function getProfitability(supabase: ServerSupabase, agencyId: strin
     total_cost: n(r.total_cost),
     revenue: n(r.revenue),
     charges: n(r.charges),
+    damages: n(r.damages),
+    damages_month: n(r.damages_month),
     gain: n(r.gain),
     revenue_month: n(r.revenue_month),
     charges_month: n(r.charges_month),

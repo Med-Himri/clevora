@@ -1389,8 +1389,11 @@
       "rentMonth": "Loyers",
       "chargesMonth": "Charges",
       "creditMonth": "Crédit",
-      "resultMonth": "Bénéfice"
-    }
+      "resultMonth": "Bénéfice",
+      "damagesMonth": "Dégâts"
+    },
+    "damages": "Frais de dégâts",
+    "damagesHint": "Retenus au retour des voitures, comptés dans le bénéfice."
   },
   "assistant": {
     "title": "Assistant IA",

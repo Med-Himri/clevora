@@ -1,4 +1,4 @@
-import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
+import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CarFrontIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { ExcelExport } from "@/components/app/excel-export";
@@ -78,6 +78,7 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
         ),
     },
     { key: "rent", header: t("profit.rentMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.revenue_month)}</Ltr> },
+    { key: "damagesMonth", header: t("profit.damagesMonth"), priority: "low", align: "end", cell: (c) => (c.damages_month > 0 ? <Ltr>{formatMoney(c.damages_month)}</Ltr> : <span className="text-muted-foreground">—</span>) },
     { key: "charges", header: t("profit.chargesMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.charges_month)}</Ltr> },
     { key: "creditMonth", header: t("profit.creditMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.credit_month)}</Ltr> },
     {
@@ -100,12 +101,15 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
   const days = rows.length;
   const revenue = buckets.reduce((s, b) => s + b.revenue, 0);
   const charges = buckets.reduce((s, b) => s + b.charges, 0);
+  // Damage fees kept at return: income on their own, added to the profit
+  const damages = buckets.reduce((s, b) => s + b.damages, 0);
   const rentedDays = buckets.reduce((s, b) => s + b.rentedDays, 0);
   const cars = (perCar ?? [])
     .map((c) => {
       const rev = Number(c.revenue);
       const ch = Number(c.charges);
-      return { ...c, revenue: rev, charges: ch, net: rev - ch, occupancy: occupancy(c.rented_days, 1, days) };
+      const dmg = Number(c.damages);
+      return { ...c, revenue: rev, charges: ch, damages: dmg, net: rev + dmg - ch, occupancy: occupancy(c.rented_days, 1, days) };
     })
     .sort((a, b) => b.net - a.net);
   const best = cars.find((c) => c.revenue > 0);
@@ -123,6 +127,7 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
     { key: "net", header: t("net"), priority: "high", align: "end", cell: (c) => <Ltr className={cn("font-bold", c.net < 0 && "text-destructive")}>{formatMoney(c.net)}</Ltr> },
     { key: "occupancy", header: t("occupancy"), priority: "high", hideLabelInCard: true, cell: (c) => <Badge variant={occupancyTone(c.occupancy)}>{t("occupancyValue", { pct: c.occupancy })}</Badge> },
     { key: "revenue", header: t("revenue"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.revenue)}</Ltr> },
+    { key: "damages", header: t("damages"), priority: "low", align: "end", cell: (c) => (c.damages > 0 ? <Ltr>{formatMoney(c.damages)}</Ltr> : <span className="text-muted-foreground">—</span>) },
     { key: "charges", header: t("carCharges"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.charges)}</Ltr> },
     { key: "days", header: t("daysRented"), priority: "low", align: "end", cell: (c) => <Ltr>{c.rented_days}</Ltr> },
   ];
@@ -138,12 +143,12 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
             <ExcelExport
               fileName={`statistiques-${from}-${to}.xlsx`}
               label={t("exportExcel")}
-              header={[t("periodColumn"), t("revenue"), t("charges"), t("net"), t("daysRented")]}
+              header={[t("periodColumn"), t("revenue"), t("damages"), t("charges"), t("net"), t("daysRented")]}
               rows={[
-                ...buckets.map((b) => [labels[b.key], b.revenue, b.charges, b.net, b.rentedDays]),
+                ...buckets.map((b) => [labels[b.key], b.revenue, b.damages, b.charges, b.net, b.rentedDays]),
                 [],
-                [t("car"), t("revenue"), t("carCharges"), t("net"), t("daysRented"), t("occupancy")],
-                ...cars.map((c) => [`${c.brand_model} ${c.plate}`, c.revenue, c.charges, c.net, c.rented_days, `${c.occupancy} %`]),
+                [t("car"), t("revenue"), t("damages"), t("carCharges"), t("net"), t("daysRented"), t("occupancy")],
+                ...cars.map((c) => [`${c.brand_model} ${c.plate}`, c.revenue, c.damages, c.charges, c.net, c.rented_days, `${c.occupancy} %`]),
               ]}
             />
             <Button variant="outline" size="lg" asChild>
@@ -201,8 +206,9 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
           />
         </li>
         <li><StatTile label={t("revenue")} value={<Ltr>{formatMoney(revenue)}</Ltr>} icon={WalletIcon} tone="success" testId="stats-revenue" /></li>
+        <li><StatTile label={t("damages")} value={<Ltr>{formatMoney(damages)}</Ltr>} hint={t("damagesHint")} icon={CarFrontIcon} testId="stats-damages" /></li>
         <li><StatTile label={t("charges")} value={<Ltr>{formatMoney(charges)}</Ltr>} icon={WalletIcon} tone="warning" testId="stats-charges" /></li>
-        <li><StatTile label={t("net")} value={<Ltr>{formatMoney(revenue - charges)}</Ltr>} icon={TrendingUpIcon} tone={revenue - charges < 0 ? "danger" : "success"} testId="stats-net" /></li>
+        <li><StatTile label={t("net")} value={<Ltr>{formatMoney(revenue + damages - charges)}</Ltr>} icon={TrendingUpIcon} tone={revenue + damages - charges < 0 ? "danger" : "success"} testId="stats-net" /></li>
         <li><StatTile label={t("daysRented")} value={rentedDays} icon={CalendarDaysIcon} /></li>
         <li><StatTile label={t("occupancy")} value={<Ltr>{occupancy(rentedDays, carCount ?? 0, days)} %</Ltr>} icon={PercentIcon} testId="stats-occupancy" /></li>
         <li><StatTile label={t("bestCar")} value={<span className="text-lg sm:text-xl">{best ? best.brand_model : "—"}</span>} hint={best ? <Ltr>{best.plate}</Ltr> : undefined} icon={TrophyIcon} /></li>
@@ -224,6 +230,7 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
                 <tr>
                   <th scope="col" className="py-1 text-start font-medium">{t("periodColumn")}</th>
                   <th scope="col" className="py-1 text-end font-medium">{t("revenue")}</th>
+                  <th scope="col" className="py-1 text-end font-medium">{t("damages")}</th>
                   <th scope="col" className="py-1 text-end font-medium">{t("charges")}</th>
                   <th scope="col" className="py-1 text-end font-medium">{t("net")}</th>
                 </tr>
@@ -233,6 +240,7 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
                   <tr key={b.key}>
                     <td className="py-1">{labels[b.key]}{b.partial ? ` (${t("partial")})` : ""}</td>
                     <td className="py-1 text-end"><Ltr>{formatMoney(b.revenue)}</Ltr></td>
+                    <td className="py-1 text-end"><Ltr>{formatMoney(b.damages)}</Ltr></td>
                     <td className="py-1 text-end"><Ltr>{formatMoney(b.charges)}</Ltr></td>
                     <td className="py-1 text-end"><Ltr>{formatMoney(b.net)}</Ltr></td>
                   </tr>

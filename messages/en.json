@@ -1389,8 +1389,11 @@
       "rentMonth": "Rent",
       "chargesMonth": "Charges",
       "creditMonth": "Credit",
-      "resultMonth": "Profit"
-    }
+      "resultMonth": "Profit",
+      "damagesMonth": "Damages"
+    },
+    "damages": "Damage fees",
+    "damagesHint": "Kept when cars came back, counted in the profit."
   },
   "assistant": {
     "title": "AI assistant",

@@ -32,12 +32,13 @@ export async function GET(request: NextRequest) {
     totals: {
       revenue: buckets.reduce((s, b) => s + b.revenue, 0),
       charges: buckets.reduce((s, b) => s + b.charges, 0),
+      damages: buckets.reduce((s, b) => s + b.damages, 0),
       rentedDays,
       occupancy: occupancy(rentedDays, count ?? 0, rows.length),
     },
     buckets: buckets.map((b) => ({ ...b, label: b.key.length === 7 ? `${b.key.slice(5)}/${b.key.slice(0, 4)}` : `${b.key.slice(8)}/${b.key.slice(5, 7)}` })),
     cars: (perCar ?? [])
-      .map((c) => ({ ...c, revenue: Number(c.revenue), charges: Number(c.charges), net: Number(c.revenue) - Number(c.charges), occupancy: occupancy(c.rented_days, 1, rows.length) }))
+      .map((c) => ({ ...c, revenue: Number(c.revenue), charges: Number(c.charges), net: Number(c.revenue) + Number(c.damages) - Number(c.charges), occupancy: occupancy(c.rented_days, 1, rows.length) }))
       .sort((a, b) => b.net - a.net),
   });
   return new NextResponse(new Uint8Array(pdf), {

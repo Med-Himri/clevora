@@ -260,6 +260,12 @@ test("Retour with a new damage: the fee is kept from the caution, the rest is st
   expect(pays!.find((p) => p.kind === "extra")).toMatchObject({ amount: 2000, note: "Retenu sur la caution (dégâts)" });
   expect(pays!.some((p) => p.kind === "deposit_refund")).toBe(false);
   await expect(page.getByText("Frais de dégâts").first()).toBeVisible();
+
+  // Statistiques (admin): the fee is income on its own, added to the profit
+  await page.context().clearCookies();
+  await login(page, agency.email, agency.password);
+  await page.goto("/statistics?period=days");
+  await expect(page.getByTestId("stats-damages")).toContainText("3 500 MAD");
 });
 
 test("a new departure starts with the car's known damages; the car page shows them", async ({ page }) => {

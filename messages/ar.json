@@ -1389,8 +1389,11 @@
       "rentMonth": "المداخيل",
       "chargesMonth": "المصاريف",
       "creditMonth": "القسط",
-      "resultMonth": "الربح"
-    }
+      "resultMonth": "الربح",
+      "damagesMonth": "الأضرار"
+    },
+    "damages": "مصاريف الأضرار",
+    "damagesHint": "مقتطعة عند رجوع السيارات، ومحسوبة في الربح."
   },
   "assistant": {
     "title": "المساعد الذكي",

@@ -394,7 +394,7 @@ export const TOOLS: AssistantTool[] = [
   },
   {
     name: "revenue",
-    description: "Chiffre d'affaires, charges et bénéfice net sur une période (réservé aux administrateurs).",
+    description: "Chiffre d'affaires (locations), frais de dégâts, charges et bénéfice net sur une période (réservé aux administrateurs).",
     roles: ["admin"],
     schema: z.object({ from: isoDate, to: isoDate }),
     async run({ supabase, agencyId }, input) {
@@ -406,9 +406,10 @@ export const TOOLS: AssistantTool[] = [
       if (error) throw error;
       const revenue = (data ?? []).reduce((s, r) => s + Number(r.revenue), 0);
       const charges = (data ?? []).reduce((s, r) => s + Number(r.charges), 0);
+      const damages = (data ?? []).reduce((s, r) => s + Number(r.damages), 0);
       const best = (perCar ?? []).map((c) => ({ voiture: `${c.brand_model} ${c.plate}`, ca: Number(c.revenue) })).sort((a, b) => b.ca - a.ca).slice(0, 3);
       return {
-        data: { du: formatDate(from), au: formatDate(to), chiffre_affaires: formatMoney(revenue), charges: formatMoney(charges), net: formatMoney(revenue - charges), meilleures_voitures: best.map((b) => ({ ...b, ca: formatMoney(b.ca) })) },
+        data: { du: formatDate(from), au: formatDate(to), chiffre_affaires: formatMoney(revenue), frais_de_degats: formatMoney(damages), charges: formatMoney(charges), net: formatMoney(revenue + damages - charges), meilleures_voitures: best.map((b) => ({ ...b, ca: formatMoney(b.ca) })) },
         sources: [{ label: "Statistiques", href: `/statistics?period=custom&from=${from}&to=${to}` }],
       };
     },

@@ -1,6 +1,7 @@
 /** Turns daily rows from SQL (stats_daily) into the bars of the chart. */
-export type DailyRow = { day: string; revenue: number; charges: number; rented_days: number };
-export type Bucket = { key: string; from: string; to: string; revenue: number; charges: number; net: number; rentedDays: number; partial: boolean };
+export type DailyRow = { day: string; revenue: number; charges: number; rented_days: number; damages?: number };
+/** revenue = rent only; damages = damage fees kept at return; net = revenue + damages − charges. */
+export type Bucket = { key: string; from: string; to: string; revenue: number; charges: number; damages: number; net: number; rentedDays: number; partial: boolean };
 
 /** Up to 45 days → one bar per day; otherwise one bar per month. */
 export function bucketGranularity(from: string, to: string): "day" | "month" {
@@ -24,16 +25,17 @@ export function toBuckets(rows: DailyRow[], from: string, to: string, today: str
       const bFrom = granularity === "day" ? r.day : `${key}-01`;
       const bTo = granularity === "day" ? r.day : lastDayOfMonth(key);
       const partial = granularity === "month" && (bFrom < from || bTo > to || (today >= bFrom && today < bTo));
-      b = { key, from: bFrom, to: bTo, revenue: 0, charges: 0, net: 0, rentedDays: 0, partial };
+      b = { key, from: bFrom, to: bTo, revenue: 0, charges: 0, damages: 0, net: 0, rentedDays: 0, partial };
       map.set(key, b);
     }
     b.revenue += Number(r.revenue);
     b.charges += Number(r.charges);
+    b.damages += Number(r.damages ?? 0);
     b.rentedDays += Number(r.rented_days);
   }
   return [...map.values()]
     .sort((a, b) => a.key.localeCompare(b.key))
-    .map((b) => ({ ...b, revenue: round(b.revenue), charges: round(b.charges), net: round(b.revenue - b.charges) }));
+    .map((b) => ({ ...b, revenue: round(b.revenue), charges: round(b.charges), damages: round(b.damages), net: round(b.revenue + b.damages - b.charges) }));
 }
 
 function round(n: number): number {

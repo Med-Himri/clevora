@@ -24,6 +24,8 @@ const base: Profitability = {
   revenue_month: 9000,
   charges_month: 1200,
   credit_month: 3000,
+  damages: 0,
+  damages_month: 0,
 };
 
 describe("addMonths", () => {
@@ -48,6 +50,8 @@ describe("summarize", () => {
 
   it("a month that earns less than its credit payment is negative", () => {
     expect(summarize({ ...base, revenue_month: 2000 }).monthResult).toBe(-2200);
+    // A damage fee kept this month is income too
+    expect(summarize({ ...base, damages_month: 1500 }).monthResult).toBe(6300);
   });
 
   it("finished credit and cash cars", () => {

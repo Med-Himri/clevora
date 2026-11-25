@@ -1719,6 +1719,15 @@ export type Database = {
         Returns: string;
       };
       current_agency_ids: { Args: { p_roles?: string[] }; Returns: string[] };
+      damage_fee_rows: {
+        Args: { p_agency: string; p_from: string; p_to: string };
+        Returns: {
+          amount: number;
+          day: string;
+          reservation_id: string;
+          vehicle_id: string;
+        }[];
+      };
       delete_agency: { Args: { p_agency: string; p_confirm_name: string }; Returns: undefined };
       generate_recurring_charges: { Args: { p_agency: string; p_month?: string }; Returns: number };
       has_role: { Args: { p_agency: string; p_roles: string[] }; Returns: boolean };
@@ -1851,6 +1860,7 @@ export type Database = {
         Returns: {
           brand_model: string;
           charges: number;
+          damages: number;
           plate: string;
           rented_days: number;
           revenue: number;
@@ -1861,6 +1871,7 @@ export type Database = {
         Args: { p_agency: string; p_from: string; p_to: string };
         Returns: {
           charges: number;
+          damages: number;
           day: string;
           rented_days: number;
           revenue: number;
@@ -1885,6 +1896,8 @@ export type Database = {
           charges_month: number;
           credit_left: number;
           credit_month: number;
+          damages: number;
+          damages_month: number;
           down_payment: number;
           first_payment_on: string;
           gain: number;
