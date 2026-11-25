@@ -1054,7 +1054,11 @@
       "confirmCar": "تأكيد السيارة",
       "startTitle": "بدء الكراء؟",
       "signedQuestion": "هل وقّع الزبون العقد؟",
-      "openContract": "فتح العقد (طباعة، توقيع)"
+      "openContract": "فتح العقد (طباعة، توقيع)",
+      "inspectionDepartureMissing": "معاينة الخروج لم تُنجز: بدون صور، سيصعب إثبات أي ضرر عند الرجوع.",
+      "inspectionReturnMissing": "معاينة الرجوع لم تُنجز: أنجزها قبل إرجاع الضمانة.",
+      "doInspectionDeparture": "إنجاز معاينة الخروج",
+      "doInspectionReturn": "إنجاز معاينة الرجوع"
     },
     "bulk": {
       "select": "تحديد {contract} · {client}",

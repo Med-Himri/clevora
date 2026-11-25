@@ -44,11 +44,16 @@ export default async function ReservationPage({ params, searchParams }: PageProp
   const tc = await getTranslations("contracts");
   const tp = await getTranslations("reservations.payment");
   const supabase = await createClient();
-  const [data, { data: payments }, { data: plannedRow }] = await Promise.all([
+  const [data, { data: payments }, { data: plannedRow }, { data: inspected }] = await Promise.all([
     getContractData(supabase, active.id, id),
     supabase.from("reservation_payments").select("id, amount, method, kind, paid_at").eq("agency_id", active.id).eq("reservation_id", id).order("paid_at"),
     supabase.from("reservation_totals").select("planned_days").eq("id", id).maybeSingle(),
+    active.inspection.enabled
+      ? supabase.from("inspections").select("kind, completed_at").eq("agency_id", active.id).eq("reservation_id", id)
+      : Promise.resolve({ data: null }),
   ]);
+  // Inspection turned on: remind it in Démarrer / Retour (never blocks).
+  const inspectionDone = inspected ? { departure: inspected.some((i) => i.kind === "departure" && i.completed_at), return: inspected.some((i) => i.kind === "return" && i.completed_at) } : null;
   if (!data) notFound();
   const { reservation: r, totals } = data;
   const missing = missingInfo(data);
@@ -96,6 +101,7 @@ export default async function ReservationPage({ params, searchParams }: PageProp
             local: { start: isoToCasablanca(r.start_at), end: isoToCasablanca(r.end_at), now: isoToCasablanca(new Date().toISOString()) },
           }}
           initialAction={typeof sp.do === "string" ? sp.do : null}
+          inspection={inspectionDone}
         />
       </div>
 

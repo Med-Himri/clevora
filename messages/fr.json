@@ -1054,7 +1054,11 @@
       "confirmCar": "Valider la voiture",
       "startTitle": "Démarrer la location ?",
       "signedQuestion": "Le client a-t-il signé le contrat ?",
-      "openContract": "Ouvrir le contrat (imprimer, signer)"
+      "openContract": "Ouvrir le contrat (imprimer, signer)",
+      "inspectionDepartureMissing": "L'inspection de départ n'est pas faite : sans photos, un dégât au retour sera difficile à prouver.",
+      "inspectionReturnMissing": "L'inspection de retour n'est pas faite : faites-la avant de rendre la caution.",
+      "doInspectionDeparture": "Faire l'inspection de départ",
+      "doInspectionReturn": "Faire l'inspection de retour"
     },
     "bulk": {
       "select": "Sélectionner {contract} · {client}",

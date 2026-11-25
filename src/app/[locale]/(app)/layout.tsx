@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   const [profile, memberships, badges, tr] = await Promise.all([
     getProfile(),
     getMemberships(),
-    getNavBadges(supabase, agency.id),
+    getNavBadges(supabase, agency.id, { inspection: agency.inspection.enabled }),
     getTranslations("roles"),
   ]);
   const hidden: NavKey[] = agency.inspection.enabled ? [] : ["inspections"];

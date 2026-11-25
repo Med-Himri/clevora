@@ -36,13 +36,14 @@ async function shrink(file: Blob, maxWidth: number, quality: number): Promise<Bl
 
 export function InspectionCapture({
   agencyId,
-  reservationId,
+  after,
   kind,
   inspection,
   reference,
 }: {
   agencyId: string;
-  reservationId: string;
+  /** Where to go once finished (the inspection page, or back to Démarrer / Retour). */
+  after: string;
   kind: Kind;
   inspection: InspectionData;
   /** At return: the departure damages, shown in grey for comparison. */
@@ -156,7 +157,7 @@ export function InspectionCapture({
       const r = await completeInspectionAction(inspection.id, notes);
       if (!r.ok) return void toast.error(r.error === "photosMissing" ? t("photosMissing") : te(r.error));
       toast.success(t("completed"));
-      router.push(`/inspections/${reservationId}`);
+      router.push(after);
     });
 
   return (

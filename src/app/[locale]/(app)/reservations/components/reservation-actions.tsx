@@ -1,6 +1,6 @@
 "use client";
 
-import { BanIcon, CalendarPlusIcon, CarIcon, CheckIcon, CornerDownLeftIcon, PenLineIcon, PencilIcon, PlayIcon, PlusIcon, RepeatIcon } from "lucide-react";
+import { BanIcon, CalendarPlusIcon, CarIcon, CheckIcon, ClipboardCheckIcon, CornerDownLeftIcon, PenLineIcon, PencilIcon, PlayIcon, PlusIcon, RepeatIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -59,7 +59,10 @@ const naive = (date: string, time: string) => `${date}T${time || "00:00"}:00Z`;
 
 type Dialogs = "start" | "return" | "extend" | "cancel" | "payment" | "car" | null;
 
-export function ReservationActions({ reservation: r, initialAction }: { reservation: R; initialAction: string | null }) {
+/** Inspection turned on: which side is already documented (null: inspection is off). */
+type InspectionDone = { departure: boolean; return: boolean } | null;
+
+export function ReservationActions({ reservation: r, initialAction, inspection = null }: { reservation: R; initialAction: string | null; inspection?: InspectionDone }) {
   const t = useTranslations("reservations.actions");
   const te = useTranslations("errors");
   const router = useRouter();
@@ -154,6 +157,7 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
       {open === "start" ? (
         <StartDialog
           r={r}
+          inspectionMissing={inspection !== null && !inspection.departure}
           pending={pending}
           onClose={close}
           onSubmit={() =>
@@ -167,7 +171,7 @@ export function ReservationActions({ reservation: r, initialAction }: { reservat
           }
         />
       ) : null}
-      {open === "return" ? <ReturnDialog r={r} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
+      {open === "return" ? <ReturnDialog r={r} inspectionMissing={inspection !== null && !inspection.return} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
       {open === "extend" ? <ExtendDialog r={r} pending={pending} onClose={close} onSubmit={(d, tm) => run(() => extendReservationAction(r.id, d, tm), t("extended"))} /> : null}
       {open === "cancel" ? <CancelDialog pending={pending} onClose={close} onSubmit={(reason) => run(() => cancelReservationAction(r.id, reason), t("cancelled"))} /> : null}
       {open === "car" ? <AssignCarDialog r={r} pending={pending} onClose={close} onSubmit={(vehicleId, price) => run(() => assignVehicleAction(r.id, vehicleId, price), t("carAssigned"))} /> : null}
@@ -181,7 +185,23 @@ function useDialogTexts() {
 }
 
 /** « Démarrer » : one confirmation; an unsigned contract is signed at the same time. */
-function StartDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolean; onClose: () => void; onSubmit: () => void }) {
+/** Not blocking: the inspection is a reminder with a link, the start / return still works. */
+function InspectionReminder({ id, kind }: { id: string; kind: "departure" | "return" }) {
+  const t = useTranslations("reservations.actions");
+  return (
+    <Alert variant="warning" className="flex flex-col gap-2" data-testid={`inspection-reminder-${kind}`}>
+      {kind === "departure" ? t("inspectionDepartureMissing") : t("inspectionReturnMissing")}
+      <Button variant="outline" asChild>
+        <Link href={`/inspections/${id}/${kind}?then=${kind === "departure" ? "start" : "return"}`}>
+          <ClipboardCheckIcon aria-hidden />
+          {kind === "departure" ? t("doInspectionDeparture") : t("doInspectionReturn")}
+        </Link>
+      </Button>
+    </Alert>
+  );
+}
+
+function StartDialog({ r, inspectionMissing, pending, onClose, onSubmit }: { r: R; inspectionMissing: boolean; pending: boolean; onClose: () => void; onSubmit: () => void }) {
   const { t, tc } = useDialogTexts();
   const [signed, setSigned] = useState<boolean | null>(r.signed ? true : null);
   return (
@@ -191,6 +211,7 @@ function StartDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolean
           <DialogTitle>{t("startTitle")}</DialogTitle>
           <DialogDescription>{r.car}</DialogDescription>
         </DialogHeader>
+        {inspectionMissing ? <InspectionReminder id={r.id} kind="departure" /> : null}
         {!r.signed ? (
           <div className="flex flex-col gap-2">
             <span className="font-medium">{t("signedQuestion")}</span>
@@ -221,11 +242,13 @@ function StartDialog({ r, pending, onClose, onSubmit }: { r: R; pending: boolean
 
 function ReturnDialog({
   r,
+  inspectionMissing,
   pending,
   onClose,
   onSubmit,
 }: {
   r: R;
+  inspectionMissing: boolean;
   pending: boolean;
   onClose: () => void;
   onSubmit: (input: Parameters<typeof returnReservationAction>[1]) => void;
@@ -275,6 +298,7 @@ function ReturnDialog({
           <DialogDescription>{t("returnSubtitle")}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
+          {inspectionMissing ? <InspectionReminder id={r.id} kind="return" /> : null}
           <div className="grid grid-cols-2 gap-3">
             <Field id="ret-date" label={t("returnDate")}>
               <DateField id="ret-date" value={date} onChange={setDate} />

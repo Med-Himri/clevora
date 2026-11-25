@@ -1054,7 +1054,11 @@
       "confirmCar": "Confirm car",
       "startTitle": "Start the rental?",
       "signedQuestion": "Has the client signed the contract?",
-      "openContract": "Open the contract (print, sign)"
+      "openContract": "Open the contract (print, sign)",
+      "inspectionDepartureMissing": "The departure inspection is not done: without photos, a damage at return will be hard to prove.",
+      "inspectionReturnMissing": "The return inspection is not done: do it before giving the deposit back.",
+      "doInspectionDeparture": "Do the departure inspection",
+      "doInspectionReturn": "Do the return inspection"
     },
     "bulk": {
       "select": "Select {contract} · {client}",

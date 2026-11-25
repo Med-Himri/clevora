@@ -180,3 +180,39 @@ test("video mode: one video at departure and at return, shown side by side, no A
     expect(i.video_path!.startsWith(`${agency.agencyId}/inspections/`)).toBe(true);
   }
 });
+
+test("Démarrer reminds the departure inspection: do it, then come straight back to start", async ({ page }, testInfo) => {
+  test.setTimeout(120_000);
+  const agency = await createTestAgency();
+  const staff = await addMember(agency.agencyId, "staff");
+  const car = await addVehicle(agency.agencyId, { plate: `R${uid().slice(-5).toUpperCase()}-A-6`, brand_model: "Kia Picanto" });
+  const sb = admin();
+  await sb.from("agencies").update({ inspection_enabled: true }).eq("id", agency.agencyId);
+  const { data: client } = await sb.from("clients").insert({ agency_id: agency.agencyId, full_name: "Client Rappel", id_type: "cin", id_number: `RP${Math.floor(100000 + Math.random() * 899999)}` }).select("id").single();
+  const { data: r } = await sb
+    .from("reservations")
+    .insert({ agency_id: agency.agencyId, vehicle_id: car, client_id: client!.id, daily_price: 250, km_out: 10000, fuel_out: 4, signed_at: new Date().toISOString(), start_at: new Date(Date.now() + 3_600_000).toISOString(), end_at: new Date(Date.now() + 3 * 86_400_000).toISOString() })
+    .select("id")
+    .single();
+
+  await login(page, staff.email, staff.password);
+  // A departure today, not inspected: badge on the Inspection menu item
+  if (testInfo.project.name !== "phone") await expect(page.getByRole("complementary").getByRole("link", { name: /Inspection/ })).toHaveText("Inspection1");
+
+  await page.goto(`/reservations/${r!.id}`);
+  await page.getByTestId("start-rental").click();
+  const reminder = page.getByTestId("inspection-reminder-departure");
+  await expect(reminder).toBeVisible();
+  await reminder.getByRole("link", { name: "Faire l'inspection de départ" }).click();
+  await page.waitForURL(/\/departure\?then=start$/);
+  await importFaces(page);
+  await page.getByTestId("inspection-finish").click();
+
+  // Back on the reservation, Démarrer already open, no reminder any more
+  await page.waitForURL(new RegExp(`/reservations/${r!.id}\\?do=start$`));
+  const dialog = page.getByTestId("start-dialog");
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByTestId("inspection-reminder-departure")).toHaveCount(0);
+  await dialog.getByTestId("start-confirm").click();
+  await expect(page.getByText("Location démarrée.")).toBeVisible();
+});

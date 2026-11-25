@@ -18,8 +18,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Inspection départ / retour of one rental: photos per view (or one video) + damage marks. */
-export default async function InspectionCapturePage({ params }: PageProps<"/[locale]/inspections/[id]/[kind]">) {
+export default async function InspectionCapturePage({ params, searchParams }: PageProps<"/[locale]/inspections/[id]/[kind]">) {
   const { id, kind } = await params;
+  // Came from Démarrer / Retour: go back there once the inspection is finished.
+  const then = (await searchParams).then;
+  const after = then === "start" || then === "return" ? `/reservations/${id}?do=${then}` : `/inspections/${id}`;
   if (!/^[0-9a-f-]{36}$/.test(id) || !KINDS.includes(kind as Kind)) notFound();
   const { agency } = await requireAgency();
   if (!agency.inspection.enabled) redirect({ href: "/inspections", locale: await getLocale() });
@@ -65,7 +68,7 @@ export default async function InspectionCapturePage({ params }: PageProps<"/[loc
           </>
         }
       />
-      <InspectionCapture agencyId={agency.id} reservationId={id} kind={kind as Kind} inspection={inspection} reference={kind === "return" ? (all.departure?.damages ?? []) : []} />
+      <InspectionCapture agencyId={agency.id} after={after} kind={kind as Kind} inspection={inspection} reference={kind === "return" ? (all.departure?.damages ?? []) : []} />
     </>
   );
 }
