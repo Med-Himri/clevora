@@ -5,7 +5,6 @@ import { z } from "zod";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
 import { getTranslations } from "next-intl/server";
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
-import { formatMoney } from "@/lib/format";
 import { kmSchema as km, oilSchema, type OilChangeInput } from "./schema";
 
 export type { OilChangeInput };
@@ -41,7 +40,7 @@ export async function recordOilChangeAction(vehicleId: string, input: OilChangeI
     note: v.note || null,
   });
   if (histError) return fail(dbErrorKey(histError));
-  // One vidange = ONE "vidange" charge: the total, with each item and its price in the detail (money: admins only).
+  // One vidange = ONE "vidange" charge: the total in Montant, the items in the detail (money: admins only).
   const priced = v.items.filter((x) => x.price && x.price > 0);
   if (priced.length && agency.role === "admin") {
     const t = await getTranslations("oil");
@@ -53,7 +52,7 @@ export async function recordOilChangeAction(vehicleId: string, input: OilChangeI
       category: "vidange",
       amount: priced.reduce((sum, x) => sum + x.price!, 0),
       date: v.date,
-      note: `${t("chargeNote", { km: kmLabel })} · ${priced.map((x) => `${label(x)} ${formatMoney(x.price!)}`).join(", ")}`.slice(0, 500),
+      note: `${t("chargeNote", { km: kmLabel })} · ${priced.map(label).join(", ")}`.slice(0, 500),
     });
     if (chargeError) return fail(dbErrorKey(chargeError));
   }

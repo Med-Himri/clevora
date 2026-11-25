@@ -82,7 +82,7 @@ test("vidange by an admin: several parts become ONE Vidange charge with the deta
   await expect(page.getByText("Vidange enregistrée.")).toBeVisible();
 
   const { data: charges } = await admin().from("charges").select("category, amount, note").eq("vehicle_id", id);
-  expect(charges).toEqual([{ category: "vidange", amount: 500, note: "Vidange à 60 000 km · Huile moteur 300 MAD, Filtre à huile 80 MAD, Filtre à air 120 MAD" }]);
+  expect(charges).toEqual([{ category: "vidange", amount: 500, note: "Vidange à 60 000 km · Huile moteur, Filtre à huile, Filtre à air" }]);
   const { data: hist } = await admin().from("oil_changes").select("km, next_km, items").eq("vehicle_id", id);
   expect(hist).toEqual([{ km: 60000, next_km: 70000, items: ["huile", "filtre_huile", "filtre_air"] }]);
 

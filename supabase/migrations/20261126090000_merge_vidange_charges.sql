@@ -1,7 +1,7 @@
 -- One vidange = one charge. Vidanges saved before were split into one charge per
 -- item ("Vidange à 50 000 km · Huile moteur", "… · Filtre à air"…). Merge each group
--- (same car, same date, same "Vidange à X km") into ONE charge: the total, and each
--- item with its price in the detail. Only the old one-item notes are touched.
+-- (same car, same date, same "Vidange à X km") into ONE charge: the total, and the
+-- items in the detail. Only the old one-item notes are touched.
 
 create temporary table vidange_groups on commit drop as
 select
@@ -12,11 +12,7 @@ select
   (array_agg(id order by created_at, id))[1] as keep_id,
   array_agg(id) as ids,
   sum(amount) as total,
-  string_agg(
-    split_part(note, ' · ', 2) || ' '
-      || replace(to_char(amount, case when amount = trunc(amount) then 'FM999G999G990' else 'FM999G999G990D00' end), ',', ' ')
-      || ' MAD',
-    ', ' order by created_at, id) as detail
+  string_agg(split_part(note, ' · ', 2), ', ' order by created_at, id) as detail
 from public.charges
 where category = 'vidange'
   and note ~ '^Vidange à [0-9  ]+ km · [^·]+$'
