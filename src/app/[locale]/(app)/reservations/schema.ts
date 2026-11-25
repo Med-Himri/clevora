@@ -96,6 +96,9 @@ export const returnSchema = z.object({
   refund_amount: money,
   refund_method: z.enum(PAYMENT_METHODS),
   notes: z.string().trim().max(1000).default(""),
+  /** Damages found at return: kept from the caution, never more than the franchise (checked by the database). */
+  damage_amount: money.default(0),
+  damage_note: z.string().trim().max(500).default(""),
 });
 export type ReturnInput = z.input<typeof returnSchema>;
 

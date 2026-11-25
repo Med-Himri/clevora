@@ -279,9 +279,12 @@ export async function returnReservationAction(id: string, input: ReturnInput): P
       notes: v.notes,
       balance: v.balance_amount > 0 ? { amount: v.balance_amount, method: v.balance_method } : null,
       deposit_refund: v.refund_deposit && v.refund_amount > 0 ? { amount: v.refund_amount, method: v.refund_method } : null,
+      damage: v.damage_amount > 0 ? { amount: v.damage_amount, note: v.damage_note } : null,
     },
   });
   if (error) {
+    if (error.hint === "damage_over_franchise") return fail("invalidForm", { damage_amount: "damageOverFranchise" });
+    if (error.hint === "refund_too_high") return fail("invalidForm", { refund_amount: "refundTooHigh" });
     if (error.code === "23514") return fail("invalidForm", { km_in: "kmInBeforeOut" });
     return reservationError(error);
   }

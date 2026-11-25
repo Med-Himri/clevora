@@ -18,6 +18,7 @@ import { YesNo } from "@/components/ui/yes-no";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import type { ActionResult } from "@/lib/action-result";
 import { formatMoney } from "@/lib/format";
+import { settleReturn } from "@/lib/damages";
 import { rentalDays } from "@/lib/revenue";
 import { cn } from "@/lib/utils";
 import {
@@ -48,6 +49,8 @@ type R = {
   km_out: number | null;
   deposit_taken: boolean;
   deposit_amount: number;
+  /** Damages at return are never more than this. */
+  franchise: number;
   balance: number;
   planned_days: number;
   /** Casablanca local date/time computed on the server (browsers can have outdated time-zone data). */
@@ -62,7 +65,20 @@ type Dialogs = "start" | "return" | "extend" | "cancel" | "payment" | "car" | nu
 /** Inspection turned on: which side is already documented (null: inspection is off). */
 type InspectionDone = { departure: boolean; return: boolean } | null;
 
-export function ReservationActions({ reservation: r, initialAction, inspection = null }: { reservation: R; initialAction: string | null; inspection?: InspectionDone }) {
+/** New damages found by the return inspection (confirmed marks), to prefill the damage fee. */
+export type FoundDamages = { count: number; text: string } | null;
+
+export function ReservationActions({
+  reservation: r,
+  initialAction,
+  inspection = null,
+  damages = null,
+}: {
+  reservation: R;
+  initialAction: string | null;
+  inspection?: InspectionDone;
+  damages?: FoundDamages;
+}) {
   const t = useTranslations("reservations.actions");
   const te = useTranslations("errors");
   const router = useRouter();
@@ -84,7 +100,11 @@ export function ReservationActions({ reservation: r, initialAction, inspection =
   const run = (action: () => Promise<ActionResult>, success: string) =>
     startTransition(async () => {
       const result = await action();
-      if (!result.ok) return void toast.error(te(result.error));
+      if (!result.ok) {
+        // Money rules checked by the database get their own clear message
+        const field = result.fieldErrors?.damage_amount ?? result.fieldErrors?.refund_amount;
+        return void toast.error(te(field === "damageOverFranchise" || field === "refundTooHigh" ? field : result.error));
+      }
       toast.success(success);
       setOpen(null);
       router.replace(pathname);
@@ -171,7 +191,7 @@ export function ReservationActions({ reservation: r, initialAction, inspection =
           }
         />
       ) : null}
-      {open === "return" ? <ReturnDialog r={r} inspectionMissing={inspection !== null && !inspection.return} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
+      {open === "return" ? <ReturnDialog r={r} damages={damages} inspectionMissing={inspection !== null && !inspection.return} pending={pending} onClose={close} onSubmit={(input) => run(() => returnReservationAction(r.id, input), t("returned"))} /> : null}
       {open === "extend" ? <ExtendDialog r={r} pending={pending} onClose={close} onSubmit={(d, tm) => run(() => extendReservationAction(r.id, d, tm), t("extended"))} /> : null}
       {open === "cancel" ? <CancelDialog pending={pending} onClose={close} onSubmit={(reason) => run(() => cancelReservationAction(r.id, reason), t("cancelled"))} /> : null}
       {open === "car" ? <AssignCarDialog r={r} pending={pending} onClose={close} onSubmit={(vehicleId, price) => run(() => assignVehicleAction(r.id, vehicleId, price), t("carAssigned"))} /> : null}
@@ -242,12 +262,14 @@ function StartDialog({ r, inspectionMissing, pending, onClose, onSubmit }: { r: 
 
 function ReturnDialog({
   r,
+  damages,
   inspectionMissing,
   pending,
   onClose,
   onSubmit,
 }: {
   r: R;
+  damages: FoundDamages;
   inspectionMissing: boolean;
   pending: boolean;
   onClose: () => void;
@@ -262,11 +284,19 @@ function ReturnDialog({
   const actual = date && time ? naive(date, time) : naive(r.local.end.date, r.local.end.time);
   const extraDays = Math.max(0, rentalDays(start, actual) - r.planned_days);
   const extraAmount = extraDays * r.daily_price;
-  const due = Math.max(0, r.balance + extraAmount);
+  const rentalDue = Math.max(0, r.balance + extraAmount);
+  // Damages: kept from the caution, never more than the franchise (src/lib/damages.ts)
+  const [hasDamage, setHasDamage] = useState<boolean>(Boolean(damages?.count) && r.franchise > 0);
+  const [fee, setFee] = useState<number | null>(null);
+  const [damageNote, setDamageNote] = useState(damages?.text ?? "");
+  const deposit = r.deposit_taken ? r.deposit_amount : 0;
+  const settle = settleReturn({ due: rentalDue, deposit, fee: hasDamage ? (fee ?? 0) : 0, franchise: r.franchise });
+  const due = settle.toPay;
   const [amount, setAmount] = useState<number | null>(null);
   const [method, setMethod] = useState<(typeof PAYMENT_METHODS)[number]>("cash");
   const [refund, setRefund] = useState<boolean>(r.deposit_taken);
-  const [refundAmount, setRefundAmount] = useState<number | null>(r.deposit_amount);
+  // null: follows the damages (caution minus what is kept)
+  const [refundAmount, setRefundAmount] = useState<number | null>(null);
   const [refundMethod, setRefundMethod] = useState<(typeof PAYMENT_METHODS)[number]>("cash");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -275,6 +305,8 @@ function ReturnDialog({
   const submit = () => {
     if (kmNumber === null || fuel === null) return setError(t("returnMissing"));
     if (r.km_out !== null && kmNumber < r.km_out) return setError(t("kmInBeforeOut", { km: r.km_out }));
+    if (hasDamage && !(fee && fee > 0)) return setError(t("damageAmountMissing"));
+    if (hasDamage && (fee ?? 0) > r.franchise) return setError(t("damageOverFranchise", { amount: formatMoney(r.franchise) }));
     setError(null);
     onSubmit({
       return_date: date,
@@ -284,9 +316,11 @@ function ReturnDialog({
       balance_amount: amount ?? due,
       balance_method: method,
       refund_deposit: refund,
-      refund_amount: refundAmount ?? 0,
+      refund_amount: refundAmount ?? settle.refund,
       refund_method: refundMethod,
       notes,
+      damage_amount: hasDamage ? settle.fee : 0,
+      damage_note: hasDamage ? damageNote : "",
     });
   };
 
@@ -319,6 +353,34 @@ function ReturnDialog({
               {t("extraDays", { count: extraDays, amount: formatMoney(extraAmount) })}
             </Alert>
           ) : null}
+          {r.franchise > 0 ? (
+            <div className="flex flex-col gap-3 border-t pt-4" data-testid="damage-section">
+              <span className="font-semibold">{t("damageQuestion")}</span>
+              {damages?.count ? (
+                <Alert variant="warning" data-testid="damage-found">
+                  {t("damageFound", { count: damages.count, list: damages.text })}
+                </Alert>
+              ) : null}
+              <YesNo label={t("damageQuestion")} value={hasDamage} onChange={setHasDamage} />
+              {hasDamage ? (
+                <div className="flex flex-col gap-3">
+                  <Field id="ret-damage" label={t("damageAmount")} hint={t("damageMax", { amount: formatMoney(r.franchise) })} className="sm:max-w-xs">
+                    <MoneyField id="ret-damage" value={fee} onChange={setFee} />
+                  </Field>
+                  <Field id="ret-damage-note" label={t("damageNote")}>
+                    <Input id="ret-damage-note" value={damageNote} maxLength={500} onChange={(e) => setDamageNote(e.target.value)} />
+                  </Field>
+                  {settle.fee > 0 ? (
+                    <ul className="flex flex-col gap-1 rounded-lg bg-muted/60 p-3 text-sm" data-testid="damage-settlement">
+                      {deposit > 0 ? <li>{t("damageKept", { amount: formatMoney(settle.kept) })}</li> : null}
+                      {deposit > 0 ? <li>{t("damageRefund", { amount: formatMoney(settle.refund) })}</li> : null}
+                      {settle.fee > settle.kept ? <li className="font-semibold">{t("damageStillOwed", { amount: formatMoney(settle.fee - settle.kept) })}</li> : null}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
           {/* Amount, then the 4 ways of paying on their own full-width row (they never overflow) */}
           <div className="flex flex-col gap-3 border-t pt-4">
             <Field id="ret-amount" label={t("balanceToPay")} hint={t("balanceDue", { amount: formatMoney(due) })} className="sm:max-w-xs">
@@ -336,7 +398,7 @@ function ReturnDialog({
               {refund ? (
                 <div className="flex flex-col gap-3">
                   <Field id="ret-refund" label={t("refundAmount")} className="sm:max-w-xs">
-                    <MoneyField id="ret-refund" value={refundAmount} onChange={setRefundAmount} />
+                    <MoneyField id="ret-refund" value={refundAmount ?? settle.refund} onChange={setRefundAmount} />
                   </Field>
                   <div className="flex flex-col gap-2">
                     <span className="text-sm font-medium">{t("method")}</span>

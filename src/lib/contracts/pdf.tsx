@@ -189,6 +189,12 @@ export function ContractDocument({ data, arabic, logo }: { data: ContractData; a
                 <Text>{formatMoney(r.delivery_fee)}</Text>
               </View>
             ) : null}
+            {Number(r.damage_fee) > 0 ? (
+              <View style={s.priceLine}>
+                <L k="damageFee" ar={arabic} />
+                <Text>{formatMoney(r.damage_fee)}</Text>
+              </View>
+            ) : null}
             <View style={s.totalLine}>
               <L k="total" ar={arabic} />
               <Text>{formatMoney(totals.total)}</Text>

@@ -3,7 +3,7 @@ import type { Style } from "@react-pdf/stylesheet";
 import { Circle, Document, G, Image, Line, Page, Path, Rect, StyleSheet, Svg, Text, View, renderToBuffer } from "@react-pdf/renderer";
 import { LABELS, type LabelKey } from "@/lib/contracts/labels";
 import { FAMILY, fetchLogo, registerFonts } from "@/lib/contracts/pdf";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, formatMoney } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import type { Damage, DamageType, View as CarView } from "./model";
 import { VIEWS } from "./model";
@@ -236,6 +236,15 @@ export function InspectionReportDocument({ report, arabic, logo }: { report: Ins
             ) : (
               <L pair={lab("noNewDamage")} ar={arabic} />
             )}
+          </View>
+        ) : null}
+        {Number(r.damage_fee) > 0 ? (
+          <View style={[s.box, { flexDirection: "row", justifyContent: "space-between" }]} wrap={false}>
+            <View style={s.col}>
+              <L pair={lab("damageFee")} ar={arabic} style={{ fontWeight: 700 }} />
+              {r.damage_note ? <Text style={s.small}>{r.damage_note}</Text> : null}
+            </View>
+            <Text style={{ fontWeight: 700, fontSize: 10 }}>{formatMoney(r.damage_fee)}</Text>
           </View>
         ) : null}
         {video ? <L pair={lab("video")} ar={arabic} style={[s.small, { marginBottom: 6 }]} /> : null}

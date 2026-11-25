@@ -28,7 +28,7 @@ export async function getContractData(supabase: ServerSupabase, agencyId: string
       .select(
         `id, contract_number, status, start_at, end_at, actual_return_at, signed_at, cancel_reason,
          delivery, delivery_place, return_place, delivery_fee, daily_price, franchise, deposit_taken, deposit_amount,
-         km_out, km_in, fuel_out, fuel_in, equipment, documents_given, notes, extended_days,
+         km_out, km_in, fuel_out, fuel_in, equipment, documents_given, notes, extended_days, damage_fee, damage_note,
          vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(id, plate, brand_model, category, fuel, gearbox),
          driver1:clients!reservations_agency_id_client_id_fkey(${DRIVER}),
          driver2:clients!reservations_agency_id_second_driver_id_fkey(${DRIVER})`,

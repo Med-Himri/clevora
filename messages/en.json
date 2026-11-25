@@ -114,7 +114,9 @@
     "aiNotInPlan": "AI is not included in your plan.",
     "aiDisabled": "AI is turned off for your agency (Settings).",
     "inspectionOff": "Inspection is not turned on in Settings.",
-    "videoMissing": "Film the car first."
+    "videoMissing": "Film the car first.",
+    "damageOverFranchise": "The damage fee cannot be more than the franchise of the contract.",
+    "refundTooHigh": "The deposit given back is more than what is left after the damage fee."
   },
   "notices": {
     "passwordUpdated": "Password changed.",
@@ -992,7 +994,8 @@
       "number": "Reservation",
       "call": "Call",
       "seeContract": "View the contract",
-      "inspection": "Inspection"
+      "inspection": "Inspection",
+      "damageFee": "Damage fee"
     },
     "actions": {
       "signed": "Contract marked as signed.",
@@ -1058,7 +1061,17 @@
       "inspectionDepartureMissing": "The departure inspection is not done: without photos, a damage at return will be hard to prove.",
       "inspectionReturnMissing": "The return inspection is not done: do it before giving the deposit back.",
       "doInspectionDeparture": "Do the departure inspection",
-      "doInspectionReturn": "Do the return inspection"
+      "doInspectionReturn": "Do the return inspection",
+      "damageQuestion": "Damages to charge?",
+      "damageFound": "{count, plural, one {The inspection found # new damage: {list}.} other {The inspection found # new damages: {list}.}}",
+      "damageAmount": "Damage fee",
+      "damageMax": "Maximum: the franchise ({amount}).",
+      "damageNote": "Which damages? (on the contract)",
+      "damageKept": "Kept from the deposit: {amount}",
+      "damageRefund": "Deposit to give back: {amount}",
+      "damageStillOwed": "The deposit is not enough: the client still owes {amount}",
+      "damageAmountMissing": "Enter the damage amount, or answer No.",
+      "damageOverFranchise": "The damage fee cannot be more than the franchise ({amount})."
     },
     "bulk": {
       "select": "Select {contract} · {client}",
@@ -1156,7 +1169,8 @@
       "deposit": "Deposit",
       "equipment": "Equipment",
       "documents": "Documents given",
-      "notes": "Remarks"
+      "notes": "Remarks",
+      "damageFee": "Damage fee"
     },
     "share": {
       "print": "Print / PDF",

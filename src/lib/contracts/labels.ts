@@ -35,6 +35,7 @@ export const LABELS = {
   balance: ["Reste à payer", "الباقي"],
   franchise: ["Franchise", "الفرانشيز"],
   deposit: ["Caution", "الضمانة"],
+  damageFee: ["Frais de dégâts", "مصاريف الأضرار"],
   none: ["Non", "لا"],
   equipment: ["Équipements", "التجهيزات"],
   documents: ["Documents remis", "الوثائق المسلمة"],

@@ -1201,6 +1201,8 @@ export type Database = {
           created_at: string;
           created_by: string | null;
           daily_price: number;
+          damage_fee: number;
+          damage_note: string | null;
           delivery: boolean;
           delivery_fee: number;
           delivery_place: string | null;
@@ -1238,6 +1240,8 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           daily_price: number;
+          damage_fee?: number;
+          damage_note?: string | null;
           delivery?: boolean;
           delivery_fee?: number;
           delivery_place?: string | null;
@@ -1274,6 +1278,8 @@ export type Database = {
           created_at?: string;
           created_by?: string | null;
           daily_price?: number;
+          damage_fee?: number;
+          damage_note?: string | null;
           delivery?: boolean;
           delivery_fee?: number;
           delivery_place?: string | null;
@@ -1610,6 +1616,7 @@ export type Database = {
         Row: {
           agency_id: string;
           balance: number | null;
+          damage_fee: number;
           days: number | null;
           id: string;
           paid: number | null;
@@ -1620,6 +1627,7 @@ export type Database = {
         Insert: {
           agency_id?: string | null;
           balance?: never;
+          damage_fee?: number | null;
           days?: never;
           id?: string | null;
           paid?: never;
@@ -1629,6 +1637,7 @@ export type Database = {
         Update: {
           agency_id?: string | null;
           balance?: never;
+          damage_fee?: number | null;
           days?: never;
           id?: string | null;
           paid?: never;

@@ -181,6 +181,7 @@ export default async function ContractPage({ params }: PageProps<"/[locale]/cont
             <Section title={t("sections.price")}>
               <Item label={t("fields.days")}><Ltr>{totals.days} × {formatMoney(r.daily_price)}</Ltr></Item>
               {r.delivery ? <Item label={t("fields.deliveryFee")}><Ltr>{formatMoney(r.delivery_fee)}</Ltr></Item> : null}
+              {Number(r.damage_fee) > 0 ? <Item label={t("fields.damageFee")}><Ltr>{formatMoney(r.damage_fee)}</Ltr>{r.damage_note ? <span className="block text-xs font-normal text-muted-foreground">{r.damage_note}</span> : null}</Item> : null}
               <Item label={t("fields.total")}><span className="text-base font-bold"><Ltr>{formatMoney(totals.total)}</Ltr></span></Item>
               <Item label={t("fields.paid")}><Ltr>{formatMoney(totals.paid)}</Ltr></Item>
               <Item label={t("fields.balance")}><span data-testid="contract-balance"><Ltr>{formatMoney(totals.balance)}</Ltr></span></Item>

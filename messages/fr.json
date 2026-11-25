@@ -114,7 +114,9 @@
     "aiNotInPlan": "L'IA n'est pas incluse dans votre forfait.",
     "aiDisabled": "L'IA est désactivée pour votre agence (Paramètres).",
     "inspectionOff": "L'inspection n'est pas activée dans Paramètres.",
-    "videoMissing": "Filmez d'abord la voiture."
+    "videoMissing": "Filmez d'abord la voiture.",
+    "damageOverFranchise": "Les frais de dégâts ne peuvent pas dépasser la franchise du contrat.",
+    "refundTooHigh": "La caution rendue dépasse ce qui reste après les frais de dégâts."
   },
   "notices": {
     "passwordUpdated": "Mot de passe modifié.",
@@ -992,7 +994,8 @@
       "number": "Réservation",
       "call": "Appeler",
       "seeContract": "Voir le contrat",
-      "inspection": "Inspection"
+      "inspection": "Inspection",
+      "damageFee": "Frais de dégâts"
     },
     "actions": {
       "signed": "Contrat marqué comme signé.",
@@ -1058,7 +1061,17 @@
       "inspectionDepartureMissing": "L'inspection de départ n'est pas faite : sans photos, un dégât au retour sera difficile à prouver.",
       "inspectionReturnMissing": "L'inspection de retour n'est pas faite : faites-la avant de rendre la caution.",
       "doInspectionDeparture": "Faire l'inspection de départ",
-      "doInspectionReturn": "Faire l'inspection de retour"
+      "doInspectionReturn": "Faire l'inspection de retour",
+      "damageQuestion": "Des dégâts à faire payer ?",
+      "damageFound": "{count, plural, one {L'inspection a trouvé # nouveau dégât : {list}.} other {L'inspection a trouvé # nouveaux dégâts : {list}.}}",
+      "damageAmount": "Frais de dégâts",
+      "damageMax": "Maximum : la franchise ({amount}).",
+      "damageNote": "Quels dégâts ? (sur le contrat)",
+      "damageKept": "Retenu sur la caution : {amount}",
+      "damageRefund": "Caution à rendre : {amount}",
+      "damageStillOwed": "La caution ne suffit pas : le client doit encore {amount}",
+      "damageAmountMissing": "Indiquez le montant des dégâts, ou répondez Non.",
+      "damageOverFranchise": "Les frais de dégâts ne peuvent pas dépasser la franchise ({amount})."
     },
     "bulk": {
       "select": "Sélectionner {contract} · {client}",
@@ -1156,7 +1169,8 @@
       "deposit": "Caution",
       "equipment": "Équipements",
       "documents": "Documents remis",
-      "notes": "Observations"
+      "notes": "Observations",
+      "damageFee": "Frais de dégâts"
     },
     "share": {
       "print": "Imprimer / PDF",

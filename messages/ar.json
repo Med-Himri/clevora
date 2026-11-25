@@ -114,7 +114,9 @@
     "aiNotInPlan": "الذكاء الاصطناعي غير مشمول في باقتك.",
     "aiDisabled": "الذكاء الاصطناعي معطل لوكالتك (الإعدادات).",
     "inspectionOff": "المعاينة غير مفعّلة في الإعدادات.",
-    "videoMissing": "صوّر السيارة أولا."
+    "videoMissing": "صوّر السيارة أولا.",
+    "damageOverFranchise": "لا يمكن أن تتجاوز مصاريف الأضرار فرانشيز العقد.",
+    "refundTooHigh": "الضمانة المرجعة أكبر مما تبقى بعد مصاريف الأضرار."
   },
   "notices": {
     "passwordUpdated": "تم تغيير كلمة المرور.",
@@ -992,7 +994,8 @@
       "number": "الحجز",
       "call": "اتصال",
       "seeContract": "عرض العقد",
-      "inspection": "المعاينة"
+      "inspection": "المعاينة",
+      "damageFee": "مصاريف الأضرار"
     },
     "actions": {
       "signed": "تم تحديد العقد كموقّع.",
@@ -1058,7 +1061,17 @@
       "inspectionDepartureMissing": "معاينة الخروج لم تُنجز: بدون صور، سيصعب إثبات أي ضرر عند الرجوع.",
       "inspectionReturnMissing": "معاينة الرجوع لم تُنجز: أنجزها قبل إرجاع الضمانة.",
       "doInspectionDeparture": "إنجاز معاينة الخروج",
-      "doInspectionReturn": "إنجاز معاينة الرجوع"
+      "doInspectionReturn": "إنجاز معاينة الرجوع",
+      "damageQuestion": "هل توجد أضرار للأداء؟",
+      "damageFound": "{count, plural, one {وجدت المعاينة ضررا جديدا: {list}.} other {وجدت المعاينة # أضرار جديدة: {list}.}}",
+      "damageAmount": "مصاريف الأضرار",
+      "damageMax": "الحد الأقصى: الفرانشيز ({amount}).",
+      "damageNote": "ما هي الأضرار؟ (في العقد)",
+      "damageKept": "مقتطع من الضمانة: {amount}",
+      "damageRefund": "الضمانة المرجعة: {amount}",
+      "damageStillOwed": "الضمانة غير كافية: ما زال على الزبون {amount}",
+      "damageAmountMissing": "أدخل مبلغ الأضرار، أو أجب بلا.",
+      "damageOverFranchise": "لا يمكن أن تتجاوز مصاريف الأضرار الفرانشيز ({amount})."
     },
     "bulk": {
       "select": "تحديد {contract} · {client}",
@@ -1156,7 +1169,8 @@
       "deposit": "الضمانة",
       "equipment": "التجهيزات",
       "documents": "الوثائق المسلمة",
-      "notes": "ملاحظات"
+      "notes": "ملاحظات",
+      "damageFee": "مصاريف الأضرار"
     },
     "share": {
       "print": "طباعة / PDF",

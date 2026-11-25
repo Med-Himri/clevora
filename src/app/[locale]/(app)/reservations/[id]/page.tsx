@@ -14,6 +14,7 @@ import { getContractData, missingInfo } from "@/lib/contracts/data";
 import { formatDate, formatDateTime, formatMoney, isoToCasablanca } from "@/lib/format";
 import { formatPhone, whatsappNumber } from "@/lib/phone";
 import { createClient } from "@/lib/supabase/server";
+import { newDamages, type Damage } from "@/lib/inspections/model";
 import { ReservationActions } from "../components/reservation-actions";
 import { ReservationStatusBadge } from "../components/status-badge";
 
@@ -49,10 +50,15 @@ export default async function ReservationPage({ params, searchParams }: PageProp
     supabase.from("reservation_payments").select("id, amount, method, kind, paid_at").eq("agency_id", active.id).eq("reservation_id", id).order("paid_at"),
     supabase.from("reservation_totals").select("planned_days").eq("id", id).maybeSingle(),
     active.inspection.enabled
-      ? supabase.from("inspections").select("kind, completed_at").eq("agency_id", active.id).eq("reservation_id", id)
+      ? supabase.from("inspections").select("kind, completed_at, damages:inspection_damages(id, x, y, type, view, note, source, confirmed)").eq("agency_id", active.id).eq("reservation_id", id)
       : Promise.resolve({ data: null }),
   ]);
   // Inspection turned on: remind it in Démarrer / Retour (never blocks).
+  const ti = await getTranslations("inspection");
+  const marks = (kind: string): Damage[] =>
+    (inspected?.find((i) => i.kind === kind)?.damages ?? []).map((d) => ({ id: d.id, x: Number(d.x), y: Number(d.y), type: d.type as Damage["type"], view: d.view as Damage["view"], note: d.note, source: d.source as Damage["source"], confirmed: d.confirmed }));
+  const found = inspected ? newDamages(marks("departure"), marks("return")) : [];
+  const damages = found.length ? { count: found.length, text: found.map((d) => ti(`types.${d.type}`) + (d.view ? ` (${ti(`views.${d.view}`)})` : "")).join(", ") } : null;
   const inspectionDone = inspected ? { departure: inspected.some((i) => i.kind === "departure" && i.completed_at), return: inspected.some((i) => i.kind === "return" && i.completed_at) } : null;
   if (!data) notFound();
   const { reservation: r, totals } = data;
@@ -96,12 +102,14 @@ export default async function ReservationPage({ params, searchParams }: PageProp
             km_out: r.km_out,
             deposit_taken: r.deposit_taken,
             deposit_amount: Number(r.deposit_amount),
+            franchise: Number(r.franchise),
             balance: totals.balance,
             planned_days: plannedRow?.planned_days ?? totals.days,
             local: { start: isoToCasablanca(r.start_at), end: isoToCasablanca(r.end_at), now: isoToCasablanca(new Date().toISOString()) },
           }}
           initialAction={typeof sp.do === "string" ? sp.do : null}
           inspection={inspectionDone}
+          damages={damages}
         />
       </div>
 
@@ -191,6 +199,12 @@ export default async function ReservationPage({ params, searchParams }: PageProp
             <dl className="flex flex-col divide-y text-sm">
               <Row label={tc("fields.days")}><Ltr>{totals.days} × {formatMoney(r.daily_price)}</Ltr></Row>
               {r.delivery ? <Row label={tc("fields.deliveryFee")}><Ltr>{formatMoney(r.delivery_fee)}</Ltr></Row> : null}
+              {Number(r.damage_fee) > 0 ? (
+                <Row label={t("damageFee")}>
+                  <Ltr>{formatMoney(r.damage_fee)}</Ltr>
+                  {r.damage_note ? <span className="block text-xs font-normal text-muted-foreground">{r.damage_note}</span> : null}
+                </Row>
+              ) : null}
               <Row label={tc("fields.total")}><span className="text-base font-bold"><Ltr>{formatMoney(totals.total)}</Ltr></span></Row>
               <Row label={tc("fields.paid")}><Ltr>{formatMoney(totals.paid)}</Ltr></Row>
               <Row label={tc("fields.balance")}>

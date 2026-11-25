@@ -216,3 +216,48 @@ test("Démarrer reminds the departure inspection: do it, then come straight back
   await dialog.getByTestId("start-confirm").click();
   await expect(page.getByText("Location démarrée.")).toBeVisible();
 });
+
+test("Retour with a new damage: the fee is kept from the caution, the rest is still owed", async ({ page }) => {
+  test.setTimeout(90_000);
+  const { agency, staff, id } = await rentalWithInspection("photos");
+  const sb = admin();
+  await sb.from("reservations").update({ franchise: 5000, deposit_taken: true, deposit_amount: 2000, km_out: 30000, fuel_out: 4 }).eq("id", id);
+  // Both inspections done; the return found a new dent on the right side
+  const { data: ins } = await sb
+    .from("inspections")
+    .insert([
+      { agency_id: agency.agencyId, reservation_id: id, kind: "departure", completed_at: new Date(Date.now() - 86_400_000).toISOString() },
+      { agency_id: agency.agencyId, reservation_id: id, kind: "return", completed_at: new Date().toISOString() },
+    ])
+    .select("id, kind");
+  const ret = ins!.find((i) => i.kind === "return")!.id;
+  await sb.from("inspection_damages").insert({ agency_id: agency.agencyId, inspection_id: ret, x: 0.85, y: 0.55, type: "dent", view: "right" });
+
+  await login(page, staff.email, staff.password);
+  await page.goto(`/reservations/${id}?do=return`);
+  const dialog = page.getByTestId("return-dialog");
+  await expect(dialog.getByTestId("damage-found")).toContainText("1 nouveau dégât : Bosse / choc (Côté droit)");
+  await dialog.getByLabel("Kilométrage au retour").fill("30500");
+  await dialog.getByRole("radio", { name: "4/4" }).click();
+  // More than the franchise is refused
+  await dialog.getByLabel("Frais de dégâts").fill("6000");
+  await dialog.getByRole("button", { name: "Enregistrer le retour" }).click();
+  await expect(dialog.getByText("ne peuvent pas dépasser la franchise")).toBeVisible();
+  await dialog.getByLabel("Frais de dégâts").fill("3500");
+  const settle = dialog.getByTestId("damage-settlement");
+  await expect(settle).toContainText("Retenu sur la caution : 2 000 MAD");
+  await expect(settle).toContainText("Caution à rendre : 0 MAD");
+  await expect(settle).toContainText("le client doit encore 1 500 MAD");
+  await expectNoHorizontalScroll(page);
+  await dialog.getByLabel("Montant encaissé maintenant").fill("0");
+  await dialog.getByRole("button", { name: "Enregistrer le retour" }).click();
+  await expect(page.getByText("Retour enregistré : la voiture est de nouveau disponible.")).toBeVisible();
+
+  const { data: r } = await sb.from("reservations").select("damage_fee, damage_note").eq("id", id).single();
+  expect(Number(r!.damage_fee)).toBe(3500);
+  expect(r!.damage_note).toContain("Bosse / choc");
+  const { data: pays } = await sb.from("reservation_payments").select("amount, kind, note").eq("reservation_id", id);
+  expect(pays!.find((p) => p.kind === "extra")).toMatchObject({ amount: 2000, note: "Retenu sur la caution (dégâts)" });
+  expect(pays!.some((p) => p.kind === "deposit_refund")).toBe(false);
+  await expect(page.getByText("Frais de dégâts").first()).toBeVisible();
+});
