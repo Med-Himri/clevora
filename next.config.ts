@@ -4,6 +4,13 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+// On Vercel, NEXT_PUBLIC_SITE_URL defaults to the project's own address (production
+// domain, or this preview's URL) when it is not set; a value set in Vercel wins.
+if (!process.env.NEXT_PUBLIC_SITE_URL && process.env.VERCEL) {
+  const host = process.env.VERCEL_ENV === "production" ? process.env.VERCEL_PROJECT_PRODUCTION_URL : process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL;
+  if (host) process.env.NEXT_PUBLIC_SITE_URL = `https://${host}`;
+}
+
 const supabaseUrl = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321");
 
 const isDev = process.env.NODE_ENV !== "production";
