@@ -1419,7 +1419,7 @@
     "disabled": "L'assistant IA est désactivé",
     "disabledAdmin": "Vous pouvez le réactiver dans Paramètres.",
     "disabledStaff": "L'administrateur de l'agence l'a désactivé.",
-    "notConfigured": "L'assistant n'est pas encore branché (clé ANTHROPIC_API_KEY manquante). Contactez l'équipe Parcolia.",
+    "notConfigured": "L'assistant n'est pas disponible pour le moment. Réessayez un peu plus tard.",
     "quotaReached": "Vous avez utilisé toutes les questions de ce mois. Le compteur repart à zéro le 1er du mois.",
     "suggestions": {
       "whoHadCar": "Qui avait la voiture 12345-A-6 hier à 15h ?",
@@ -1552,31 +1552,6 @@
       "deleteForever": "Supprimer définitivement",
       "deleted": "L'agence a été supprimée."
     },
-    "privacy": {
-      "title": "Clients et vie privée (loi 09-08)",
-      "intro": "Un client vous demande ses données ou leur suppression ? Cherchez-le ici.",
-      "policyLink": "Politique de confidentialité",
-      "search": "Nom, CIN ou téléphone du client",
-      "find": "Chercher",
-      "noClient": "Aucun client trouvé.",
-      "rentals": "{count, plural, =0 {aucune location} one {# location} other {# locations}}",
-      "isAnonymized": "Anonymisé",
-      "export": "Ses données",
-      "anonymize": "Anonymiser",
-      "anonymized": "Client anonymisé.",
-      "confirmTitle": "Anonymiser ce client ?",
-      "confirmBody": "Le nom, la pièce d'identité, le permis et les coordonnées de {name} seront effacés. Ses locations et paiements restent (comptabilité). C'est définitif.",
-      "retentionTitle": "Anciens clients",
-      "retentionBody": "Anonymisez les clients qui n'ont pas loué depuis longtemps : vous ne gardez que ce qui est nécessaire.",
-      "years": "Sans location depuis",
-      "yearsValue": "{count} ans",
-      "countOld": "Compter",
-      "noOld": "Aucun client concerné.",
-      "anonymizeOld": "Anonymiser {count, plural, one {# client} other {# clients}}",
-      "confirmOldTitle": "Anonymiser {count, plural, one {# client} other {# clients}} ?",
-      "confirmOldBody": "Leurs noms, pièces d'identité et coordonnées seront effacés. Les locations et paiements restent. C'est définitif.",
-      "retentionDone": "{count, plural, =0 {Aucun client anonymisé.} one {# client anonymisé.} other {# clients anonymisés.}}"
-    },
     "inspection": {
       "enabled": "Utiliser l'inspection des voitures ?",
       "hint": "Oui : une section « Inspection » apparaît dans le menu pour tous les membres. Non : elle est cachée, rien d'autre ne change.",
@@ -1684,7 +1659,8 @@
       "reservationsTotal": "Réservations (total)",
       "reservations30Short": "Réservations (30 j)",
       "aiQuestions": "Questions IA ce mois",
-      "lateOrSuspended": "En retard ou suspendues"
+      "lateOrSuspended": "En retard ou suspendues",
+      "aiMissing": "L'assistant IA est coupé pour toutes les agences : ajoutez GROQ_API_KEY (ou ANTHROPIC_API_KEY) dans Vercel → Settings → Environment Variables, puis redéployez."
     },
     "agenciesSubtitle": "{count, plural, one {# agence} other {# agences}} sur Parcolia.",
     "filterLabel": "Filtrer",

@@ -6,6 +6,7 @@ import { PageHeader } from "@/components/app/page-header";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
+import { assistantConfigured } from "@/lib/ai/provider";
 import { requireAgency } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import { Chat } from "./components/chat";
@@ -26,7 +27,7 @@ export default async function AssistantPage() {
   const supabase = await createClient();
   const { data: quotaRows } = await supabase.rpc("ai_quota", { p_agency: agency.id });
   const quota = quotaRows?.[0];
-  const configured = process.env.AI_PROVIDER === "mock" || Boolean(process.env.ANTHROPIC_API_KEY);
+  const configured = assistantConfigured();
   const remaining = quota?.quota === null || quota?.quota === undefined ? null : Math.max(0, quota.quota - quota.used);
 
   if (!quota?.plan_allows) {

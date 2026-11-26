@@ -18,6 +18,11 @@ const SHEETS = [
   ["Achats et crédits", "vehicle_finance"],
 ] as const;
 
+/** Columns left out of the file, per table (not used by the agencies). */
+const HIDDEN: Partial<Record<(typeof SHEETS)[number][1], string[]>> = {
+  vehicles: ["insurer", "policy_number"],
+};
+
 type Cell = string | number | boolean | null;
 
 function cell(v: unknown): Cell {
@@ -43,7 +48,8 @@ export async function GET() {
       rows.push(...(data as Array<Record<string, unknown>>));
       if (!data || data.length < 1000) break;
     }
-    const columns = rows.length ? Object.keys(rows[0]).filter((k) => k !== "agency_id") : ["id"];
+    const hidden = new Set(["agency_id", ...(HIDDEN[table] ?? [])]);
+    const columns = rows.length ? Object.keys(rows[0]).filter((k) => !hidden.has(k)) : ["id"];
     sheets.push({
       sheet: title,
       stickyRowsCount: 1,

@@ -1419,7 +1419,7 @@
     "disabled": "The AI assistant is turned off",
     "disabledAdmin": "You can turn it back on in Settings.",
     "disabledStaff": "Your agency admin turned it off.",
-    "notConfigured": "The assistant is not connected yet (missing ANTHROPIC_API_KEY). Contact the Parcolia team.",
+    "notConfigured": "The assistant is not available right now. Please try again a bit later.",
     "quotaReached": "You used all the questions for this month. The counter resets on the 1st.",
     "suggestions": {
       "whoHadCar": "Who had car 12345-A-6 yesterday at 3 pm?",
@@ -1552,31 +1552,6 @@
       "deleteForever": "Delete for good",
       "deleted": "The agency was deleted."
     },
-    "privacy": {
-      "title": "Clients and privacy (law 09-08)",
-      "intro": "A client asks for their data or its deletion? Find them here.",
-      "policyLink": "Privacy policy",
-      "search": "Client's name, ID card or phone",
-      "find": "Search",
-      "noClient": "No client found.",
-      "rentals": "{count, plural, =0 {no rentals} one {# rental} other {# rentals}}",
-      "isAnonymized": "Anonymized",
-      "export": "Their data",
-      "anonymize": "Anonymize",
-      "anonymized": "Client anonymized.",
-      "confirmTitle": "Anonymize this client?",
-      "confirmBody": "{name}'s name, ID, licence and contact details will be erased. Their rentals and payments stay (accounting). This cannot be undone.",
-      "retentionTitle": "Old clients",
-      "retentionBody": "Anonymize clients who have not rented for a long time: keep only what you need.",
-      "years": "No rental for",
-      "yearsValue": "{count} years",
-      "countOld": "Count",
-      "noOld": "No client concerned.",
-      "anonymizeOld": "Anonymize {count, plural, one {# client} other {# clients}}",
-      "confirmOldTitle": "Anonymize {count, plural, one {# client} other {# clients}}?",
-      "confirmOldBody": "Their names, IDs and contact details will be erased. Rentals and payments stay. This cannot be undone.",
-      "retentionDone": "{count, plural, =0 {No client anonymized.} one {# client anonymized.} other {# clients anonymized.}}"
-    },
     "inspection": {
       "enabled": "Use car inspection?",
       "hint": "Yes: an \"Inspection\" section appears in the menu for every member. No: it is hidden, nothing else changes.",
@@ -1684,7 +1659,8 @@
       "reservationsTotal": "Bookings (total)",
       "reservations30Short": "Bookings (30 d)",
       "aiQuestions": "AI questions this month",
-      "lateOrSuspended": "Late or suspended"
+      "lateOrSuspended": "Late or suspended",
+      "aiMissing": "The AI assistant is off for every agency: add GROQ_API_KEY (or ANTHROPIC_API_KEY) in Vercel → Settings → Environment Variables, then redeploy."
     },
     "agenciesSubtitle": "{count, plural, one {# agency} other {# agencies}} on Parcolia.",
     "filterLabel": "Filter",

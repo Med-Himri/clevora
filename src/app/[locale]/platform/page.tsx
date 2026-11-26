@@ -10,6 +10,8 @@ import { Link } from "@/i18n/navigation";
 import { formatDate, formatMoney } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { formatUsage, usageLines } from "@/lib/usage";
+import { assistantConfigured } from "@/lib/ai/provider";
+import { Alert } from "@/components/ui/alert";
 import { MonthBars } from "./components/month-bars";
 import { PaymentActions } from "./components/payment-actions";
 
@@ -63,6 +65,12 @@ export default async function PlatformDashboard() {
   return (
     <>
       <PageHeader title={t("dashboard.title")} subtitle={t("dashboard.subtitle")} />
+      {!assistantConfigured() ? (
+        <Alert variant="warning" className="mb-4" data-testid="platform-ai-missing">
+          <SparklesIcon aria-hidden />
+          <span>{t("dashboard.aiMissing")}</span>
+        </Alert>
+      ) : null}
 
       <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4" data-testid="platform-kpis">
         <li><StatTile label={t("dashboard.mrr")} value={<Ltr>{formatMoney(Number(s.mrr))}</Ltr>} hint={t("dashboard.mrrHint")} icon={TrendingUpIcon} tone="success" testId="platform-mrr" /></li>

@@ -41,6 +41,12 @@ export async function runTool(
   }
 }
 
+/** The assistant can answer: a key for Groq or Claude is set (or the test stand-in). Same rules as getProvider(). */
+export function assistantConfigured(): boolean {
+  if (process.env.AI_PROVIDER === "mock" && process.env.VERCEL_ENV !== "production") return true;
+  return Boolean(process.env.GROQ_API_KEY || process.env.ANTHROPIC_API_KEY);
+}
+
 export async function getProvider(): Promise<AssistantProvider | null> {
   // The offline stand-in is for tests and local dev only, never on the live site.
   if (process.env.AI_PROVIDER === "mock" && process.env.VERCEL_ENV !== "production") {

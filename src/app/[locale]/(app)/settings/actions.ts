@@ -2,7 +2,6 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { fail, ok, zodFieldErrors, type ActionResult } from "@/lib/action-result";
 import { dbErrorKey, requireActionContext } from "@/lib/auth/action";
 import { ACTIVE_AGENCY_COOKIE } from "@/lib/auth/session";
@@ -112,67 +111,4 @@ export async function deleteAgencyAction(confirmName: string): Promise<ActionRes
   (await cookies()).delete(ACTIVE_AGENCY_COOKIE);
   refresh();
   return ok();
-}
-
-// ---------------------------------------------------------------------------
-// Vie privée (loi 09-08): find a client, export or anonymize, retention.
-// ---------------------------------------------------------------------------
-export type ClientHit = { id: string; full_name: string; id_number: string; phone: string | null; rentals: number; anonymized: boolean };
-
-export async function searchClientsAction(q: string): Promise<ActionResult<ClientHit[]>> {
-  const guard = await requireActionContext({ roles: ["admin"], write: false });
-  if (!guard.ok) return guard;
-  const { supabase, agency } = guard.ctx;
-  const clean = String(q ?? "").replace(/[^\p{L}\p{N} -]/gu, " ").trim().slice(0, 60);
-  if (clean.length < 2) return ok([]);
-  const digits = clean.replace(/\D/g, "").replace(/^0/, "");
-  const ors = [`full_name.ilike.%${clean}%`, `id_number.ilike.%${clean}%`];
-  if (digits.length >= 4) ors.push(`phone.ilike.%${digits}%`);
-  const { data, error } = await supabase
-    .from("clients")
-    .select("id, full_name, id_number, phone, anonymized_at, reservations:reservations!reservations_agency_id_client_id_fkey(count)")
-    .eq("agency_id", agency.id)
-    .or(ors.join(","))
-    .limit(10);
-  if (error) return fail(dbErrorKey(error));
-  return ok(
-    (data ?? []).map((c) => ({
-      id: c.id,
-      full_name: c.full_name,
-      id_number: c.id_number,
-      phone: c.phone,
-      rentals: (c.reservations as unknown as Array<{ count: number }>)?.[0]?.count ?? 0,
-      anonymized: Boolean(c.anonymized_at),
-    })),
-  );
-}
-
-export async function anonymizeClientAction(clientId: string): Promise<ActionResult> {
-  if (!z.uuid().safeParse(clientId).success) return fail("forbidden");
-  const guard = await requireActionContext({ roles: ["admin"], write: false });
-  if (!guard.ok) return guard;
-  const { supabase, agency } = guard.ctx;
-  const { error } = await supabase.rpc("anonymize_client", { p_agency: agency.id, p_client: clientId });
-  if (error) return fail(error.hint === "client_active" ? "clientActive" : dbErrorKey(error));
-  return ok();
-}
-
-export async function oldClientsCountAction(years: number): Promise<ActionResult<number>> {
-  if (!Number.isInteger(years) || years < 1 || years > 20) return fail("invalidForm");
-  const guard = await requireActionContext({ roles: ["admin"], write: false });
-  if (!guard.ok) return guard;
-  const { supabase, agency } = guard.ctx;
-  const { data, error } = await supabase.rpc("old_clients", { p_agency: agency.id, p_years: years });
-  if (error) return fail(dbErrorKey(error));
-  return ok((data ?? []).length);
-}
-
-export async function anonymizeOldClientsAction(years: number): Promise<ActionResult<number>> {
-  if (!Number.isInteger(years) || years < 1 || years > 20) return fail("invalidForm");
-  const guard = await requireActionContext({ roles: ["admin"], write: false });
-  if (!guard.ok) return guard;
-  const { supabase, agency } = guard.ctx;
-  const { data, error } = await supabase.rpc("anonymize_old_clients", { p_agency: agency.id, p_years: years });
-  if (error) return fail(dbErrorKey(error));
-  return ok(data ?? 0);
 }
