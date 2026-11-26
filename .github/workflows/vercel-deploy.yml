@@ -37,7 +37,7 @@ jobs:
             echo "::warning::Vercel secrets are not set yet: skipping. See docs/DEPLOY.md (Deploy to another Vercel account)."
             echo "SKIP=1" >> "$GITHUB_ENV"
           fi
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         if: env.SKIP != '1'
         with:
           # the commit CI tested
@@ -45,6 +45,10 @@ jobs:
       - name: Deploy (Vercel builds it with the project's variables)
         if: env.SKIP != '1'
         run: |
-          url=$(npx --yes vercel@66.6.0 deploy --prod --yes --token "$VERCEL_TOKEN")
+          # A pasted secret often ends with a space or a new line: drop them
+          token=$(printf '%s' "$VERCEL_TOKEN" | tr -d '[:space:]')
+          export VERCEL_ORG_ID=$(printf '%s' "$VERCEL_ORG_ID" | tr -d '[:space:]')
+          export VERCEL_PROJECT_ID=$(printf '%s' "$VERCEL_PROJECT_ID" | tr -d '[:space:]')
+          url=$(npx --yes vercel@66.6.0 deploy --prod --yes --token "$token")
           echo "Deployed: $url"
           echo "### Deployed to Vercel: $url" >> "$GITHUB_STEP_SUMMARY"
