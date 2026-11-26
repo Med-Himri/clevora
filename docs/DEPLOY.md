@@ -159,6 +159,28 @@ the deployment in Vercel (step 5).
 6. The daily job (`vercel.json`, 07:00 UTC) sends alerts, creates monthly recurring charges
    and checks Supabase usage. Vercel adds the `CRON_SECRET` header itself.
 
+### 5.1 Deploy to another Vercel account
+
+If the Vercel project lives in an account that is not linked to this GitHub
+repository, do NOT use « Import Third-Party Git Repository »: it makes a copy of
+the code in that account's GitHub, and the copy never gets the updates. Instead,
+GitHub deploys it (`.github/workflows/vercel-deploy.yml`), after CI passed on `main`:
+
+1. In the other Vercel account: **Add New → Project** → any template or an empty
+   project named `parcolia` (or reuse the existing one and, in Settings → Git,
+   **Disconnect** the copied repository).
+2. That project: Settings → Environment Variables (the table in step 5 above), Settings →
+   Functions → Region **fra1**, Node.js **22.x**, Deployment Protection → Vercel
+   Authentication **Only Preview Deployments**.
+3. Copy three values:
+   - **VERCEL_TOKEN**: Account Settings → Tokens → Create (scope: that account).
+   - **VERCEL_ORG_ID**: Settings (of the account/team) → General → « Team ID » (or « Your ID »).
+   - **VERCEL_PROJECT_ID**: Project → Settings → General → « Project ID ».
+4. GitHub → `Med-Himri/clevora` → Settings → Secrets and variables → Actions →
+   New repository secret, for each of the three.
+5. GitHub → Actions → **Deploy to Vercel** → Run workflow (first time). After that,
+   every push to `main` that passes CI is deployed by itself.
+
 ---
 
 ## 6. Monitoring

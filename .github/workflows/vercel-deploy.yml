@@ -1,0 +1,50 @@
+# Deploys the app to Vercel (any Vercel account, even one not linked to this
+# GitHub repository) after CI passed on main. Vercel builds it with the
+# project's own environment variables (Settings → Environment Variables).
+#
+# Secrets (GitHub → Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN       Vercel → Account Settings → Tokens (scope: the account/team of the project)
+#   VERCEL_ORG_ID      Vercel → Team/Account Settings → General → "Team ID" / "Your ID"
+#   VERCEL_PROJECT_ID  Vercel → Project → Settings → General → "Project ID"
+# Without them the job says so and does nothing.
+name: Deploy to Vercel
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Only when CI passed on main (or when started by hand)
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - name: Secrets set?
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::warning::Vercel secrets are not set yet: skipping. See docs/DEPLOY.md (Deploy to another Vercel account)."
+            echo "SKIP=1" >> "$GITHUB_ENV"
+          fi
+      - uses: actions/checkout@v4
+        if: env.SKIP != '1'
+        with:
+          # the commit CI tested
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+      - name: Deploy (Vercel builds it with the project's variables)
+        if: env.SKIP != '1'
+        run: |
+          url=$(npx --yes vercel@66.6.0 deploy --prod --yes --token "$VERCEL_TOKEN")
+          echo "Deployed: $url"
+          echo "### Deployed to Vercel: $url" >> "$GITHUB_STEP_SUMMARY"
