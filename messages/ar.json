@@ -331,7 +331,14 @@
     },
     "seeAll": "عرض الحجوزات ({count})",
     "chooseCar": "السيارة",
-    "carToChoose": "السيارة لم تختر بعد"
+    "carToChoose": "السيارة لم تختر بعد",
+    "hello": "مرحبا {name}",
+    "summary": "{departures, plural, =0 {لا خروج} one {خروج واحد} other {# خروج}} و{returns, plural, =0 {لا رجوع} one {رجوع واحد} other {# رجوع}} اليوم",
+    "planning": "التخطيط",
+    "balances": "المبالغ المتبقية",
+    "fleetTitle": "الأسطول",
+    "occupancyNow": "{pct} % من السيارات في الكراء",
+    "vsLastMonth": "مقارنة بنفس أيام الشهر الماضي"
   },
   "billing": {
     "title": "الاشتراك",
@@ -1364,8 +1371,8 @@
     "occupancy": "نسبة الإشغال",
     "occupancyValue": "مشغولة {pct} %",
     "bestCar": "أفضل سيارة",
-    "revenueByMonth": "رقم المعاملات حسب الشهر",
-    "revenueByDay": "رقم المعاملات حسب اليوم",
+    "revenueByMonth": "المداخيل والمصاريف حسب الشهر",
+    "revenueByDay": "المداخيل والمصاريف حسب اليوم",
     "partial": "شهر جارٍ أو جزئي",
     "showTable": "عرض الأرقام",
     "periodColumn": "الفترة",
@@ -1393,7 +1400,14 @@
       "damagesMonth": "الأضرار"
     },
     "damages": "مصاريف الأضرار",
-    "damagesHint": "مقتطعة عند رجوع السيارات، ومحسوبة في الربح."
+    "damagesHint": "مقتطعة عند رجوع السيارات، ومحسوبة في الربح.",
+    "vsPrevious": "مقارنة بالفترة السابقة",
+    "income": "المداخيل",
+    "chartLabel": "المداخيل (الكراء والأضرار) والمصاريف حسب الفترة",
+    "ranking": "ترتيب السيارات",
+    "rankingHint": "ربح كل سيارة خلال الفترة (المداخيل − مصاريفها).",
+    "rankingEmpty": "لا يوجد كراء في هذه الفترة بعد.",
+    "daysRentedHint": "{count, plural, one {يوم كراء واحد} other {# أيام كراء}}"
   },
   "assistant": {
     "title": "المساعد الذكي",

@@ -32,7 +32,7 @@ export async function getDashboard(supabase: ServerSupabase, agencyId: string, i
   const select =
     "id, contract_number, status, start_at, end_at, signed_at, delivery, delivery_place, return_place, vehicle:vehicles!reservations_agency_id_vehicle_id_fkey(plate, brand_model), client:clients!reservations_agency_id_client_id_fkey(full_name, phone)";
 
-  const [vehicles, { data: agency }, { data: onRental }, { data: departures }, { data: maintenance }, revenueRows] = await Promise.all([
+  const [vehicles, { data: agency }, { data: onRental }, { data: departures }, { data: maintenance }, revenueRows, trend] = await Promise.all([
     listVehicles(supabase, agencyId, now),
     supabase.from("agencies").select("alert_days_before, alert_km_before").eq("id", agencyId).single(),
     supabase.from("reservations").select(select).eq("agency_id", agencyId).eq("status", "on_rental").order("end_at"),
@@ -51,6 +51,8 @@ export async function getDashboard(supabase: ServerSupabase, agencyId: string, i
           return revenueBetween((data ?? []).map((r) => ({ ...r, daily_price: Number(r.daily_price), delivery_fee: Number(r.delivery_fee) })), m.from, m.to);
         })()
       : Promise.resolve(null),
+    // Admins: revenue of each day of the month, and the same days of last month (for the change)
+    isAdmin ? revenueTrend(supabase, agencyId, today) : Promise.resolve(null),
   ]);
 
   const active = vehicles.filter((v) => v.status === "active");
@@ -91,6 +93,7 @@ export async function getDashboard(supabase: ServerSupabase, agencyId: string, i
       returnsToday: returns.filter((r) => dayKey(r.end_at) <= today).length,
       maintenance: active.filter((v) => v.computed.kind === "maintenance").length,
       revenueMonth: revenueRows,
+      revenueTrend: trend,
     },
     returns,
     departures: leaving,
@@ -109,4 +112,26 @@ function urgency(a: DashboardAlert): number {
     default:
       return a.daysLeft < 0 ? 1 : 2 + a.daysLeft / 1000;
   }
+}
+
+/**
+ * This month, day by day (rent + damage fees), and the total of the same days
+ * last month: the dashboard draws the days and the change in %.
+ */
+async function revenueTrend(supabase: ServerSupabase, agencyId: string, today: string) {
+  const [y, m, d] = today.split("-").map(Number);
+  const first = `${today.slice(0, 7)}-01`;
+  const last = new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+  const prevFirst = new Date(Date.UTC(y, m - 2, 1)).toISOString().slice(0, 10);
+  const prevLastDay = new Date(Date.UTC(y, m - 1, 0)).getUTCDate();
+  const prevTo = new Date(Date.UTC(y, m - 2, Math.min(d, prevLastDay))).toISOString().slice(0, 10);
+  const [{ data: cur }, { data: prev }] = await Promise.all([
+    supabase.rpc("stats_daily", { p_agency: agencyId, p_from: first, p_to: last }),
+    supabase.rpc("stats_daily", { p_agency: agencyId, p_from: prevFirst, p_to: prevTo }),
+  ]);
+  const income = (r: { revenue: number; damages: number }) => Number(r.revenue) + Number(r.damages ?? 0);
+  const days = (cur ?? []).map((r) => ({ day: r.day, value: income(r) }));
+  const soFar = days.filter((x) => x.day <= today).reduce((s, x) => s + x.value, 0);
+  const previous = (prev ?? []).reduce((s, r) => s + income(r), 0);
+  return { days, today: d - 1, soFar, previous };
 }

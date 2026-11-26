@@ -331,7 +331,14 @@
     },
     "seeAll": "See all {count} bookings",
     "chooseCar": "Car",
-    "carToChoose": "Car to choose"
+    "carToChoose": "Car to choose",
+    "hello": "Hello {name}",
+    "summary": "{departures, plural, =0 {No departure} one {# departure} other {# departures}} and {returns, plural, =0 {no return} one {# return} other {# returns}} today",
+    "planning": "Planning",
+    "balances": "Balances due",
+    "fleetTitle": "Fleet",
+    "occupancyNow": "{pct} % of the cars on rental",
+    "vsLastMonth": "vs the same days last month"
   },
   "billing": {
     "title": "Subscription",
@@ -1364,8 +1371,8 @@
     "occupancy": "Occupancy",
     "occupancyValue": "{pct} % occupied",
     "bestCar": "Best car",
-    "revenueByMonth": "Revenue by month",
-    "revenueByDay": "Revenue by day",
+    "revenueByMonth": "Income and expenses per month",
+    "revenueByDay": "Income and expenses per day",
     "partial": "current or partial month",
     "showTable": "Show the numbers",
     "periodColumn": "Period",
@@ -1393,7 +1400,14 @@
       "damagesMonth": "Damages"
     },
     "damages": "Damage fees",
-    "damagesHint": "Kept when cars came back, counted in the profit."
+    "damagesHint": "Kept when cars came back, counted in the profit.",
+    "vsPrevious": "vs previous period",
+    "income": "Income",
+    "chartLabel": "Income (rentals and damages) and expenses per period",
+    "ranking": "Cars ranking",
+    "rankingHint": "Profit of each car over the period (income − its expenses).",
+    "rankingEmpty": "No rental yet in this period.",
+    "daysRentedHint": "{count, plural, one {# day rented} other {# days rented}}"
   },
   "assistant": {
     "title": "AI assistant",

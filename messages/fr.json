@@ -331,7 +331,14 @@
     },
     "seeAll": "Voir les {count} réservations",
     "chooseCar": "Voiture",
-    "carToChoose": "Voiture à choisir"
+    "carToChoose": "Voiture à choisir",
+    "hello": "Bonjour {name}",
+    "summary": "{departures, plural, =0 {Aucun départ} one {# départ} other {# départs}} et {returns, plural, =0 {aucun retour} one {# retour} other {# retours}} aujourd'hui",
+    "planning": "Planning",
+    "balances": "Restes à payer",
+    "fleetTitle": "Parc auto",
+    "occupancyNow": "{pct} % des voitures en location",
+    "vsLastMonth": "vs les mêmes jours du mois dernier"
   },
   "billing": {
     "title": "Abonnement",
@@ -1364,8 +1371,8 @@
     "occupancy": "Taux d'occupation",
     "occupancyValue": "{pct} % occupée",
     "bestCar": "Meilleure voiture",
-    "revenueByMonth": "Chiffre d'affaires par mois",
-    "revenueByDay": "Chiffre d'affaires par jour",
+    "revenueByMonth": "Revenus et charges par mois",
+    "revenueByDay": "Revenus et charges par jour",
     "partial": "mois en cours ou partiel",
     "showTable": "Voir les chiffres",
     "periodColumn": "Période",
@@ -1393,7 +1400,14 @@
       "damagesMonth": "Dégâts"
     },
     "damages": "Frais de dégâts",
-    "damagesHint": "Retenus au retour des voitures, comptés dans le bénéfice."
+    "damagesHint": "Retenus au retour des voitures, comptés dans le bénéfice.",
+    "vsPrevious": "vs période précédente",
+    "income": "Revenus",
+    "chartLabel": "Revenus (locations et dégâts) et charges par période",
+    "ranking": "Classement des voitures",
+    "rankingHint": "Bénéfice de chaque voiture sur la période (revenus − ses charges).",
+    "rankingEmpty": "Pas encore de location sur cette période.",
+    "daysRentedHint": "{count, plural, one {# jour loué} other {# jours loués}}"
   },
   "assistant": {
     "title": "Assistant IA",

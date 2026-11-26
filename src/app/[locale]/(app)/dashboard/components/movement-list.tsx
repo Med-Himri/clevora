@@ -44,7 +44,11 @@ export async function MovementList({
   };
 
   return (
-    <section aria-labelledby={`${kind}-title`} className="@container flex min-w-0 flex-col overflow-hidden rounded-xl border bg-card shadow-xs" data-testid={`dash-${kind}s`}>
+    <section
+      aria-labelledby={`${kind}-title`}
+      className={cn("@container flex min-w-0 flex-col overflow-hidden rounded-xl border border-t-4 bg-card shadow-xs", kind === "return" ? "border-t-warning/70" : "border-t-info/70")}
+      data-testid={`dash-${kind}s`}
+    >
       <header className="flex items-center gap-3 border-b px-4 py-3">
         <span className={cn("inline-flex size-9 items-center justify-center rounded-lg", kind === "return" ? "bg-warning-soft text-warning" : "bg-info-soft text-info")} aria-hidden>
           <Icon className="size-5" />
@@ -56,7 +60,12 @@ export async function MovementList({
       </header>
 
       {items.length === 0 ? (
-        <p className="px-4 py-6 text-center text-sm text-muted-foreground">{empty}</p>
+        <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+          <span className="inline-flex size-12 items-center justify-center rounded-full bg-muted text-muted-foreground" aria-hidden>
+            <Icon className="size-6" />
+          </span>
+          <p className="text-sm text-muted-foreground">{empty}</p>
+        </div>
       ) : (
         <div className="flex flex-col">
           {groups.map((g) => (

@@ -1,11 +1,12 @@
-import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CarFrontIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
+import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CarFrontIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, ReceiptIcon, TrendingDownIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { ExcelExport } from "@/components/app/excel-export";
 import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
-import { StatTile } from "@/components/app/stat-tile";
+import { pctChange, StatTile } from "@/components/app/stat-tile";
+import { Meter, RankBars } from "@/components/app/charts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +38,11 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
   const t = await getTranslations("statistics");
   const format = await getFormatter();
   const supabase = await createClient();
-  const [{ data: daily }, { data: perCar }, { count: carCount }, credit, profit] = await Promise.all([
+  // The previous period of the same length, for the ▲ / ▼ %
+  const spanDays = Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) + 1;
+  const prevTo = new Date(Date.parse(`${from}T12:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+  const prevFrom = new Date(Date.parse(`${from}T12:00:00Z`) - spanDays * 86_400_000).toISOString().slice(0, 10);
+  const [{ data: daily }, { data: perCar }, { count: carCount }, credit, profit, { data: prevDaily }] = await Promise.all([
     supabase.rpc("stats_daily", { p_agency: agency.id, p_from: from, p_to: to }),
     supabase.rpc("stats_by_vehicle", { p_agency: agency.id, p_from: from, p_to: to }),
     supabase.from("vehicles").select("id", { count: "exact", head: true }).eq("agency_id", agency.id).eq("status", "active"),
@@ -45,7 +50,14 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
     getBalances(supabase, agency.id),
     // Rentabilité depuis l'achat (all time, not the period)
     getProfitability(supabase, agency.id),
+    supabase.rpc("stats_daily", { p_agency: agency.id, p_from: prevFrom, p_to: prevTo }),
   ]);
+  const prevRows = prevDaily ?? [];
+  const prev = {
+    revenue: prevRows.reduce((x, r) => x + Number(r.revenue), 0),
+    damages: prevRows.reduce((x, r) => x + Number(r.damages), 0),
+    charges: prevRows.reduce((x, r) => x + Number(r.charges), 0),
+  };
   const profitRows = profit
     .filter((p) => p.status !== "sold")
     .map((p) => ({ ...p, s: summarize(p) }))
@@ -104,6 +116,8 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
   // Damage fees kept at return: income on their own, added to the profit
   const damages = buckets.reduce((s, b) => s + b.damages, 0);
   const rentedDays = buckets.reduce((s, b) => s + b.rentedDays, 0);
+  const net = revenue + damages - charges;
+  const occupancyPct = occupancy(rentedDays, carCount ?? 0, days);
   const cars = (perCar ?? [])
     .map((c) => {
       const rev = Number(c.revenue);
@@ -193,11 +207,34 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
         ) : null}
       </div>
 
-      <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4 2xl:grid-cols-7">
-        <li className="col-span-2 2xl:col-span-1">
+      {/* The money of the period, each with its change versus the previous period of the same length */}
+      <ul className="mb-3 grid grid-cols-2 gap-3 xl:grid-cols-4" data-testid="stats-kpis">
+        <li>
+          <StatTile label={t("revenue")} value={<Ltr>{formatMoney(revenue)}</Ltr>} icon={WalletIcon} tone="success" testId="stats-revenue" delta={{ pct: pctChange(revenue, prev.revenue), label: t("vsPrevious") }} />
+        </li>
+        <li>
+          <StatTile label={t("damages")} value={<Ltr>{formatMoney(damages)}</Ltr>} hint={t("damagesHint")} icon={CarFrontIcon} tone="info" testId="stats-damages" delta={{ pct: pctChange(damages, prev.damages), label: t("vsPrevious") }} />
+        </li>
+        <li>
+          <StatTile label={t("charges")} value={<Ltr>{formatMoney(charges)}</Ltr>} icon={ReceiptIcon} tone="warning" testId="stats-charges" delta={{ pct: pctChange(charges, prev.charges), goodWhenUp: false, label: t("vsPrevious") }} />
+        </li>
+        <li>
+          <StatTile
+            highlight={net >= 0}
+            label={t("net")}
+            value={<Ltr className={net < 0 ? "text-destructive" : undefined}>{formatMoney(net)}</Ltr>}
+            icon={net < 0 ? TrendingDownIcon : TrendingUpIcon}
+            tone={net < 0 ? "danger" : "success"}
+            testId="stats-net"
+            delta={{ pct: pctChange(net, prev.revenue + prev.damages - prev.charges), label: t("vsPrevious") }}
+          />
+        </li>
+      </ul>
+      <ul className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
+        <li>
           <StatTile
             label={t("credit")}
-            value={<Ltr>{formatMoney(credit.reduce((s, r) => s + r.balance, 0))}</Ltr>}
+            value={<Ltr>{formatMoney(credit.reduce((x, r) => x + r.balance, 0))}</Ltr>}
             hint={t("creditHint", { count: credit.length })}
             icon={HandCoinsIcon}
             tone={credit.length ? "danger" : "success"}
@@ -205,19 +242,26 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
             testId="stats-credit"
           />
         </li>
-        <li><StatTile label={t("revenue")} value={<Ltr>{formatMoney(revenue)}</Ltr>} icon={WalletIcon} tone="success" testId="stats-revenue" /></li>
-        <li><StatTile label={t("damages")} value={<Ltr>{formatMoney(damages)}</Ltr>} hint={t("damagesHint")} icon={CarFrontIcon} testId="stats-damages" /></li>
-        <li><StatTile label={t("charges")} value={<Ltr>{formatMoney(charges)}</Ltr>} icon={WalletIcon} tone="warning" testId="stats-charges" /></li>
-        <li><StatTile label={t("net")} value={<Ltr>{formatMoney(revenue + damages - charges)}</Ltr>} icon={TrendingUpIcon} tone={revenue + damages - charges < 0 ? "danger" : "success"} testId="stats-net" /></li>
-        <li><StatTile label={t("daysRented")} value={rentedDays} icon={CalendarDaysIcon} /></li>
-        <li><StatTile label={t("occupancy")} value={<Ltr>{occupancy(rentedDays, carCount ?? 0, days)} %</Ltr>} icon={PercentIcon} testId="stats-occupancy" /></li>
-        <li><StatTile label={t("bestCar")} value={<span className="text-lg sm:text-xl">{best ? best.brand_model : "—"}</span>} hint={best ? <Ltr>{best.plate}</Ltr> : undefined} icon={TrophyIcon} /></li>
+        <li>
+          <StatTile label={t("occupancy")} value={<Ltr>{occupancyPct} %</Ltr>} hint={t("daysRentedHint", { count: rentedDays })} icon={PercentIcon} tone="info" testId="stats-occupancy">
+            <Meter pct={occupancyPct} label={t("occupancy")} />
+          </StatTile>
+        </li>
+        <li>
+          <StatTile label={t("daysRented")} value={rentedDays} icon={CalendarDaysIcon} />
+        </li>
+        <li>
+          <StatTile label={t("bestCar")} value={<span className="text-lg sm:text-xl">{best ? best.brand_model : "—"}</span>} hint={best ? <Ltr>{best.plate}</Ltr> : undefined} icon={TrophyIcon} tone="success" />
+        </li>
       </ul>
 
-      <Card className="mb-6">
+      <div className="mb-8 grid gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <Card className="min-w-0 shadow-xs">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BarChart3Icon className="size-5 text-muted-foreground" aria-hidden />
+            <span className="inline-flex size-9 items-center justify-center rounded-lg bg-info-soft text-info" aria-hidden>
+              <BarChart3Icon className="size-5" />
+            </span>
             {buckets[0]?.key.length === 7 ? t("revenueByMonth") : t("revenueByDay")}
           </CardTitle>
         </CardHeader>
@@ -250,6 +294,30 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
           </details>
         </CardContent>
       </Card>
+
+      {/* Which cars make the most money in the period (profit = income − their own charges) */}
+      <Card className="min-w-0 shadow-xs">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <span className="inline-flex size-9 items-center justify-center rounded-lg bg-success-soft text-success" aria-hidden>
+              <TrophyIcon className="size-5" />
+            </span>
+            {t("ranking")}
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">{t("rankingHint")}</p>
+        </CardHeader>
+        <CardContent>
+          {cars.some((c) => c.revenue || c.charges || c.damages) ? (
+            <RankBars
+              testId="stats-ranking"
+              rows={cars.slice(0, 8).map((c) => ({ key: c.vehicle_id, label: c.brand_model, sub: <Ltr>{c.plate}</Ltr>, value: c.net, display: formatMoney(c.net) }))}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("rankingEmpty")}</p>
+          )}
+        </CardContent>
+      </Card>
+      </div>
 
       <section aria-labelledby="perf-title">
         <h2 id="perf-title" className="mb-1 flex items-center gap-2 text-xl font-bold">

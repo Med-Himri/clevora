@@ -42,9 +42,15 @@
   --input: #cbd5e1;
   --ring: #2563eb;
   --radius: 0.75rem;
+  /* Chart series (validated: CVD-safe pair, light surface) */
+  --series-1: #257de0;
+  --series-2: #f47230;
 }
 
 .dark {
+  /* Chart series, stepped for the dark surface (validated) */
+  --series-1: #338ced;
+  --series-2: #e76624;
   /* Parcolia pages only: agencies override --brand with their own colour */
   --brand: #0b5f8a;
   --background: #0b1120;
