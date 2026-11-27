@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuIcon, PlusIcon, UserCogIcon, type LucideIcon } from "lucide-react";
+import { MenuIcon, PlusIcon, SparklesIcon, UserCogIcon, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -24,6 +24,7 @@ export function BottomNav({ role, hidden = [], badges }: { role: Role; hidden?: 
   const main = BOTTOM_KEYS.map((k) => items.find((i) => i.key === k)!).filter(Boolean);
   const more = items.filter((i) => !BOTTOM_KEYS.includes(i.key));
   const moreBadge = more.reduce((n, i) => n + (badges[i.key]?.count ?? 0), 0);
+  const assistant = items.find((i) => i.key === "assistant");
   const moreActive = more.some((i) => isActive(pathname, i.href)) || isActive(pathname, "/account");
 
 
@@ -82,6 +83,19 @@ export function BottomNav({ role, hidden = [], badges }: { role: Role; hidden?: 
           </button>
         </div>
       </nav>
+
+      {/* The AI assistant, one tap away: a round button in the bottom-right corner, above the bar */}
+      {assistant && !isActive(pathname, assistant.href) ? (
+        <Link
+          href={assistant.href}
+          aria-label={t("assistant")}
+          title={t("assistant")}
+          data-testid="assistant-fab"
+          className="fixed end-4 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-30 inline-flex size-13 items-center justify-center rounded-full bg-gradient-to-br from-brand to-[color-mix(in_oklab,var(--brand)_60%,#7c3aed)] text-brand-foreground shadow-lg ring-4 ring-background transition-transform active:scale-95 md:hidden"
+        >
+          <SparklesIcon className="size-6" aria-hidden />
+        </Link>
+      ) : null}
 
       <Dialog open={moreOpen} onOpenChange={setMoreOpen}>
         <DialogContent closeLabel={tc("close")} className="md:hidden">

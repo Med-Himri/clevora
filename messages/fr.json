@@ -1424,7 +1424,15 @@
       "days": "30 jours",
       "custom": "Dates"
     },
-    "subtitle": "Revenus, charges et bénéfice de l'agence."
+    "subtitle": "Revenus, charges et bénéfice de l'agence.",
+    "short": {
+      "revenue": "Revenus",
+      "charges": "Charges",
+      "damages": "Dégâts",
+      "days": "{count, plural, one {# jour} other {# jours}}",
+      "occupancy": "Occupation",
+      "net": "Bénéfice"
+    }
   },
   "assistant": {
     "title": "Assistant IA",

@@ -1424,7 +1424,15 @@
       "days": "30 days",
       "custom": "Dates"
     },
-    "subtitle": "The agency's income, charges and profit."
+    "subtitle": "The agency's income, charges and profit.",
+    "short": {
+      "revenue": "Income",
+      "charges": "Charges",
+      "damages": "Damage",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "occupancy": "Occupancy",
+      "net": "Profit"
+    }
   },
   "assistant": {
     "title": "AI assistant",

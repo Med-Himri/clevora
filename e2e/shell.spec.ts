@@ -104,3 +104,20 @@ test("language menu in the header: same page in Arabic (RTL), saved in the profi
     .poll(async () => (await admin().from("profiles").select("preferred_locale").eq("id", agency.userId).single()).data?.preferred_locale)
     .toBe("ar");
 });
+
+test("phones: a round assistant button in the bottom-right corner opens the assistant", async ({ page }, testInfo) => {
+  await login(page, DEMO.staff.email, DEMO.staff.password);
+  const fab = page.getByTestId("assistant-fab");
+  if (testInfo.project.name !== "phone") {
+    await expect(fab).toBeHidden();
+    return;
+  }
+  await expect(fab).toBeVisible();
+  await expect(fab).toHaveAccessibleName("Assistant IA");
+  const box = (await fab.boundingBox())!;
+  const vp = page.viewportSize()!;
+  expect(box.x + box.width).toBeGreaterThan(vp.width - 40); // right corner
+  await fab.click();
+  await page.waitForURL(/\/assistant/);
+  await expect(fab).toHaveCount(0); // not shown on the assistant itself
+});

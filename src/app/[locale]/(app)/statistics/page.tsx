@@ -64,6 +64,18 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
     .sort((a, b) => a.s.monthResult - b.s.monthResult);
   const withoutPurchase = (perCar ?? []).filter((c) => !profit.some((p) => p.vehicle_id === c.vehicle_id)).length;
   type ProfitRow = (typeof profitRows)[number];
+  /** Phones: one quiet line « Revenus 12 000 MAD · Charges 3 000 MAD · Dégâts 500 MAD » under the car. */
+  const moneyLine = (items: Array<[string, number, boolean?]>) => (
+    <span className="flex flex-wrap gap-x-2.5 gap-y-0.5">
+      {items
+        .filter(([, v, hideZero]) => !(hideZero && v === 0))
+        .map(([label, v]) => (
+          <span key={label} className="whitespace-nowrap">
+            {label} <Ltr className="font-semibold text-foreground">{formatMoney(v)}</Ltr>
+          </span>
+        ))}
+    </span>
+  );
   const profitColumns: Column<ProfitRow>[] = [
     {
       key: "car",
@@ -80,6 +92,8 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
       key: "credit",
       header: t("profit.credit"),
       priority: "high",
+      phone: "column",
+      phoneOrder: 1,
       cell: (c) =>
         c.mode === "cash" ? (
           <StatusPill tone="neutral" label={t("profit.cash")} />
@@ -89,15 +103,31 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
           <StatusPill tone="success" label={t("profit.creditDone")} />
         ),
     },
-    { key: "rent", header: t("profit.rentMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.revenue_month)}</Ltr> },
-    { key: "damagesMonth", header: t("profit.damagesMonth"), priority: "low", align: "end", cell: (c) => (c.damages_month > 0 ? <Ltr>{formatMoney(c.damages_month)}</Ltr> : <span className="text-muted-foreground">—</span>) },
-    { key: "charges", header: t("profit.chargesMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.charges_month)}</Ltr> },
-    { key: "creditMonth", header: t("profit.creditMonth"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.credit_month)}</Ltr> },
+    {
+      key: "rent",
+      header: t("profit.rentMonth"),
+      priority: "high",
+      align: "end",
+      cell: (c) => <Ltr>{formatMoney(c.revenue_month)}</Ltr>,
+      // Phones: this month's money on one quiet line under the car
+      phoneCell: (c) =>
+        moneyLine([
+          [t("profit.rentMonth"), c.revenue_month],
+          [t("profit.damagesMonth"), c.damages_month, true],
+          [t("profit.chargesMonth"), c.charges_month],
+          [t("profit.creditMonth"), c.credit_month, true],
+        ]),
+    },
+    { key: "damagesMonth", header: t("profit.damagesMonth"), priority: "low", align: "end", phone: "hide", cell: (c) => (c.damages_month > 0 ? <Ltr>{formatMoney(c.damages_month)}</Ltr> : <span className="text-muted-foreground">—</span>) },
+    { key: "charges", header: t("profit.chargesMonth"), priority: "low", align: "end", phone: "hide", cell: (c) => <Ltr>{formatMoney(c.charges_month)}</Ltr> },
+    { key: "creditMonth", header: t("profit.creditMonth"), priority: "low", align: "end", phone: "hide", cell: (c) => <Ltr>{formatMoney(c.credit_month)}</Ltr> },
     {
       key: "month",
       header: t("profit.resultMonth"),
       priority: "high",
       align: "end",
+      phone: "column",
+      phoneOrder: 2,
       cell: (c) => <Ltr className={cn("font-bold", c.s.monthResult < 0 ? "text-destructive" : "text-success")}>{formatMoney(c.s.monthResult)}</Ltr>,
     },
     {
@@ -136,14 +166,66 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
     ]),
   );
 
+  const rank = new Map(cars.map((c, i) => [c.vehicle_id, i + 1]));
   const columns: Column<(typeof cars)[number]>[] = [
-    { key: "car", header: t("car"), priority: "primary", cell: (c) => <span>{c.brand_model} <Ltr className="text-sm font-normal text-muted-foreground">{c.plate}</Ltr></span> },
-    { key: "net", header: t("net"), priority: "high", align: "end", cell: (c) => <Ltr className={cn("font-bold", c.net < 0 && "text-destructive")}>{formatMoney(c.net)}</Ltr> },
-    { key: "occupancy", header: t("occupancy"), priority: "high", hideLabelInCard: true, cell: (c) => <Badge variant={occupancyTone(c.occupancy)}>{t("occupancyValue", { pct: c.occupancy })}</Badge> },
-    { key: "revenue", header: t("revenue"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.revenue)}</Ltr> },
-    { key: "damages", header: t("damages"), priority: "low", align: "end", cell: (c) => (c.damages > 0 ? <Ltr>{formatMoney(c.damages)}</Ltr> : <span className="text-muted-foreground">—</span>) },
-    { key: "charges", header: t("carCharges"), priority: "low", align: "end", cell: (c) => <Ltr>{formatMoney(c.charges)}</Ltr> },
-    { key: "days", header: t("daysRented"), priority: "low", align: "end", cell: (c) => <Ltr>{c.rented_days}</Ltr> },
+    {
+      key: "car",
+      header: t("car"),
+      priority: "primary",
+      cell: (c) => <span>{c.brand_model} <Ltr className="text-sm font-normal text-muted-foreground">{c.plate}</Ltr></span>,
+      // Phones: its rank, the name and the plate
+      phoneCell: (c) => (
+        <span className="flex items-start gap-2">
+          <span className={cn("mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold tabular-nums", rank.get(c.vehicle_id) === 1 && c.net > 0 ? "bg-warning-soft text-warning" : "bg-muted text-muted-foreground")}>
+            {rank.get(c.vehicle_id)}
+          </span>
+          <span className="flex min-w-0 flex-col">
+            <span>{c.brand_model}</span>
+            <Ltr className="text-xs font-normal text-muted-foreground">{c.plate}</Ltr>
+          </span>
+        </span>
+      ),
+    },
+    {
+      key: "net",
+      header: t("net"),
+      phoneHeader: t("short.net"),
+      priority: "high",
+      align: "end",
+      phone: "column",
+      phoneOrder: 2,
+      cell: (c) => <Ltr className={cn("font-bold", c.net < 0 && "text-destructive")}>{formatMoney(c.net)}</Ltr>,
+      phoneCell: (c) => <Ltr className={cn("text-sm font-bold", c.net < 0 ? "text-destructive" : c.net > 0 && "text-success")}>{formatMoney(c.net)}</Ltr>,
+    },
+    {
+      key: "occupancy",
+      header: t("occupancy"),
+      phoneHeader: t("short.occupancy"),
+      priority: "high",
+      hideLabelInCard: true,
+      phone: "column",
+      phoneOrder: 1,
+      cell: (c) => <Badge variant={occupancyTone(c.occupancy)}>{t("occupancyValue", { pct: c.occupancy })}</Badge>,
+      // Phones: the %, a thin bar, and the days rented
+      phoneCell: (c) => (
+        <span className="flex w-16 flex-col gap-1">
+          <span className="text-sm font-bold tabular-nums">{c.occupancy} %</span>
+          <Meter pct={c.occupancy} label={`${t("occupancy")} ${c.occupancy} %`} />
+          <span className="text-[11px] text-muted-foreground">{t("short.days", { count: c.rented_days })}</span>
+        </span>
+      ),
+    },
+    {
+      key: "revenue",
+      header: t("revenue"),
+      priority: "high",
+      align: "end",
+      cell: (c) => <Ltr>{formatMoney(c.revenue)}</Ltr>,
+      phoneCell: (c) => moneyLine([[t("short.revenue"), c.revenue], [t("short.charges"), c.charges], [t("short.damages"), c.damages, true]]),
+    },
+    { key: "damages", header: t("damages"), priority: "low", align: "end", phone: "hide", cell: (c) => (c.damages > 0 ? <Ltr>{formatMoney(c.damages)}</Ltr> : <span className="text-muted-foreground">—</span>) },
+    { key: "charges", header: t("carCharges"), priority: "low", align: "end", phone: "hide", cell: (c) => <Ltr>{formatMoney(c.charges)}</Ltr> },
+    { key: "days", header: t("daysRented"), priority: "low", align: "end", phone: "hide", cell: (c) => <Ltr>{c.rented_days}</Ltr> },
   ];
   const qs = `from=${from}&to=${to}`;
 

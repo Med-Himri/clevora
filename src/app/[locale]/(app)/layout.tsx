@@ -50,7 +50,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           platformAdmin={await isPlatformAdmin()}
         />
         <SubscriptionBanner subscription={agency.subscription} role={agency.role} />
-        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pb-28 pt-4 sm:pt-6 md:pb-8">{children}</main>
+        <main className="mx-auto w-full min-w-0 max-w-6xl flex-1 px-4 pb-40 pt-4 sm:pt-6 md:pb-8">{children}</main>
       </div>
       <BottomNav role={agency.role} hidden={hidden} badges={badges} />
       <Suspense>
