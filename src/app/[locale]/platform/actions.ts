@@ -135,3 +135,33 @@ export async function savePlanAction(input: PlanInput): Promise<ActionResult> {
   revalidatePath("/[locale]", "layout");
   return ok();
 }
+
+export type AssistantCheck =
+  | { result: "ok"; provider: "groq" | "anthropic"; models: string[] }
+  | { result: "missing" | "invalid" | "busy" | "down" | "network" | "noModel"; provider?: "groq" | "anthropic"; detail?: string; missing?: string[] };
+
+/**
+ * « Tester l'assistant » (Parcolia owners): checks from the live server that the
+ * AI key works and that the models it uses still exist. Never returns the key.
+ */
+export async function testAssistantAction(): Promise<ActionResult<AssistantCheck>> {
+  if (!(await isPlatformAdmin())) return fail("forbidden");
+  const { groqModels } = await import("@/lib/ai/groq");
+  const key = process.env.GROQ_API_KEY;
+  if (!key) return ok(process.env.ANTHROPIC_API_KEY ? { result: "ok", provider: "anthropic", models: [process.env.ANTHROPIC_MODEL || "claude"] } : { result: "missing" });
+  let res: Response;
+  try {
+    res = await fetch("https://api.groq.com/openai/v1/models", { headers: { Authorization: `Bearer ${key.trim()}` }, signal: AbortSignal.timeout(15_000), cache: "no-store" });
+  } catch (e) {
+    return ok({ result: "network", provider: "groq", detail: e instanceof Error ? e.message.slice(0, 120) : undefined });
+  }
+  if (res.status === 401 || res.status === 403) return ok({ result: "invalid", provider: "groq" });
+  if (res.status === 429) return ok({ result: "busy", provider: "groq" });
+  if (!res.ok) return ok({ result: "down", provider: "groq", detail: `HTTP ${res.status}` });
+  const body = (await res.json().catch(() => null)) as { data?: Array<{ id: string }> } | null;
+  const available = new Set((body?.data ?? []).map((m) => m.id));
+  const wanted = groqModels();
+  const usable = wanted.filter((m) => available.has(m));
+  if (!usable.length) return ok({ result: "noModel", provider: "groq", missing: wanted });
+  return ok({ result: "ok", provider: "groq", models: usable });
+}

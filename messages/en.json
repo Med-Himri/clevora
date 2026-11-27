@@ -334,8 +334,6 @@
     "carToChoose": "Car to choose",
     "hello": "Hello {name}",
     "summary": "{departures, plural, =0 {No departure} one {# departure} other {# departures}} and {returns, plural, =0 {no return} one {# return} other {# returns}} today",
-    "planning": "Planning",
-    "balances": "Balances due",
     "fleetTitle": "Fleet",
     "occupancyNow": "{pct} % of the cars on rental",
     "vsLastMonth": "vs the same days last month"
@@ -1765,6 +1763,18 @@
       "activeNo": "No, hidden",
       "save": "Save",
       "saved": "Plan {name} saved."
+    },
+    "aiCheck": {
+      "title": "AI assistant",
+      "hint": "Checks from the live site that the AI key works and that its models exist.",
+      "run": "Test the assistant",
+      "ok": "The assistant works ({provider}). Available models: {models}. If it does not answer in an agency: Settings → AI assistant = Yes, and a plan that includes it.",
+      "missing": "No key: add GROQ_API_KEY in Vercel → Settings → Environment Variables (Production), then redeploy.",
+      "invalid": "The Groq key is refused (deleted, badly copied or expired). Create a new key on console.groq.com, replace GROQ_API_KEY in Vercel, then redeploy.",
+      "busy": "Groq is busy right now (free limit). Try again in a minute.",
+      "down": "Groq is not answering properly right now. Try again later.",
+      "network": "The server could not reach Groq. Try again later.",
+      "noModel": "The key works, but none of the planned models exists any more at Groq. Update GROQ_MODELS in Vercel."
     }
   },
   "marketing": {

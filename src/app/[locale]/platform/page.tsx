@@ -11,6 +11,7 @@ import { formatDate, formatMoney } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { formatUsage, usageLines } from "@/lib/usage";
 import { assistantConfigured } from "@/lib/ai/provider";
+import { AssistantCheck } from "./components/assistant-check";
 import { Alert } from "@/components/ui/alert";
 import { MonthBars } from "./components/month-bars";
 import { PaymentActions } from "./components/payment-actions";
@@ -155,6 +156,7 @@ export default async function PlatformDashboard() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
+        <AssistantCheck />
         {usage.length ? (
           <Card data-testid="platform-usage">
             <CardHeader>

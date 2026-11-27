@@ -2,13 +2,11 @@ import {
   ArrowUpRightIcon,
   BellIcon,
   CalendarCheckIcon,
-  CalendarRangeIcon,
   CarIcon,
   CircleCheckIcon,
   CornerDownLeftIcon,
   DropletIcon,
   FileSignatureIcon,
-  HandCoinsIcon,
   LogOutIcon,
   PlusIcon,
   ShieldAlertIcon,
@@ -99,20 +97,6 @@ export default async function DashboardPage() {
                 {t("newReservation")}
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="border-white/40 bg-white/10 text-brand-foreground hover:bg-white/20 hover:text-brand-foreground">
-              <Link href="/planning">
-                <CalendarRangeIcon aria-hidden />
-                {t("planning")}
-              </Link>
-            </Button>
-            {isAdmin ? (
-              <Button size="lg" variant="outline" asChild className="border-white/40 bg-white/10 text-brand-foreground hover:bg-white/20 hover:text-brand-foreground">
-                <Link href="/balances">
-                  <HandCoinsIcon aria-hidden />
-                  {t("balances")}
-                </Link>
-              </Button>
-            ) : null}
           </div>
         </div>
       </section>

@@ -334,8 +334,6 @@
     "carToChoose": "Voiture à choisir",
     "hello": "Bonjour {name}",
     "summary": "{departures, plural, =0 {Aucun départ} one {# départ} other {# départs}} et {returns, plural, =0 {aucun retour} one {# retour} other {# retours}} aujourd'hui",
-    "planning": "Planning",
-    "balances": "Restes à payer",
     "fleetTitle": "Parc auto",
     "occupancyNow": "{pct} % des voitures en location",
     "vsLastMonth": "vs les mêmes jours du mois dernier"
@@ -1765,6 +1763,18 @@
       "activeNo": "Non, caché",
       "save": "Enregistrer",
       "saved": "Forfait {name} enregistré."
+    },
+    "aiCheck": {
+      "title": "Assistant IA",
+      "hint": "Vérifie depuis le site en ligne que la clé de l'IA marche et que ses modèles existent.",
+      "run": "Tester l'assistant",
+      "ok": "L'assistant marche ({provider}). Modèles disponibles : {models}. S'il ne répond pas dans une agence : Paramètres → Assistant IA = Oui, et un forfait qui inclut l'assistant.",
+      "missing": "Aucune clé : ajoutez GROQ_API_KEY dans Vercel → Settings → Environment Variables (Production), puis redéployez.",
+      "invalid": "La clé Groq est refusée (supprimée, mal copiée ou expirée). Créez une nouvelle clé sur console.groq.com, remplacez GROQ_API_KEY dans Vercel, puis redéployez.",
+      "busy": "Groq est saturé pour le moment (limite gratuite). Réessayez dans une minute.",
+      "down": "Groq ne répond pas correctement pour le moment. Réessayez plus tard.",
+      "network": "Le serveur n'a pas pu joindre Groq. Réessayez plus tard.",
+      "noModel": "La clé marche, mais aucun des modèles prévus n'existe plus chez Groq. Mettez à jour GROQ_MODELS dans Vercel."
     }
   },
   "marketing": {
