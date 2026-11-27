@@ -58,11 +58,28 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
   const weekStart = mondayOf(requested);
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const weekEnd = days[6];
-  const selectedDay = typeof sp.day === "string" && days.includes(sp.day) ? sp.day : days.includes(today) ? today : weekStart;
+  // Phone: a month calendar. ?day= picks a day (and its month), ?month= opens a month.
+  const isDay = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v);
+  const month = isDay(sp.day) ? sp.day.slice(0, 7) : typeof sp.month === "string" && /^\d{4}-\d{2}$/.test(sp.month) ? sp.month : today.slice(0, 7);
+  const selectedDay = isDay(sp.day) ? sp.day : today.startsWith(month) ? today : `${month}-01`;
+  const monthFirst = `${month}-01`;
+  const monthLast = (() => {
+    const [y, m] = month.split("-").map(Number);
+    return new Date(Date.UTC(y, m, 0)).toISOString().slice(0, 10);
+  })();
+  const gridStart = mondayOf(monthFirst);
+  const gridDays = Array.from({ length: Math.ceil((daysBetween(gridStart, monthLast) + 1) / 7) * 7 }, (_, i) => addDays(gridStart, i));
+  const shiftMonth = (n: number) => {
+    const [y, m] = month.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1 + n, 1)).toISOString().slice(0, 7);
+  };
 
   const supabase = await createClient();
-  const from = casablancaToIso(weekStart, "00:00");
-  const to = casablancaToIso(addDays(weekEnd, 1), "00:00");
+  // One query for both views: the week (tablet & laptop) and the month grid (phone)
+  const rangeStart = weekStart < gridStart ? weekStart : gridStart;
+  const rangeEnd = weekEnd > gridDays[gridDays.length - 1] ? weekEnd : gridDays[gridDays.length - 1];
+  const from = casablancaToIso(rangeStart, "00:00");
+  const to = casablancaToIso(addDays(rangeEnd, 1), "00:00");
   const [{ data: vehicles }, { data: bookings }, { data: maintenance }] = await Promise.all([
     supabase.from("vehicles").select("id, plate, brand_model").eq("agency_id", agency.id).eq("status", "active").order("brand_model").order("plate"),
     supabase
@@ -76,8 +93,8 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
       .from("maintenance_periods")
       .select("id, vehicle_id, reason, starts_on, expected_end_on, ended_on")
       .eq("agency_id", agency.id)
-      .lte("starts_on", weekEnd)
-      .or(`ended_on.is.null,ended_on.gt.${weekStart}`),
+      .lte("starts_on", rangeEnd)
+      .or(`ended_on.is.null,ended_on.gt.${rangeStart}`),
   ]);
   const list = (bookings ?? []) as unknown as Booking[];
   const cars = vehicles ?? [];
@@ -94,8 +111,9 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
     m.ended_on ? addDays(m.ended_on, -1) : (m.expected_end_on && m.expected_end_on >= today ? m.expected_end_on : weekEnd);
 
   const weekLabel = `${format.dateTime(new Date(`${weekStart}T12:00:00Z`), { day: "numeric", month: "short" })} – ${format.dateTime(new Date(`${weekEnd}T12:00:00Z`), { day: "numeric", month: "short", year: "numeric" })}`;
+  // Week navigation: tablet & laptop only (phones have the month calendar)
   const nav = (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="hidden flex-wrap items-center gap-2 md:flex">
       <Button variant="outline" size="icon" asChild>
         <Link href={`/planning?week=${addDays(weekStart, -7)}`} aria-label={t("previousWeek")}>
           <ChevronLeftIcon className="rtl:rotate-180" aria-hidden />
@@ -125,6 +143,16 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
     const c = cars.find((x) => x.id === id);
     return c ? `${c.brand_model} · ${c.plate}` : "";
   };
+  // Phone calendar: per day, cars out (all bookings, past ones included), departures and returns
+  const dayInfo = (day: string) => {
+    const out = new Set(list.filter((b) => b.vehicle_id && bookingDays(b).start <= day && bookingDays(b).end >= day).map((b) => b.vehicle_id)).size;
+    const dep = list.filter((b) => bookingDays(b).start === day).length;
+    const ret = list.filter((b) => bookingDays(b).end === day).length;
+    return { out, dep, ret };
+  };
+  const monthLabel = format.dateTime(new Date(`${monthFirst}T12:00:00Z`), { month: "long", year: "numeric" });
+  const weekdays = Array.from({ length: 7 }, (_, i) => format.dateTime(new Date(`${addDays(gridStart, i)}T12:00:00Z`), { weekday: "narrow" }));
+
   // Reservations of the week still without a car (chosen on the contract)
   const carless = list.filter((b) => !b.vehicle_id && b.status === "reserved" && span(bookingDays(b).start, bookingDays(b).end));
 
@@ -151,39 +179,86 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
         </section>
       ) : null}
 
-      {/* Phone (< 768 px): day picker + lists instead of a tiny grid */}
+      {/* Phone (< 768 px): a month calendar; tap a day for its departures, returns, cars out and free cars */}
       <div className="md:hidden" data-testid="planning-day">
-        <nav aria-label={t("pickDay")} className="mb-4 grid grid-cols-7 gap-1">
-          {days.map((d) => (
-            <Link
-              key={d}
-              href={`/planning?week=${weekStart}&day=${d}`}
-              aria-current={d === selectedDay ? "date" : undefined}
-              className={cn(
-                "flex min-h-14 flex-col items-center justify-center rounded-lg border text-xs",
-                d === selectedDay ? "border-primary bg-primary text-primary-foreground" : d === today ? "border-primary/50" : "bg-card",
-              )}
-            >
-              <span className="uppercase">{format.dateTime(new Date(`${d}T12:00:00Z`), { weekday: "short" })}</span>
-              <span className="text-base font-bold">{Number(d.slice(8))}</span>
-            </Link>
-          ))}
-        </nav>
+        <section className="mb-5 rounded-2xl border bg-card p-3 shadow-xs" aria-labelledby="month-title">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={`/planning?month=${shiftMonth(-1)}`} aria-label={t("previousMonth")}>
+                <ChevronLeftIcon className="rtl:rotate-180" aria-hidden />
+              </Link>
+            </Button>
+            <h2 id="month-title" className="text-base font-bold first-letter:uppercase" data-testid="month-label">
+              {monthLabel}
+            </h2>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={`/planning?month=${shiftMonth(1)}`} aria-label={t("nextMonth")}>
+                <ChevronRightIcon className="rtl:rotate-180" aria-hidden />
+              </Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-muted-foreground" aria-hidden>
+            {weekdays.map((w, i) => (
+              <span key={i} className="py-1 uppercase">
+                {w}
+              </span>
+            ))}
+          </div>
+          <nav aria-label={t("pickDay")} className="grid grid-cols-7 gap-1">
+            {gridDays.map((d) => {
+              const info = dayInfo(d);
+              const inMonth = d.startsWith(month);
+              const selected = d === selectedDay;
+              const pct = cars.length ? Math.min(100, Math.round((info.out / cars.length) * 100)) : 0;
+              return (
+                <Link
+                  key={d}
+                  href={`/planning?day=${d}`}
+                  aria-current={selected ? "date" : undefined}
+                  aria-label={t("dayLabel", { date: formatDate(d), out: info.out, dep: info.dep, ret: info.ret })}
+                  className={cn(
+                    "relative flex aspect-square min-h-11 flex-col items-center justify-start gap-0.5 rounded-lg pt-1 text-sm transition-colors",
+                    selected ? "bg-primary text-primary-foreground" : d === today ? "bg-primary/10 font-bold text-primary dark:text-foreground" : "hover:bg-accent",
+                    !inMonth && !selected && "text-muted-foreground",
+                  )}
+                >
+                  <span className="font-semibold tabular-nums">{Number(d.slice(8))}</span>
+                  <span className="flex h-1.5 items-center gap-0.5" aria-hidden>
+                    {info.dep ? <span className={cn("size-1.5 rounded-full", selected ? "bg-primary-foreground" : "bg-[var(--series-1)]")} /> : null}
+                    {info.ret ? <span className={cn("size-1.5 rounded-full", selected ? "bg-primary-foreground/70" : "bg-[var(--series-2)]")} /> : null}
+                  </span>
+                  {/* cars out that day, as a share of the fleet */}
+                  <span className={cn("absolute inset-x-1.5 bottom-1 h-1 overflow-hidden rounded-full", selected ? "bg-primary-foreground/25" : "bg-muted")} aria-hidden>
+                    <span className={cn("block h-full rounded-full", selected ? "bg-primary-foreground" : "bg-success")} style={{ width: `${pct}%` }} />
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+          <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground" aria-hidden>
+            <li className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[var(--series-1)]" />{t("legendDeparture")}</li>
+            <li className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-[var(--series-2)]" />{t("legendReturn")}</li>
+            <li className="flex items-center gap-1.5"><span className="h-1 w-4 rounded-full bg-success" />{t("legendOut")}</li>
+          </ul>
+        </section>
+        <h2 className="mb-3 text-lg font-bold first-letter:uppercase" data-testid="selected-day">
+          {format.dateTime(new Date(`${selectedDay}T12:00:00Z`), { weekday: "long", day: "numeric", month: "long" })}
+        </h2>
         <div className="flex flex-col gap-5">
-          <DayList title={t("leaving", { count: leaving.length })} icon={<LogOutIcon className="size-5" aria-hidden />}>
+          <DayList title={t("leaving", { count: leaving.length })} icon={<LogOutIcon className="size-4 text-[var(--series-1)]" aria-hidden />}>
             {leaving.map((b) => (
               <li key={b.id}>
-                <Link href={`/reservations/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
+                <Link href={`/reservations/${b.id}`} className="flex min-h-14 flex-col justify-center px-3 py-2.5 active:bg-accent/70">
                   <span className="font-semibold"><Ltr>{formatTime(b.start_at)}</Ltr> · {b.client?.full_name}</span>
                   <span className="text-sm text-muted-foreground">{carName(b.vehicle_id)}{b.delivery ? ` · ${t("delivery")}` : ""}</span>
                 </Link>
               </li>
             ))}
           </DayList>
-          <DayList title={t("returning", { count: returning.length })} icon={<CornerDownLeftIcon className="size-5" aria-hidden />}>
+          <DayList title={t("returning", { count: returning.length })} icon={<CornerDownLeftIcon className="size-4 text-[var(--series-2)]" aria-hidden />}>
             {returning.map((b) => (
               <li key={b.id}>
-                <Link href={`/reservations/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
+                <Link href={`/reservations/${b.id}`} className="flex min-h-14 flex-col justify-center px-3 py-2.5 active:bg-accent/70">
                   <span className="font-semibold"><Ltr>{formatTime(b.end_at)}</Ltr> · {b.client?.full_name}</span>
                   <span className="text-sm text-muted-foreground">{carName(b.vehicle_id)}</span>
                 </Link>
@@ -193,7 +268,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           <DayList title={t("outAllDay", { count: outOn(selectedDay).length })}>
             {outOn(selectedDay).map((b) => (
               <li key={b.id}>
-                <Link href={`/reservations/${b.id}`} className="flex flex-col rounded-lg border bg-card p-3">
+                <Link href={`/reservations/${b.id}`} className="flex min-h-14 flex-col justify-center px-3 py-2.5 active:bg-accent/70">
                   <span className="font-semibold">{carName(b.vehicle_id)}</span>
                   <span className="text-sm text-muted-foreground">{b.client?.full_name}</span>
                 </Link>
@@ -203,7 +278,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           <DayList title={t("free", { count: free.length })}>
             {free.map((c) => (
               <li key={c.id}>
-                <Link href={`/reservations/new?vehicle=${c.id}&date=${selectedDay}`} className="flex items-center justify-between gap-2 rounded-lg border bg-card p-3">
+                <Link href={`/reservations/new?vehicle=${c.id}&date=${selectedDay}`} className="flex min-h-14 items-center justify-between gap-2 px-3 py-2.5 active:bg-accent/70">
                   <span className="font-semibold">{c.brand_model} · <Ltr>{c.plate}</Ltr></span>
                   <PlusIcon className="size-5 text-muted-foreground" aria-hidden />
                 </Link>
@@ -300,11 +375,11 @@ function DayList({ title, icon, children }: { title: string; icon?: React.ReactN
   const items = Array.isArray(children) ? children : [children];
   return (
     <section>
-      <h2 className="mb-2 flex items-center gap-2 font-semibold">
+      <h3 className="mb-2 flex items-center gap-2 px-1 text-sm font-semibold text-muted-foreground">
         {icon}
         {title}
-      </h2>
-      {items.length ? <ul className="flex flex-col gap-2">{children}</ul> : null}
+      </h3>
+      {items.length ? <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-xs">{children}</ul> : null}
     </section>
   );
 }

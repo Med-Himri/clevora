@@ -16,8 +16,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("assistant") };
 }
 
-const STAFF_SUGGESTIONS = ["whoHadCar", "returns", "free", "unpaid", "carHistory", "oil"] as const;
-const ADMIN_SUGGESTIONS = ["revenue", "unpaid", "whoHadCar", "returns", "free", "carHistory"] as const;
 
 /** Assistant IA: questions in plain words, answered from the agency's own data. */
 export default async function AssistantPage() {
@@ -52,23 +50,14 @@ export default async function AssistantPage() {
     );
   }
 
-  const suggestions = (isAdmin ? ADMIN_SUGGESTIONS : STAFF_SUGGESTIONS).map((k) => t(`suggestions.${k}`));
-
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <h1 className="sr-only">{t("title")}</h1>
       {/* Phone: room under the content for the fixed question bar above the bottom nav */}
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-4 pb-40 md:pb-0">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-3 pb-32 md:pb-0">
         {!configured ? <Alert variant="warning">{t("notConfigured")}</Alert> : null}
         {remaining === 0 ? <Alert variant="warning">{t("quotaReached")}</Alert> : null}
-        <Chat suggestions={suggestions} remaining={remaining} />
-        <details className="text-sm text-muted-foreground">
-          <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 font-medium">
-            <LockIcon className="size-4" aria-hidden />
-            {t("privacyTitle")}
-          </summary>
-          <p className="mt-1">{isAdmin ? t("privacyAdmin") : t("privacyStaff")}</p>
-        </details>
+        <Chat remaining={remaining} />
       </div>
     </>
   );

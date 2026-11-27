@@ -1,10 +1,9 @@
 "use client";
 
-import { ExternalLinkIcon, LoaderCircleIcon, RotateCcwIcon, SendIcon, SparklesIcon, SquareIcon } from "lucide-react";
+import { ArrowUpIcon, ExternalLinkIcon, SparklesIcon, SquareIcon, SquarePenIcon } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { AnswerText } from "./answer-text";
@@ -26,7 +25,7 @@ const MAX = 1000;
  * The conversation lives only in this browser tab (never saved on the server).
  * Each answer streams in as NDJSON events from /api/assistant.
  */
-export function Chat({ suggestions, remaining }: { suggestions: string[]; remaining: number | null }) {
+export function Chat({ remaining }: { remaining: number | null }) {
   const t = useTranslations("assistant");
   const locale = useLocale();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -108,65 +107,83 @@ export function Chat({ suggestions, remaining }: { suggestions: string[]; remain
     }
   };
 
+  // The textarea grows with the text (up to ~6 lines), like a chat app
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 168)}px`;
+  }, [question]);
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex min-h-[calc(100dvh-13rem)] flex-col md:min-h-[calc(100dvh-10rem)]">
+      {messages.length ? (
+        <div className="mb-2 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setMessages([])}
+            disabled={busy}
+            className={cn("inline-flex min-h-11 items-center gap-1.5 rounded-full border bg-card px-4 text-sm font-medium hover:bg-accent", busy && "opacity-50")}
+          >
+            <SquarePenIcon className="size-4" aria-hidden />
+            {t("newChat")}
+          </button>
+        </div>
+      ) : null}
+
       {messages.length === 0 ? (
-        <section aria-labelledby="suggest-title" className="flex flex-col gap-3 rounded-xl border bg-card p-4">
-          <h2 id="suggest-title" className="flex items-center gap-2 font-semibold">
-            <SparklesIcon className="size-5 text-primary" aria-hidden />
-            {t("tryTitle")}
-          </h2>
-          <ul className="grid gap-2 sm:grid-cols-2">
-            {suggestions.map((s) => (
-              <li key={s}>
-                <button
-                  type="button"
-                  onClick={() => void ask(s)}
-                  className="flex min-h-12 w-full items-center rounded-lg border bg-background px-3 py-2 text-start text-sm font-medium hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring"
-                  data-testid="assistant-suggestion"
-                >
-                  {s}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </section>
+        /* Empty conversation: a welcome in the middle, like a chat app */
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 py-10 text-center" data-testid="assistant-welcome">
+          <span className="inline-flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-primary-foreground shadow-md" aria-hidden>
+            <SparklesIcon className="size-7" />
+          </span>
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("welcome")}</h2>
+          <p className="max-w-md text-muted-foreground">{t("welcomeHint")}</p>
+        </div>
       ) : (
-        <ol className="flex flex-col gap-4" aria-live="polite" aria-label={t("conversation")} data-testid="assistant-messages">
+        <ol className="flex flex-1 flex-col gap-6 pb-4" aria-live="polite" aria-label={t("conversation")} data-testid="assistant-messages">
           {messages.map((m) =>
             m.role === "user" ? (
               <li key={m.id} className="flex justify-end">
-                <p dir="auto" className="max-w-[85%] rounded-2xl rounded-ee-sm bg-primary px-4 py-2 text-primary-foreground [overflow-wrap:anywhere]">{m.text}</p>
+                <p dir="auto" className="max-w-[85%] rounded-3xl bg-muted px-4 py-2.5 whitespace-pre-wrap [overflow-wrap:anywhere]">
+                  {m.text}
+                </p>
               </li>
             ) : (
-              <li key={m.id} className="flex flex-col gap-2 rounded-2xl rounded-es-sm border bg-card p-4" data-testid="assistant-answer">
-                {m.text ? <AnswerText text={m.text} /> : null}
-                {m.pending && !m.text ? (
-                  <p className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
-                    <LoaderCircleIcon className="size-4 animate-spin" aria-hidden />
-                    {m.tool ? t(`tools.${m.tool}`) : t("thinking")}
-                  </p>
-                ) : null}
-                {m.error ? (
-                  <p role="alert" className="text-sm font-medium text-destructive">
-                    {t(`errors.${m.error}`)}
-                  </p>
-                ) : null}
-                {m.sources?.length ? (
-                  <div className="flex flex-col gap-1 border-t pt-2">
-                    <span className="text-xs font-medium text-muted-foreground">{t("sources")}</span>
-                    <ul className="flex flex-wrap gap-2" data-testid="assistant-sources">
-                      {m.sources.map((s) => (
-                        <li key={s.href}>
-                          <Link href={s.href} className="inline-flex min-h-11 items-center gap-1 rounded-full border px-3 text-sm hover:bg-accent">
+              <li key={m.id} className="flex gap-3" data-testid="assistant-answer">
+                <span className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground" aria-hidden>
+                  <SparklesIcon className="size-4" />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-col gap-2 pt-1">
+                  {m.text ? <AnswerText text={m.text} /> : null}
+                  {m.pending && !m.text ? (
+                    <p className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
+                      <span className="flex gap-1" aria-hidden>
+                        <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+                        <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+                        <span className="size-1.5 animate-bounce rounded-full bg-muted-foreground" />
+                      </span>
+                      {m.tool ? t(`tools.${m.tool}`) : t("thinking")}
+                    </p>
+                  ) : null}
+                  {m.error ? (
+                    <p role="alert" className="rounded-lg bg-danger-soft/60 px-3 py-2 text-sm font-medium text-destructive">
+                      {t(`errors.${m.error}`)}
+                    </p>
+                  ) : null}
+                  {m.sources?.length ? (
+                    <ul className="flex flex-wrap gap-2" data-testid="assistant-sources" aria-label={t("sources")}>
+                      {m.sources.map((src) => (
+                        <li key={src.href}>
+                          <Link href={src.href} className="inline-flex min-h-9 items-center gap-1 rounded-full border bg-card px-3 text-xs font-medium hover:bg-accent">
                             <ExternalLinkIcon className="size-3.5 rtl:-scale-x-100" aria-hidden />
-                            <span dir="auto">{s.label}</span>
+                            <span dir="auto">{src.label}</span>
                           </Link>
                         </li>
                       ))}
                     </ul>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </li>
             ),
           )}
@@ -174,13 +191,16 @@ export function Chat({ suggestions, remaining }: { suggestions: string[]; remain
       )}
       <div ref={endRef} />
 
+      {/* Composer: a rounded field with the send button inside, kept at the bottom */}
       <form
         onSubmit={submit}
-        className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 border-t bg-card/95 p-3 backdrop-blur md:sticky md:bottom-4 md:rounded-xl md:border md:bg-card md:shadow-sm md:backdrop-blur-none"
+        className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-40 bg-background/95 px-3 pt-2 pb-2 backdrop-blur md:sticky md:bottom-0 md:bg-background md:px-0 md:pb-4 md:backdrop-blur-none"
       >
-        <label htmlFor="assistant-question" className="sr-only">{t("questionLabel")}</label>
-        <div className="mx-auto flex max-w-3xl items-end gap-2 md:max-w-none">
-          <Textarea
+        <label htmlFor="assistant-question" className="sr-only">
+          {t("questionLabel")}
+        </label>
+        <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-3xl border bg-card p-2 shadow-sm focus-within:ring-2 focus-within:ring-ring">
+          <textarea
             ref={inputRef}
             id="assistant-question"
             value={question}
@@ -189,30 +209,22 @@ export function Chat({ suggestions, remaining }: { suggestions: string[]; remain
             placeholder={t("placeholder")}
             rows={1}
             dir="auto"
-            className="max-h-40 min-h-12 flex-1 resize-none"
+            className="max-h-42 min-h-10 flex-1 resize-none bg-transparent px-3 py-2 text-base outline-none placeholder:text-muted-foreground md:text-sm"
             disabled={left === 0}
           />
           {busy ? (
-            <Button type="button" size="lg" variant="outline" onClick={() => abort.current?.abort()}>
-              <SquareIcon aria-hidden />
-              {t("stop")}
+            <Button type="button" size="icon" variant="outline" className="size-10 shrink-0 rounded-full" onClick={() => abort.current?.abort()} aria-label={t("stop")} title={t("stop")}>
+              <SquareIcon className="fill-current" aria-hidden />
             </Button>
           ) : (
-            <Button type="submit" size="lg" disabled={!question.trim() || left === 0}>
-              <SendIcon className="rtl:-scale-x-100" aria-hidden />
-              {t("send")}
+            <Button type="submit" size="icon" className="size-10 shrink-0 rounded-full" disabled={!question.trim() || left === 0} aria-label={t("send")} title={t("send")}>
+              <ArrowUpIcon aria-hidden />
             </Button>
           )}
         </div>
-        <div className="mx-auto mt-2 flex max-w-3xl flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground md:max-w-none">
-          <span>{left === null ? t("privacyShort") : t("remaining", { count: left })}</span>
-          {messages.length ? (
-            <button type="button" onClick={() => setMessages([])} disabled={busy} className={cn("inline-flex min-h-11 items-center gap-1 font-medium hover:text-foreground", busy && "opacity-50")}>
-              <RotateCcwIcon className="size-3.5" aria-hidden />
-              {t("newChat")}
-            </button>
-          ) : null}
-        </div>
+        <p className="mx-auto mt-1.5 max-w-3xl text-center text-xs text-muted-foreground">
+          {left === null ? t("disclaimer") : `${t("remaining", { count: left })} · ${t("disclaimer")}`}
+        </p>
       </form>
     </div>
   );

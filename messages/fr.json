@@ -1209,7 +1209,13 @@
     },
     "carToChoose": "Voiture à choisir",
     "chooseCar": "Choisir",
-    "carlessTitle": "{count, plural, one {# réservation sans voiture} other {# réservations sans voiture}}"
+    "carlessTitle": "{count, plural, one {# réservation sans voiture} other {# réservations sans voiture}}",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "dayLabel": "{date} : {out, plural, =0 {aucune voiture dehors} one {# voiture dehors} other {# voitures dehors}}, {dep, plural, =0 {aucun départ} one {# départ} other {# départs}}, {ret, plural, =0 {aucun retour} one {# retour} other {# retours}}",
+    "legendDeparture": "Départ",
+    "legendReturn": "Retour",
+    "legendOut": "Voitures dehors"
   },
   "insurance": {
     "title": "Assurance et visite technique",
@@ -1410,7 +1416,6 @@
   "assistant": {
     "title": "Assistant IA",
     "subtitle": "Posez vos questions en mots simples : l'assistant cherche la réponse dans les données de votre agence (voitures, clients, réservations, contrats, vidange, assurance).",
-    "tryTitle": "Essayez une question",
     "conversation": "Conversation",
     "thinking": "Je réfléchis…",
     "sources": "Sources",
@@ -1433,17 +1438,6 @@
     "disabledStaff": "L'administrateur de l'agence l'a désactivé.",
     "notConfigured": "L'assistant n'est pas disponible pour le moment. Réessayez un peu plus tard.",
     "quotaReached": "Vous avez utilisé toutes les questions de ce mois. Le compteur repart à zéro le 1er du mois.",
-    "suggestions": {
-      "whoHadCar": "Qui avait la voiture 12345-A-6 hier à 15h ?",
-      "returns": "Quelles voitures reviennent aujourd'hui et demain ?",
-      "free": "Quelles voitures sont libres ce week-end ?",
-      "oil": "Quelles voitures ont besoin d'une vidange ?",
-      "insurance": "Quelles assurances expirent bientôt ?",
-      "revenue": "Quel est mon chiffre d'affaires ce mois-ci ?",
-      "charges": "Combien j'ai dépensé en charges ce mois-ci ?",
-      "unpaid": "Quels clients nous doivent encore de l'argent ?",
-      "carHistory": "Montre-moi l'historique de la Dacia Logan"
-    },
     "tools": {
       "who_had_car": "Je cherche qui avait la voiture…",
       "upcoming_returns": "Je regarde les retours…",
@@ -1472,7 +1466,10 @@
       "aiDisabled": "L'assistant est désactivé pour votre agence.",
       "aiQuota": "Plus de questions disponibles ce mois-ci.",
       "aiNotConfigured": "L'assistant n'est pas encore branché. Contactez l'équipe Parcolia."
-    }
+    },
+    "welcome": "Comment puis-je vous aider aujourd'hui ?",
+    "welcomeHint": "Posez une question sur vos voitures, réservations, clients ou paiements. Je réponds avec les données de votre agence.",
+    "disclaimer": "L'assistant peut se tromper : vérifiez les informations importantes."
   },
   "settings": {
     "title": "Paramètres",

@@ -1,3 +1,4 @@
+import { ChevronRightIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -57,7 +58,7 @@ function GroupTitle({ label, count, tone = "default" }: { label: ReactNode; coun
 }
 
 /**
- * A table from 1024 px that becomes stacked cards on phones and tablets —
+ * A table from 1024 px that becomes a compact list on phones and tablets —
  * never a horizontal page scroll. Rows can be grouped by urgency.
  * Works in server and client components.
  */
@@ -68,6 +69,12 @@ export function ResponsiveList<T>(props: Props<T>) {
   const primary = columns.filter((c) => c.priority === "primary");
   const high = columns.filter((c) => c.priority === "high");
   const low = columns.filter((c) => c.priority === "low");
+  // Phone: the first end-aligned column (an amount) sits at the end of the title line;
+  // the other "high" columns make the grey details line; "low" columns a small label : value line.
+  const trailing = [...high, ...low].find((c) => c.align === "end");
+  const details = high.filter((c) => c !== trailing);
+  // The other columns: small « label : value » pairs, so no number is lost on phones
+  const extra = low.filter((c) => c !== trailing);
   const span = columns.length + (actions ? 1 : 0) + (select ? 1 : 0);
   const nowrap = (c: Column<T>) => c.nowrap ?? c.align === "end";
 
@@ -138,36 +145,42 @@ export function ResponsiveList<T>(props: Props<T>) {
         {footer ? <div className="border-t bg-muted/30 px-4 py-2.5 text-sm">{footer}</div> : null}
       </div>
 
-      {/* Phone & tablet: cards */}
+      {/* Phone & tablet: a compact list (one block, thin separators). Each row: the title
+          in bold, one grey line with the details, the amount on the end, the main action
+          and a « ⋯ » menu (the compact actions), and a chevron when the row opens a page. */}
       <div className="flex flex-col gap-5 lg:hidden">
         {groups.map((g) =>
           g.rows.length ? (
             <section key={g.key} className="flex flex-col gap-2" data-group={grouped ? g.key : undefined}>
-              {grouped ? <GroupTitle label={g.label} count={g.rows.length} tone={g.tone} /> : null}
-              <ul className="grid gap-3 md:grid-cols-2">
-                {g.rows.map((row) => {
-                  const title = (
-                    <div className="flex min-w-0 flex-col gap-0.5">
-                      {primary.map((c) => (
-                        <div key={c.key} className="min-w-0 break-words font-semibold">
-                          {c.cell(row)}
+              {grouped ? (
+                <div className="px-1">
+                  <GroupTitle label={g.label} count={g.rows.length} tone={g.tone} />
+                </div>
+              ) : null}
+              <ul className="divide-y overflow-hidden rounded-xl border bg-card shadow-xs">
+                {g.rows.map((row) => (
+                  <li key={rowKey(row)} className={cn("relative flex items-center gap-3 px-3 py-3 transition-colors", rowHref && "active:bg-accent/70")} data-testid={rowTestId}>
+                    {select ? <div className="relative z-10 shrink-0">{select.cell(row)}</div> : null}
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <div className="flex min-w-0 items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1 font-semibold leading-snug [&_*]:leading-snug">
+                          {primary.map((c, i) =>
+                            i === 0 && rowHref ? (
+                              <Link key={c.key} href={rowHref(row)} className="block min-w-0 break-words outline-none before:absolute before:inset-0 before:content-[''] focus-visible:before:ring-2 focus-visible:before:ring-ring focus-visible:before:ring-inset">
+                                {c.cell(row)}
+                              </Link>
+                            ) : (
+                              <div key={c.key} className="min-w-0 break-words">
+                                {c.cell(row)}
+                              </div>
+                            ),
+                          )}
                         </div>
-                      ))}
-                    </div>
-                  );
-                  return (
-                    <li key={rowKey(row)} className={cn("relative flex flex-col gap-3 rounded-xl border bg-card p-4 shadow-xs", select && "pe-14")} data-testid={rowTestId}>
-                      {select ? <div className="absolute end-3 top-3">{select.cell(row)}</div> : null}
-                      {rowHref ? (
-                        <Link href={rowHref(row)} className="rounded-md">
-                          {title}
-                        </Link>
-                      ) : (
-                        title
-                      )}
-                      {high.length ? (
-                        <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
-                          {high.map((c) => (
+                        {trailing ? <div className="shrink-0 text-end text-sm font-semibold whitespace-nowrap">{trailing.cell(row)}</div> : null}
+                      </div>
+                      {details.length ? (
+                        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground [&_.font-bold]:font-semibold [&_.text-base]:text-sm">
+                          {details.map((c) => (
                             <div key={c.key} className="min-w-0 break-words">
                               {c.hideLabelInCard ? null : <span className="sr-only">{c.header}: </span>}
                               {c.cell(row)}
@@ -175,20 +188,22 @@ export function ResponsiveList<T>(props: Props<T>) {
                           ))}
                         </div>
                       ) : null}
-                      {low.length ? (
-                        <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                          {low.map((c) => (
-                            <div key={c.key} className="min-w-0">
-                              <dt className="text-xs text-muted-foreground">{c.header}</dt>
-                              <dd className="break-words">{c.cell(row)}</dd>
+                      {extra.length ? (
+                        <dl className="flex min-w-0 flex-wrap gap-x-4 gap-y-1 text-xs">
+                          {extra.map((c) => (
+                            <div key={c.key} className="flex min-w-0 items-baseline gap-1">
+                              <dt className="text-muted-foreground">{c.header} :</dt>
+                              <dd className="min-w-0 break-words font-medium [&_.text-base]:text-xs">{c.cell(row)}</dd>
                             </div>
                           ))}
                         </dl>
                       ) : null}
-                      {actions ? <div className="flex flex-wrap gap-2 border-t pt-3">{actions(row, "card")}</div> : null}
-                    </li>
-                  );
-                })}
+                      {/* Actions on their own line: the text keeps the full width */}
+                      {actions ? <div className="relative z-10 mt-1 flex flex-wrap items-center gap-1.5">{actions(row, "table")}</div> : null}
+                    </div>
+                    {rowHref ? <ChevronRightIcon className="size-5 shrink-0 self-center text-muted-foreground rtl:rotate-180" aria-hidden /> : null}
+                  </li>
+                ))}
               </ul>
             </section>
           ) : null,

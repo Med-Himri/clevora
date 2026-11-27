@@ -12,11 +12,13 @@ test("staff: asks about vidange, gets an answer with sources; money questions ar
   const staff = await addMember(agency.agencyId, "staff");
   await login(page, staff.email, staff.password);
   await page.goto("/assistant");
-  await expect(page.getByRole("heading", { name: "Assistant IA" })).toBeVisible();
+  await expect(page.getByTestId("assistant-welcome")).toContainText("Comment puis-je vous aider aujourd'hui ?");
   await expect(page.getByTestId("assistant-docs")).toHaveCount(0); // staff cannot manage documents
   await expectNoHorizontalScroll(page);
 
-  await page.getByTestId("assistant-suggestion").filter({ hasText: "vidange" }).click();
+  // No suggested questions any more: type it, like in a chat app
+  await page.getByLabel("Votre question").fill("Quelles voitures ont besoin d'une vidange ?");
+  await page.getByRole("button", { name: "Envoyer" }).click();
   const answer = page.getByTestId("assistant-answer").last();
   await expect(answer).toContainText("oil_due");
   await expect(answer).toContainText(plate);
