@@ -576,7 +576,8 @@
       "type": "Type",
       "km": "Mileage",
       "rate": "Price/day",
-      "age": "Age"
+      "age": "Age",
+      "rateShort": "Price"
     },
     "empty": {
       "title": "No cars yet",
@@ -837,7 +838,8 @@
       "menu": "Actions for {name}",
       "chooseCar": "Choose the car",
       "carToChoose": "To choose",
-      "sign": "Sign"
+      "sign": "Sign",
+      "status": "Status"
     },
     "status": {
       "late": "Late",
@@ -1297,7 +1299,8 @@
     "pricesTitle": "Prices (added to Charges)",
     "pricesHint": "The prices make one « Vidange » expense for this car (the total, with the details). Leave empty if you do not know.",
     "pricesTotal": "Total:",
-    "chargeNote": "Vidange at {km} km"
+    "chargeNote": "Vidange at {km} km",
+    "nextShort": "Next"
   },
   "charges": {
     "title": "Expenses",

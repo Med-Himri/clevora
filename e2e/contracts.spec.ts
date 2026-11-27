@@ -1,20 +1,62 @@
 import { expect, test } from "@playwright/test";
-import { addMember, addVehicle, admin, createTestAgency, expectNoHorizontalScroll, login, uid } from "./helpers";
+import {
+  addMember,
+  addVehicle,
+  admin,
+  createTestAgency,
+  expectNoHorizontalScroll,
+  login,
+  uid,
+} from "./helpers";
 
 async function contractWithTwoDrivers(options: { complete: boolean }) {
-  const agency = await createTestAgency({ name: `Agence Prestige Location Voitures Marrakech Ménara ${uid()}` });
+  const agency = await createTestAgency({
+    name: `Agence Prestige Location Voitures Marrakech Ménara ${uid()}`,
+  });
   const staff = await addMember(agency.agencyId, "staff");
-  const vehicleId = await addVehicle(agency.agencyId, { plate: `PDF${uid().slice(-4).toUpperCase()}-A-6`, brand_model: "Mercedes-Benz Classe C 220d AMG Line" });
+  const vehicleId = await addVehicle(agency.agencyId, {
+    plate: `PDF${uid().slice(-4).toUpperCase()}-A-6`,
+    brand_model: "Mercedes-Benz Classe C 220d AMG Line",
+  });
   const sb = admin();
-  await sb.from("agencies").update({ address: "Avenue Mohammed VI, Résidence Al Andalous, Immeuble 12, Bureau 4", city: "Marrakech", rc: "RC-12345", ice: "001234567000089", contract_terms: "1. وثيقة باللغة العربية.\n2. Le véhicule est rendu propre." }).eq("id", agency.agencyId);
+  await sb
+    .from("agencies")
+    .update({
+      address:
+        "Avenue Mohammed VI, Résidence Al Andalous, Immeuble 12, Bureau 4",
+      city: "Marrakech",
+      rc: "RC-12345",
+      ice: "001234567000089",
+      contract_terms:
+        "1. وثيقة باللغة العربية.\n2. Le véhicule est rendu propre.",
+    })
+    .eq("id", agency.agencyId);
   const { data: d1 } = await sb
     .from("clients")
-    .insert({ agency_id: agency.agencyId, full_name: "Mohammed Amine Ben Abdelkader El Idrissi Alaoui Chérif", phone: "+212661000001", id_type: "cin", id_number: `ZZ${uid().slice(-6)}`, license_number: options.complete ? "LIC-1" : null, address: "حي الرياض، زنقة 7، الرباط", nationality: "Marocaine", birth_date: "1985-04-12", birth_place: "Fès" })
+    .insert({
+      agency_id: agency.agencyId,
+      full_name: "Mohammed Amine Ben Abdelkader El Idrissi Alaoui Chérif",
+      phone: "+212661000001",
+      id_type: "cin",
+      id_number: `ZZ${uid().slice(-6)}`,
+      license_number: options.complete ? "LIC-1" : null,
+      address: "حي الرياض، زنقة 7، الرباط",
+      nationality: "Marocaine",
+      birth_date: "1985-04-12",
+      birth_place: "Fès",
+    })
     .select("id")
     .single();
   const { data: d2 } = await sb
     .from("clients")
-    .insert({ agency_id: agency.agencyId, full_name: "Jean-Christophe de la Fontaine-Beaumarchais", id_type: "passport", id_number: `FR${uid().slice(-7)}`, license_number: "FR-998877", nationality: "Française" })
+    .insert({
+      agency_id: agency.agencyId,
+      full_name: "Jean-Christophe de la Fontaine-Beaumarchais",
+      id_type: "passport",
+      id_number: `FR${uid().slice(-7)}`,
+      license_number: "FR-998877",
+      nationality: "Française",
+    })
     .select("id")
     .single();
   const { data: r } = await sb
@@ -35,29 +77,51 @@ async function contractWithTwoDrivers(options: { complete: boolean }) {
       fuel_out: options.complete ? 4 : null,
       equipment: ["Roue de secours", "Cric", "Siège bébé"],
       documents_given: ["Carte grise", "Attestation d'assurance"],
-      notes: "Rayure légère pare-choc arrière droit, notée au départ avec le client.",
+      notes:
+        "Rayure légère pare-choc arrière droit, notée au départ avec le client.",
     })
     .select("id, contract_number")
     .single();
-  return { agency, staff, reservationId: r!.id, contractNumber: r!.contract_number };
+  return {
+    agency,
+    staff,
+    reservationId: r!.id,
+    contractNumber: r!.contract_number,
+  };
 }
 
-test("contract page: missing information blocks nothing but is listed with links, then ready to sign", async ({ page }) => {
+test("contract page: missing information blocks nothing but is listed with links, then ready to sign", async ({
+  page,
+}) => {
   const c = await contractWithTwoDrivers({ complete: false });
   await login(page, c.staff.email, c.staff.password);
   await page.goto("/contracts");
-  await expect(page.getByRole("link", { name: /^À signer/ })).toContainText("1");
+  await expect(page.getByRole("link", { name: /^À signer/ })).toContainText(
+    "1",
+  );
   // Contrats = the document: rows offer Signer / PDF, never Démarrer or Retour (those are in Réservations)
   const list = page.getByTestId("contract-list");
-  await expect(list.getByRole("link", { name: "Signer" }).first()).toBeVisible();
-  await expect(list.getByRole("link", { name: /^(Démarrer|Retour)$/ })).toHaveCount(0);
-  await page.getByTestId("contract-list").getByRole("link", { name: new RegExp(c.contractNumber) }).click();
+  await expect(
+    list.getByRole("link", { name: "Signer" }).first(),
+  ).toBeVisible();
+  await expect(
+    list.getByRole("link", { name: /^(Démarrer|Retour)$/ }),
+  ).toHaveCount(0);
+  // The row with this contract number opens the document (its first link covers the whole row)
+  await list
+    .locator("[data-testid=reservation-row]:visible")
+    .filter({ hasText: c.contractNumber })
+    .getByRole("link")
+    .first()
+    .click();
   await page.waitForURL(/\/contracts\/[0-9a-f-]{36}/);
 
   const missing = page.getByTestId("missing-info");
   await expect(missing).toContainText("Permis du conducteur 1");
   await expect(missing).toContainText("Kilométrage au départ");
-  await expect(page.getByTestId("paper-contract")).toContainText("Jean-Christophe de la Fontaine-Beaumarchais");
+  await expect(page.getByTestId("paper-contract")).toContainText(
+    "Jean-Christophe de la Fontaine-Beaumarchais",
+  );
   await expectNoHorizontalScroll(page);
 
   await missing.getByRole("link", { name: "Permis du conducteur 1" }).click();
@@ -65,15 +129,22 @@ test("contract page: missing information blocks nothing but is listed with links
   await expect(page.getByText("Étape 2 sur 4")).toBeVisible();
 });
 
-test("PDF: long names, two drivers, delivery and Arabic labels render on 2 A4 pages", async ({ page }) => {
+test("PDF: long names, two drivers, delivery and Arabic labels render on 2 A4 pages", async ({
+  page,
+}) => {
   const c = await contractWithTwoDrivers({ complete: true });
   await login(page, c.agency.email, c.agency.password);
   await page.goto(`/contracts/${c.reservationId}`);
   await expect(page.getByTestId("ready-to-sign")).toBeVisible();
-  await expect(page.getByTestId("contract-whatsapp")).toHaveAttribute("href", /wa\.me\/212661000001\?text=/);
+  await expect(page.getByTestId("contract-whatsapp")).toHaveAttribute(
+    "href",
+    /wa\.me\/212661000001\?text=/,
+  );
 
   for (const lang of ["fr", "ar"]) {
-    const res = await page.request.get(`/api/contracts/${c.reservationId}/pdf?lang=${lang}`);
+    const res = await page.request.get(
+      `/api/contracts/${c.reservationId}/pdf?lang=${lang}`,
+    );
     expect(res.status()).toBe(200);
     expect(res.headers()["content-type"]).toBe("application/pdf");
     const body = await res.body();

@@ -21,7 +21,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Every client of the agency: search, open, add (with the ID scan). */
-export default async function ClientsPage({ searchParams }: PageProps<"/[locale]/clients">) {
+export default async function ClientsPage({
+  searchParams,
+}: PageProps<"/[locale]/clients">) {
   const { agency } = await requireAgency();
   const sp = await searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
@@ -39,9 +41,15 @@ export default async function ClientsPage({ searchParams }: PageProps<"/[locale]
         <span className="flex flex-col">
           <span className="flex flex-wrap items-center gap-2">
             {c.full_name}
-            {c.anonymized_at ? <Badge variant="neutral">{t("anonymized")}</Badge> : null}
+            {c.anonymized_at ? (
+              <Badge variant="neutral">{t("anonymized")}</Badge>
+            ) : null}
           </span>
-          {c.phone ? <Ltr className="text-xs font-normal text-muted-foreground">{formatPhone(c.phone)}</Ltr> : null}
+          {c.phone ? (
+            <Ltr className="text-xs font-normal text-muted-foreground">
+              {formatPhone(c.phone)}
+            </Ltr>
+          ) : null}
         </span>
       ),
     },
@@ -49,16 +57,47 @@ export default async function ClientsPage({ searchParams }: PageProps<"/[locale]
       key: "id",
       header: t("columns.document"),
       priority: "high",
+      phone: "column",
+      phoneCell: (c) => (
+        <Ltr className="font-semibold tracking-wide">{c.id_number}</Ltr>
+      ),
       cell: (c) => (
         <span className="flex flex-col">
           <Ltr className="font-semibold tracking-wide">{c.id_number}</Ltr>
-          <span className="text-xs text-muted-foreground">{c.id_type === "cin" ? td("cin") : td("passport")}</span>
+          <span className="text-xs text-muted-foreground">
+            {c.id_type === "cin" ? td("cin") : td("passport")}
+          </span>
         </span>
       ),
     },
-    { key: "license", header: t("columns.license"), priority: "low", cell: (c) => (c.license_number ? <Ltr>{c.license_number}</Ltr> : "—") },
-    { key: "rentals", header: t("columns.rentals"), priority: "low", align: "end", cell: (c) => <Ltr>{c.rentals}</Ltr> },
-    { key: "last", header: t("columns.last"), priority: "low", cell: (c) => (c.last_rental ? <Ltr>{formatDate(c.last_rental)}</Ltr> : <span className="text-muted-foreground">{t("never")}</span>) },
+    {
+      key: "license",
+      header: t("columns.license"),
+      priority: "low",
+      phone: "hide",
+      cell: (c) => (c.license_number ? <Ltr>{c.license_number}</Ltr> : "—"),
+    },
+    {
+      key: "rentals",
+      header: t("columns.rentals"),
+      priority: "low",
+      align: "end",
+      phone: "column",
+      cell: (c) => <Ltr>{c.rentals}</Ltr>,
+    },
+    {
+      key: "last",
+      header: t("columns.last"),
+      priority: "low",
+      phoneCell: (c) =>
+        c.last_rental ? <Ltr>{formatDate(c.last_rental)}</Ltr> : null,
+      cell: (c) =>
+        c.last_rental ? (
+          <Ltr>{formatDate(c.last_rental)}</Ltr>
+        ) : (
+          <span className="text-muted-foreground">{t("never")}</span>
+        ),
+    },
   ];
 
   const add = (
@@ -72,20 +111,45 @@ export default async function ClientsPage({ searchParams }: PageProps<"/[locale]
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle", { count: total })} action={add} />
+      <PageHeader
+        title={t("title")}
+        subtitle={t("subtitle", { count: total })}
+        action={add}
+      />
       {total === 0 && !q ? (
-        <EmptyState icon={UsersRoundIcon} title={t("empty")} description={t("emptyBody")} action={add} />
+        <EmptyState
+          icon={UsersRoundIcon}
+          title={t("empty")}
+          description={t("emptyBody")}
+          action={add}
+        />
       ) : (
         <>
           <div className="mb-4 lg:max-w-md">
             <SearchBar placeholder={t("search")} />
           </div>
           {rows.length === 0 ? (
-            <EmptyState icon={SearchXIcon} title={t("noResult")} description={t("noResultBody")} />
+            <EmptyState
+              icon={SearchXIcon}
+              title={t("noResult")}
+              description={t("noResultBody")}
+            />
           ) : (
             <>
-              {limited ? <p className="mb-2 text-sm text-muted-foreground">{t("limited", { count: rows.length })}</p> : null}
-              <ResponsiveList rows={rows} columns={columns} rowKey={(c) => c.id} rowHref={(c) => `/clients/${c.id}`} caption={t("title")} testId="client-list" rowTestId="client-row" />
+              {limited ? (
+                <p className="mb-2 text-sm text-muted-foreground">
+                  {t("limited", { count: rows.length })}
+                </p>
+              ) : null}
+              <ResponsiveList
+                rows={rows}
+                columns={columns}
+                rowKey={(c) => c.id}
+                rowHref={(c) => `/clients/${c.id}`}
+                caption={t("title")}
+                testId="client-list"
+                rowTestId="client-row"
+              />
             </>
           )}
         </>

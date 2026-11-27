@@ -16,13 +16,19 @@ export function uid(): string {
 
 /** Service-role client for test setup only. */
 export function admin() {
-  return createClient<Database>(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+    },
+  );
 }
 
 /** A fresh agency with its admin (confirmed account), created through the real SQL function. */
-export async function createTestAgency(options: { name?: string; trialEnded?: boolean } = {}) {
+export async function createTestAgency(
+  options: { name?: string; trialEnded?: boolean } = {},
+) {
   const sb = admin();
   const id = uid();
   const email = `owner-${id}@test.parcolia.ma`;
@@ -34,14 +40,21 @@ export async function createTestAgency(options: { name?: string; trialEnded?: bo
     user_metadata: { full_name: `Owner ${id}`, locale: "fr" },
   });
   if (error || !user.user) throw error ?? new Error("createUser failed");
-  const { data: agencyId, error: rpcError } = await sb.rpc("create_agency_for_user", {
-    p_user: user.user.id,
-    p_name: name,
-    p_slug: `test-${id}`,
-  });
-  if (rpcError || !agencyId) throw rpcError ?? new Error("create_agency_for_user failed");
+  const { data: agencyId, error: rpcError } = await sb.rpc(
+    "create_agency_for_user",
+    {
+      p_user: user.user.id,
+      p_name: name,
+      p_slug: `test-${id}`,
+    },
+  );
+  if (rpcError || !agencyId)
+    throw rpcError ?? new Error("create_agency_for_user failed");
   if (options.trialEnded) {
-    await sb.from("agencies").update({ trial_ends_at: new Date(Date.now() - 3_600_000).toISOString() }).eq("id", agencyId);
+    await sb
+      .from("agencies")
+      .update({ trial_ends_at: new Date(Date.now() - 3_600_000).toISOString() })
+      .eq("id", agencyId);
   }
   return { agencyId, name, email, password: PASSWORD, userId: user.user.id };
 }
@@ -56,8 +69,17 @@ export async function login(page: Page, email: string, password: string) {
 
 /** CLAUDE.md: no horizontal page scroll at any size. */
 export async function expectNoHorizontalScroll(page: Page) {
-  const overflow = await page.evaluate(() => document.scrollingElement!.scrollWidth - window.innerWidth);
+  const overflow = await page.evaluate(
+    () => document.scrollingElement!.scrollWidth - window.innerWidth,
+  );
   expect(overflow, "page must not scroll horizontally").toBeLessThanOrEqual(0);
+  // Phone tables must fit too (their card clips anything wider, so nothing may be cut off)
+  const cut = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>("[data-testid=phone-table]")]
+      .map((e) => e.scrollWidth - e.clientWidth)
+      .filter((x) => x > 0),
+  );
+  expect(cut, "phone tables must fit the screen").toEqual([]);
 }
 
 /** Opens the user menu in the header (works at every size). */
@@ -69,10 +91,14 @@ export async function openUserMenu(page: Page) {
 export async function latestEmailHtml(to: string): Promise<string> {
   const base = "http://127.0.0.1:54324/api/v1";
   for (let attempt = 0; attempt < 20; attempt++) {
-    const search = await fetch(`${base}/search?query=${encodeURIComponent(`to:"${to}"`)}`).then((r) => r.json());
+    const search = await fetch(
+      `${base}/search?query=${encodeURIComponent(`to:"${to}"`)}`,
+    ).then((r) => r.json());
     const id = search?.messages?.[0]?.ID;
     if (id) {
-      const message = await fetch(`${base}/message/${id}`).then((r) => r.json());
+      const message = await fetch(`${base}/message/${id}`).then((r) =>
+        r.json(),
+      );
       return message.HTML as string;
     }
     await new Promise((r) => setTimeout(r, 500));
@@ -92,13 +118,18 @@ export async function addMember(agencyId: string, role: "admin" | "staff") {
     user_metadata: { full_name: `${role} ${id}`, locale: "fr" },
   });
   if (error || !data.user) throw error ?? new Error("createUser failed");
-  const { error: memberError } = await sb.from("agency_members").insert({ agency_id: agencyId, user_id: data.user.id, role });
+  const { error: memberError } = await sb
+    .from("agency_members")
+    .insert({ agency_id: agencyId, user_id: data.user.id, role });
   if (memberError) throw memberError;
   return { email, password: PASSWORD, userId: data.user.id };
 }
 
 /** Inserts a car directly (test setup). */
-export async function addVehicle(agencyId: string, values: { plate: string; brand_model?: string; daily_rate?: number }) {
+export async function addVehicle(
+  agencyId: string,
+  values: { plate: string; brand_model?: string; daily_rate?: number },
+) {
   const { data, error } = await admin()
     .from("vehicles")
     .insert({
@@ -122,9 +153,16 @@ export async function addVehicle(agencyId: string, values: { plate: string; bran
 export async function createPlatformAdmin() {
   const sb = admin();
   const email = `parcolia-${uid()}@test.parcolia.ma`;
-  const { data, error } = await sb.auth.admin.createUser({ email, password: PASSWORD, email_confirm: true, user_metadata: { full_name: "Équipe Parcolia" } });
+  const { data, error } = await sb.auth.admin.createUser({
+    email,
+    password: PASSWORD,
+    email_confirm: true,
+    user_metadata: { full_name: "Équipe Parcolia" },
+  });
   if (error || !data.user) throw error ?? new Error("createUser failed");
-  const { error: e2 } = await sb.from("platform_admins").insert({ user_id: data.user.id });
+  const { error: e2 } = await sb
+    .from("platform_admins")
+    .insert({ user_id: data.user.id });
   if (e2) throw e2;
   return { email, password: PASSWORD, userId: data.user.id };
 }

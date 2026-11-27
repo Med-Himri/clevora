@@ -1,8 +1,19 @@
 import { writeFileSync } from "node:fs";
 import { expect, test } from "@playwright/test";
-import { addMember, addVehicle, admin, createTestAgency, DEMO, expectNoHorizontalScroll, login, uid } from "./helpers";
+import {
+  addMember,
+  addVehicle,
+  admin,
+  createTestAgency,
+  DEMO,
+  expectNoHorizontalScroll,
+  login,
+  uid,
+} from "./helpers";
 
-test("an admin adds a car; every value is typed by the user", async ({ page }) => {
+test("an admin adds a car; every value is typed by the user", async ({
+  page,
+}) => {
   const agency = await createTestAgency();
   const plate = `${Math.floor(10000 + Math.random() * 89999)}-B-6`;
   await login(page, agency.email, agency.password);
@@ -25,8 +36,12 @@ test("an admin adds a car; every value is typed by the user", async ({ page }) =
   await page.getByRole("button", { name: "Enregistrer" }).click();
 
   await page.waitForURL(/\/fleet\/[0-9a-f-]{36}$/);
-  await expect(page.getByRole("heading", { name: "Hyundai Accent" })).toBeVisible();
-  await expect(page.getByTestId("vehicle-status").first()).toHaveText("Disponible");
+  await expect(
+    page.getByRole("heading", { name: "Hyundai Accent" }),
+  ).toBeVisible();
+  await expect(page.getByTestId("vehicle-status").first()).toHaveText(
+    "Disponible",
+  );
   await expect(page.getByText("Dans 5 000 km")).toBeVisible();
 
   // No insurer / policy number asked here (that is on the Assurance page)
@@ -34,7 +49,9 @@ test("an admin adds a car; every value is typed by the user", async ({ page }) =
   await expect(page.getByLabel(/assureur|police/i)).toHaveCount(0);
 });
 
-test("staff put a car in maintenance, see the reason and date, then put it back in service", async ({ page }) => {
+test("staff put a car in maintenance, see the reason and date, then put it back in service", async ({
+  page,
+}) => {
   const agency = await createTestAgency();
   const staff = await addMember(agency.agencyId, "staff");
   const plate = `M-${uid().slice(-6).toUpperCase()}`;
@@ -42,7 +59,11 @@ test("staff put a car in maintenance, see the reason and date, then put it back 
 
   await login(page, staff.email, staff.password);
   await page.goto("/fleet");
-  const card = page.getByTestId("fleet-list").locator("li:visible, tr:visible").filter({ hasText: plate }).first();
+  const card = page
+    .getByTestId("fleet-list")
+    .locator("[data-testid=vehicle-row]:visible")
+    .filter({ hasText: plate })
+    .first();
   // Table rows keep their actions in a "⋯" menu; cards show the buttons.
   const rowAction = async (row: typeof card, name: string) => {
     const menu = row.getByTestId("vehicle-menu");
@@ -57,29 +78,48 @@ test("staff put a car in maintenance, see the reason and date, then put it back 
 
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("radio", { name: "Pneus" }).click();
-  const until = new Date(Date.now() + 3 * 86_400_000).toISOString().slice(0, 10);
+  const until = new Date(Date.now() + 3 * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
   await dialog.getByLabel("Retour prévu").fill(until);
   await dialog.getByRole("button", { name: "Mettre en maintenance" }).click();
   await expect(page.getByText("Voiture mise en maintenance.")).toBeVisible();
 
   const [y, m, d] = until.split("-");
   await expect(card.getByTestId("vehicle-status")).toContainText("Maintenance");
-  await expect(card.getByTestId("vehicle-status")).toContainText(`Pneus · jusqu'au ${d}/${m}`);
+  await expect(card.getByTestId("vehicle-status")).toContainText(
+    `Pneus · jusqu'au ${d}/${m}`,
+  );
   await page.goto("/fleet?tab=maintenance");
   await expect(page.getByTestId("fleet-list")).toContainText(plate);
   expect(y).toBeTruthy();
 
-  await rowAction(page.getByTestId("fleet-list").locator("li:visible, tr:visible").filter({ hasText: plate }).first(), "Remettre en service");
-  await expect(page.getByText("La voiture est de nouveau disponible.")).toBeVisible();
+  await rowAction(
+    page
+      .getByTestId("fleet-list")
+      .locator("[data-testid=vehicle-row]:visible")
+      .filter({ hasText: plate })
+      .first(),
+    "Remettre en service",
+  );
+  await expect(
+    page.getByText("La voiture est de nouveau disponible."),
+  ).toBeVisible();
   await page.goto("/fleet?tab=available");
   await expect(page.getByTestId("fleet-list")).toContainText(plate);
 });
 
-test("import updates existing plates instead of duplicating them", async ({ page }, testInfo) => {
+test("import updates existing plates instead of duplicating them", async ({
+  page,
+}, testInfo) => {
   const agency = await createTestAgency();
   const existing = `IMP-${uid().slice(-5).toUpperCase()}`;
   const fresh = `NEW-${uid().slice(-5).toUpperCase()}`;
-  await addVehicle(agency.agencyId, { plate: existing, brand_model: "Ancien modèle", daily_rate: 200 });
+  await addVehicle(agency.agencyId, {
+    plate: existing,
+    brand_model: "Ancien modèle",
+    daily_rate: 200,
+  });
 
   const csv = testInfo.outputPath("parc.csv");
   writeFileSync(
@@ -99,20 +139,34 @@ test("import updates existing plates instead of duplicating them", async ({ page
   await page.getByTestId("import-file").setInputFiles(csv);
   const preview = page.getByTestId("import-preview");
   await expect(preview).toContainText("matricule manquant");
-  await expect(preview.locator("li").filter({ hasText: "Dacia Duster" })).toContainText("Mise à jour");
-  await expect(preview.locator("li").filter({ hasText: "Kia Picanto" })).toContainText("Nouvelle");
+  await expect(
+    preview.locator("li").filter({ hasText: "Dacia Duster" }),
+  ).toContainText("Mise à jour");
+  await expect(
+    preview.locator("li").filter({ hasText: "Kia Picanto" }),
+  ).toContainText("Nouvelle");
   await page.getByRole("button", { name: "Importer 2 voitures" }).click();
-  await expect(page.getByTestId("import-result")).toContainText("1 voiture ajoutée, 1 mise à jour.");
+  await expect(page.getByTestId("import-result")).toContainText(
+    "1 voiture ajoutée, 1 mise à jour.",
+  );
 
-  const { data: cars } = await admin().from("vehicles").select("plate, brand_model, daily_rate").eq("agency_id", agency.agencyId).order("plate");
+  const { data: cars } = await admin()
+    .from("vehicles")
+    .select("plate, brand_model, daily_rate")
+    .eq("agency_id", agency.agencyId)
+    .order("plate");
   expect(cars).toHaveLength(2);
-  expect(cars!.find((c) => c.brand_model === "Dacia Duster")).toMatchObject({ daily_rate: 333 });
+  expect(cars!.find((c) => c.brand_model === "Dacia Duster")).toMatchObject({
+    daily_rate: 333,
+  });
 });
 
 test("filters, search and staff limits on the demo fleet", async ({ page }) => {
   await login(page, DEMO.staff.email, DEMO.staff.password);
   await page.goto("/fleet");
-  await expect(page.getByRole("link", { name: "Ajouter une voiture" })).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "Ajouter une voiture" }),
+  ).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Importer" })).toHaveCount(0);
 
   await page.getByRole("link", { name: /^Maintenance/ }).click();
@@ -124,7 +178,9 @@ test("filters, search and staff limits on the demo fleet", async ({ page }) => {
   await page.getByRole("searchbox").fill("12345 a");
   await expect(page).toHaveURL(/q=12345/);
   await expect(page.getByTestId("fleet-list")).toContainText("Dacia Logan");
-  await expect(page.getByTestId("fleet-list")).not.toContainText("Peugeot 3008");
+  await expect(page.getByTestId("fleet-list")).not.toContainText(
+    "Peugeot 3008",
+  );
   await expectNoHorizontalScroll(page);
 
   await page.goto("/fleet/new");

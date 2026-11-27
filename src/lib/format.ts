@@ -2,10 +2,15 @@
 
 export const TIME_ZONE = "Africa/Casablanca";
 
-const moneyFormatter = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2, minimumFractionDigits: 0 });
+const moneyFormatter = new Intl.NumberFormat("fr-FR", {
+  maximumFractionDigits: 2,
+  minimumFractionDigits: 0,
+});
 
 /** 1250 → "1 250 MAD" (normal spaces so it never breaks layouts or copy/paste). */
-export function formatMoney(amount: number | string | null | undefined): string {
+export function formatMoney(
+  amount: number | string | null | undefined,
+): string {
   const n = typeof amount === "string" ? Number(amount) : (amount ?? 0);
   const safe = Number.isFinite(n) ? n : 0;
   return `${moneyFormatter.format(safe).replace(/[  ]/g, " ")} MAD`;
@@ -13,7 +18,10 @@ export function formatMoney(amount: number | string | null | undefined): string 
 
 /** "1 250,50" / "1250.5" / "1 250" → 1250.5 (null when not a number). */
 export function parseMoney(input: string): number | null {
-  const cleaned = input.replace(/[\s  ]/g, "").replace(/MAD$/i, "").replace(",", ".");
+  const cleaned = input
+    .replace(/[\s  ]/g, "")
+    .replace(/MAD$/i, "")
+    .replace(",", ".");
   if (!cleaned) return null;
   const n = Number(cleaned);
   return Number.isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : null;
@@ -35,12 +43,26 @@ const timeParts = new Intl.DateTimeFormat("en-GB", {
 /** Date or ISO string → "dd/mm/yyyy" in Casablanca time. */
 export function formatDate(value: Date | string | null | undefined): string {
   if (!value) return "";
-  const d = typeof value === "string" ? new Date(value.length === 10 ? `${value}T12:00:00Z` : value) : value;
+  const d =
+    typeof value === "string"
+      ? new Date(value.length === 10 ? `${value}T12:00:00Z` : value)
+      : value;
   return dateParts.format(d);
 }
 
+/** → "dd/mm HH:mm" in Casablanca time (phone tables). */
+export function formatShortDateTime(
+  value: Date | string | null | undefined,
+): string {
+  if (!value) return "";
+  const d = typeof value === "string" ? new Date(value) : value;
+  return `${dateParts.format(d).slice(0, 5)} ${timeParts.format(d)}`;
+}
+
 /** → "dd/mm/yyyy HH:mm" in Casablanca time. */
-export function formatDateTime(value: Date | string | null | undefined): string {
+export function formatDateTime(
+  value: Date | string | null | undefined,
+): string {
   if (!value) return "";
   const d = typeof value === "string" ? new Date(value) : value;
   return `${dateParts.format(d)} ${timeParts.format(d)}`;
@@ -60,7 +82,9 @@ export function dayKey(value: Date | string): string {
 
 /** Whole days between two "yyyy-mm-dd" keys (b - a). */
 export function daysBetween(a: string, b: string): number {
-  return Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000);
+  return Math.round(
+    (Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86_400_000,
+  );
 }
 
 /** Matricule as typed → stored display form: uppercase, single spaces. */
@@ -85,8 +109,16 @@ function casablancaOffsetMinutes(at: Date): number {
     minute: "2-digit",
     second: "2-digit",
   }).formatToParts(at);
-  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
-  const asUtc = Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second"));
+  const get = (type: string) =>
+    Number(parts.find((p) => p.type === type)?.value);
+  const asUtc = Date.UTC(
+    get("year"),
+    get("month") - 1,
+    get("day"),
+    get("hour"),
+    get("minute"),
+    get("second"),
+  );
   return Math.round((asUtc - at.getTime()) / 60_000);
 }
 

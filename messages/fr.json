@@ -576,7 +576,8 @@
       "type": "Type",
       "km": "Kilométrage",
       "rate": "Prix/jour",
-      "age": "Âge"
+      "age": "Âge",
+      "rateShort": "Prix"
     },
     "empty": {
       "title": "Aucune voiture pour le moment",
@@ -837,7 +838,8 @@
       "menu": "Actions pour {name}",
       "chooseCar": "Choisir la voiture",
       "carToChoose": "À choisir",
-      "sign": "Signer"
+      "sign": "Signer",
+      "status": "Statut"
     },
     "status": {
       "late": "En retard",
@@ -1297,7 +1299,8 @@
     "pricesTitle": "Prix (ajoutés aux Charges)",
     "pricesHint": "Les prix forment une seule charge « Vidange » pour cette voiture (le total, avec le détail). Laissez vide si vous ne savez pas.",
     "pricesTotal": "Total :",
-    "chargeNote": "Vidange à {km} km"
+    "chargeNote": "Vidange à {km} km",
+    "nextShort": "Prochaine"
   },
   "charges": {
     "title": "Charges",
