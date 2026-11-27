@@ -25,9 +25,10 @@ export type Column<T> = {
    * Phones and tablets, when one column of the list is a "column" (phone table):
    *  - "column": its own narrow column (a status, dates, an amount); 2 at most
    *  - "hide":   not shown (the detail page has it)
+   *  - "title":  the bold title of the first column (when the "primary" column became a narrow column)
    *  - not set:  under the title in the first column (high: grey line, low: « label : value »)
    */
-  phone?: "column" | "hide";
+  phone?: "column" | "hide" | "title";
   /** A shorter cell for phones (e.g. "23/11 10:00" instead of the full date). Return null to show nothing. */
   phoneCell?: (row: T) => ReactNode;
   /** A shorter header for phones. */
@@ -55,6 +56,8 @@ type Props<T> = {
   rowTestId?: string;
   /** Under the table: totals, a count… */
   footer?: ReactNode;
+  /** Phone table: the row actions in their own narrow column at the end ("column", for one icon button) or on a line under the row (default). */
+  phoneActions?: "row" | "column";
   /** Multi-select: a box per row (first column / card corner) and a "select all" box in the header. */
   select?: { cell: (row: T) => ReactNode; all: ReactNode };
 } & ({ rows: T[]; groups?: never } | { groups: ListGroup<T>[]; rows?: never });
@@ -392,15 +395,22 @@ function PhoneTable<T>({
   const main = columns.filter(
     (c) => c.phone !== "column" && c.phone !== "hide",
   );
-  const primary = main.filter((c) => c.priority === "primary");
-  const details = main.filter((c) => c.priority === "high");
-  const extra = main.filter((c) => c.priority === "low");
+  const primary = main.filter(
+    (c) => c.phone === "title" || c.priority === "primary",
+  );
+  const details = main.filter(
+    (c) => c.phone !== "title" && c.priority === "high",
+  );
+  const extra = main.filter((c) => c.phone !== "title" && c.priority === "low");
   const show = (c: Column<T>, row: T) => (c.phoneCell ?? c.cell)(row);
   const line = "col-span-full grid grid-cols-subgrid";
   // Columns: the title takes the room left (at least 7.5rem); the others fit their content up to 6.5rem, then wrap
-  const colCell = (c: Column<T>) =>
+  // One icon action can sit in its own narrow column at the end instead of a line under the row
+  const sideActions = list.phoneActions === "column" && Boolean(actions);
+  const colCell = (c: Column<T>, i: number) =>
     cn(
-      "min-w-0 px-1.5 last:pe-2.5",
+      "min-w-0 px-1.5",
+      i === cols.length - 1 && !sideActions && "pe-2.5",
       c.align === "end" ? "text-end" : "text-start",
     );
 
@@ -414,31 +424,40 @@ function PhoneTable<T>({
         aria-label={caption}
         className="grid text-sm"
         style={{
-          gridTemplateColumns: `minmax(7.5rem,1fr) repeat(${cols.length}, fit-content(6.5rem))`,
+          gridTemplateColumns: `minmax(7.5rem,1fr) repeat(${cols.length}, fit-content(6.5rem))${sideActions ? " auto" : ""}`,
         }}
       >
         <div role="rowgroup" className={cn(line, "bg-muted/50")}>
           <div role="row" className={line}>
             <div
               role="columnheader"
-              className="ps-2.5 pe-1.5 py-2 text-start text-[11px] font-semibold tracking-wide text-muted-foreground uppercase"
+              className="flex items-center gap-2 ps-2.5 pe-1.5 py-2 text-start text-[11px] font-semibold tracking-wide text-muted-foreground uppercase"
             >
+              {/* "Select all" sits in the header, like on the laptop table */}
+              {select ? (
+                <span className="-my-2 shrink-0 normal-case">{select.all}</span>
+              ) : null}
               {primary[0]
                 ? (primary[0].phoneHeader ?? primary[0].header)
                 : null}
             </div>
-            {cols.map((c) => (
+            {cols.map((c, i) => (
               <div
                 key={c.key}
                 role="columnheader"
                 className={cn(
-                  colCell(c),
+                  colCell(c, i),
                   "py-2 text-[11px] font-semibold tracking-wide text-muted-foreground uppercase",
                 )}
               >
                 {c.phoneHeader ?? c.header}
               </div>
             ))}
+            {sideActions ? (
+              <div role="columnheader">
+                <span className="sr-only">Actions</span>
+              </div>
+            ) : null}
           </div>
         </div>
         {groups.map((g) =>
@@ -466,7 +485,7 @@ function PhoneTable<T>({
                   .filter(
                     (x) => x.v !== null && x.v !== undefined && x.v !== false,
                   );
-                const below = Boolean(actions || select);
+                const below = Boolean((actions && !sideActions) || select);
                 return (
                   <div
                     key={rowKey(row)}
@@ -526,12 +545,12 @@ function PhoneTable<T>({
                         </p>
                       ))}
                     </div>
-                    {cols.map((c) => (
+                    {cols.map((c, i) => (
                       <div
                         key={c.key}
                         role="cell"
                         className={cn(
-                          colCell(c),
+                          colCell(c, i),
                           "text-xs [&_.text-base]:text-sm [&_.text-sm]:text-xs",
                           // Numbers stay on one line; words (a status) may wrap so the table always fits
                           (c.nowrap ?? c.align === "end")
@@ -543,6 +562,11 @@ function PhoneTable<T>({
                         {show(c, row)}
                       </div>
                     ))}
+                    {sideActions && actions ? (
+                      <div role="cell" className="relative z-10 -my-1.5 ps-1 pe-2">
+                        {actions(row, "table")}
+                      </div>
+                    ) : null}
                     {below ? (
                       // The row's select box and its actions, on one line across the full width
                       <div
@@ -550,11 +574,11 @@ function PhoneTable<T>({
                         className="relative z-10 col-span-full flex flex-wrap items-center gap-1.5 px-2.5 pt-2"
                       >
                         {select ? (
-                          <div className="-ms-2.5 shrink-0">
+                          <div className="shrink-0">
                             {select.cell(row)}
                           </div>
                         ) : null}
-                        {actions ? actions(row, "table") : null}
+                        {actions && !sideActions ? actions(row, "table") : null}
                       </div>
                     ) : null}
                   </div>

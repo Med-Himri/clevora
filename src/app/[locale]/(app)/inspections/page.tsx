@@ -47,7 +47,7 @@ export default async function InspectionsPage({ searchParams }: PageProps<"/[loc
   if (!agency.inspection.enabled) {
     return (
       <>
-        <PageHeader title={t("title")} />
+        <PageHeader icon={ClipboardCheckIcon} title={t("title")} />
         <EmptyState
           icon={ClipboardCheckIcon}
           title={tl("off")}
@@ -203,7 +203,7 @@ export default async function InspectionsPage({ searchParams }: PageProps<"/[loc
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={ClipboardCheckIcon}
         title={t("title")}
         subtitle={
           <span className="inline-flex items-center gap-1">

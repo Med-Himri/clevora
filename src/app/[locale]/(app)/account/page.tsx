@@ -1,3 +1,4 @@
+import { UserCogIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/app/page-header";
@@ -22,7 +23,7 @@ export default async function AccountPage() {
   const mfaOn = Boolean(factors?.totp.some((f) => f.status === "verified"));
   return (
     <>
-      <PageHeader title={t("title")} subtitle={user.email} />
+      <PageHeader icon={UserCogIcon} title={t("title")} subtitle={user.email} />
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>

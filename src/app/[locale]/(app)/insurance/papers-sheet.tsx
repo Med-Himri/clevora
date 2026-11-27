@@ -67,9 +67,10 @@ export function PapersSheet({
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setOpen(true)} disabled={!writable}>
+      {/* Phones: just the pencil (its name is still read out); laptops: pencil + label */}
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)} disabled={!writable} title={t("edit")} className="max-lg:size-11 max-lg:px-0">
         <PencilIcon aria-hidden />
-        {t("edit")}
+        <span className="max-lg:sr-only">{t("edit")}</span>
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent closeLabel={tc("close")}>

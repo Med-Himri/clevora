@@ -31,7 +31,10 @@ test("charges: add a monthly agency charge and a car charge with a receipt; tota
 
   await expect(page.getByTestId("charges-total")).toHaveText("6 080 MAD");
   await expect(page.getByTestId("charges-list")).toContainText("Mensuelle");
-  await expect(page.getByTestId("charge-row").filter({ hasText: "Toyota Yaris" }).getByRole("button", { name: "Reçu" })).toBeVisible();
+  // The receipt is in the row's « ⋯ » menu
+  await page.getByTestId("charge-row").filter({ hasText: "Toyota Yaris", visible: true }).getByTestId("charge-menu").click();
+  await expect(page.getByRole("menuitem", { name: "Reçu" })).toBeVisible();
+  await page.keyboard.press("Escape");
   await expectNoHorizontalScroll(page);
 
   const { data } = await admin().from("charges").select("receipt_path").eq("agency_id", agency.agencyId).not("receipt_path", "is", null);

@@ -1,8 +1,9 @@
-import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CarFrontIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, ReceiptIcon, TrendingDownIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
+import { BarChart3Icon, BanknoteIcon, CalendarDaysIcon, CalendarIcon, CalendarRangeIcon, CalendarSearchIcon, CarFrontIcon, CarIcon, HandCoinsIcon, FileTextIcon, PercentIcon, ReceiptIcon, TrendingDownIcon, TrendingUpIcon, TrophyIcon, WalletIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { ExcelExport } from "@/components/app/excel-export";
 import { Ltr } from "@/components/app/ltr";
+import { SegmentTabs } from "@/components/app/segment-tabs";
 import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
 import { pctChange, StatTile } from "@/components/app/stat-tile";
@@ -12,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DateInput } from "@/components/ui/fields";
 import { Label } from "@/components/ui/label";
-import { Link } from "@/i18n/navigation";
 import { requireRole } from "@/lib/auth/session";
 import { dayKey, formatDate, formatMoney } from "@/lib/format";
 import { occupancy, occupancyTone, PERIODS, resolvePeriod, toBuckets, type DailyRow } from "@/lib/stats";
@@ -149,9 +149,9 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={BarChart3Icon}
         title={t("title")}
-        subtitle={<>{t("period")} <Ltr>{formatDate(from)}</Ltr> – <Ltr>{formatDate(to)}</Ltr></>}
+        subtitle={t("subtitle")}
         action={
           <>
             <ExcelExport
@@ -167,7 +167,7 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
             />
             <Button variant="outline" size="lg" asChild>
               <a href={`/api/statistics/pdf?${qs}`} target="_blank" rel="noopener">
-                <FileTextIcon aria-hidden />
+                <FileTextIcon className="text-destructive" aria-hidden />
                 {t("exportPdf")}
               </a>
             </Button>
@@ -175,36 +175,43 @@ export default async function StatisticsPage({ searchParams }: PageProps<"/[loca
         }
       />
 
-      <div className="mb-4 flex flex-col gap-3">
-        <nav aria-label={t("periodLabel")} className="flex flex-wrap gap-2">
-          {PERIODS.map((p) => (
-            <Link
-              key={p}
-              href={p === "custom" ? `/statistics?period=custom&${qs}` : `/statistics?period=${p}`}
-              aria-current={period === p ? "page" : undefined}
-              className={cn("inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold", period === p ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-accent")}
-            >
-              {t(`periods.${p}`)}
-            </Link>
-          ))}
-        </nav>
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+        <SegmentTabs
+          label={t("periodLabel")}
+          active={period}
+          items={PERIODS.map((p) => ({
+            key: p,
+            href: p === "custom" ? `/statistics?period=custom&${qs}` : `/statistics?period=${p}`,
+            label: t(`periodsShort.${p}`),
+            icon: p === "months" ? CalendarRangeIcon : p === "days" ? CalendarIcon : CalendarSearchIcon,
+          }))}
+        />
         {period === "custom" ? (
-          <form method="get" className="flex flex-wrap items-end gap-3">
+          <form method="get" className="grid grid-cols-2 items-end gap-2 rounded-xl border bg-card p-3 shadow-xs sm:flex sm:flex-wrap">
             <input type="hidden" name="period" value="custom" />
-            <div className="flex flex-col gap-2">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="stats-from">{t("from")}</Label>
-              <DateInput id="stats-from" name="from" defaultValue={from} required className="w-44" />
+              <DateInput id="stats-from" name="from" defaultValue={from} required className="sm:w-44" />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex min-w-0 flex-col gap-1">
               <Label htmlFor="stats-to">{t("to")}</Label>
-              <DateInput id="stats-to" name="to" defaultValue={to} required className="w-44" />
+              <DateInput id="stats-to" name="to" defaultValue={to} required className="sm:w-44" />
             </div>
-            <Button type="submit" size="lg">
+            <Button type="submit" size="lg" className="col-span-2">
               <CalendarDaysIcon aria-hidden />
               {t("apply")}
             </Button>
           </form>
         ) : null}
+        {/* The dates of the period, written once, clearly */}
+        <p className="flex items-center gap-2 self-start rounded-lg bg-muted/60 px-3 py-2 text-sm lg:self-center" data-testid="stats-period">
+          <CalendarDaysIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden />
+          <span className="text-muted-foreground">{t("period")}</span>
+          <Ltr className="font-semibold">{formatDate(from)}</Ltr>
+          <span aria-hidden>→</span>
+          <span className="sr-only">–</span>
+          <Ltr className="font-semibold">{formatDate(to)}</Ltr>
+        </p>
       </div>
 
       {/* The money of the period, each with its change versus the previous period of the same length */}

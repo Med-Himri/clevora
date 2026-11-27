@@ -130,7 +130,7 @@ export default async function ActivityPage({ searchParams }: PageProps<"/[locale
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader icon={HistoryIcon} title={t("title")} subtitle={t("subtitle")} />
       <div className="mb-4 flex flex-col gap-3">
         <nav aria-label={t("filterType")} className="flex flex-wrap gap-2">
           <Link href={qs({ type: null, page: null })} aria-current={!type ? "page" : undefined} className={chip(!type)}>

@@ -2,12 +2,11 @@ import { FileSignatureIcon, SearchXIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
+import { SegmentTabs } from "@/components/app/segment-tabs";
 import { PageHeader } from "@/components/app/page-header";
 import { SearchBar } from "@/components/app/search-bar";
-import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
-import { cn } from "@/lib/utils";
 import { ReservationTable } from "../reservations/components/reservation-table";
 import type { ListedReservation } from "../reservations/queries";
 
@@ -59,24 +58,13 @@ export default async function ContractsPage({ searchParams }: PageProps<"/[local
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader icon={FileSignatureIcon} title={t("title")} subtitle={t("subtitle")} />
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <nav aria-label={t("tabsLabel")} className="flex flex-wrap gap-2">
-          {TABS.map((k) => (
-            <Link
-              key={k}
-              href={`/contracts?tab=${k}${q ? `&q=${encodeURIComponent(q)}` : ""}`}
-              aria-current={tab === k ? "page" : undefined}
-              className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold",
-                tab === k ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-accent",
-              )}
-            >
-              {t(`tabs.${k}`)}
-              <span className={cn("rounded-full px-1.5 text-xs", tab === k ? "bg-white/20" : "bg-muted")}>{counts[k]}</span>
-            </Link>
-          ))}
-        </nav>
+        <SegmentTabs
+          label={t("tabsLabel")}
+          active={tab}
+          items={TABS.map((k) => ({ key: k, href: `/contracts?tab=${k}${q ? `&q=${encodeURIComponent(q)}` : ""}`, label: t(`tabs.${k}`), count: counts[k] }))}
+        />
         <div className="lg:w-80">
           <SearchBar placeholder={t("search")} />
         </div>

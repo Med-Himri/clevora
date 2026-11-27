@@ -1,4 +1,4 @@
-import { CarIcon, FileDownIcon, LandmarkIcon, SparklesIcon, UsersIcon, type LucideIcon } from "lucide-react";
+import { CarIcon, CreditCardIcon, FileDownIcon, LandmarkIcon, SparklesIcon, UsersIcon, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Ltr } from "@/components/app/ltr";
@@ -85,7 +85,7 @@ export default async function BillingPage() {
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader icon={CreditCardIcon} title={t("title")} subtitle={t("subtitle")} />
       <div className="flex flex-col gap-6">
         {pendingPay ? (
           <Card className="border-warning" data-testid="billing-pending">

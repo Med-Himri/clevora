@@ -1,17 +1,15 @@
-import { CalendarCheckIcon, PlusIcon, SearchIcon, SearchXIcon, SirenIcon } from "lucide-react";
+import { CalendarCheckIcon, PlusIcon, SearchXIcon, SirenIcon, XIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
 import { PageHeader } from "@/components/app/page-header";
-import { SelectAllBox, SelectionProvider } from "@/components/app/selection";
+import { SelectionProvider } from "@/components/app/selection";
 import { SearchBar } from "@/components/app/search-bar";
 import { Button } from "@/components/ui/button";
-import { DateInput } from "@/components/ui/fields";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Link } from "@/i18n/navigation";
 import { requireAgency } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { InfractionDialog } from "./components/infraction-dialog";
 import { InfractionResults } from "./components/infraction-results";
 import { ReservationBulkBar } from "./components/reservation-bulk-bar";
 import { ReservationTable } from "./components/reservation-table";
@@ -43,49 +41,42 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={CalendarCheckIcon}
         title={t("title")}
         action={
+          <>
+            {/* The infraction finder: a compact button beside « Nouvelle réservation » */}
+            <InfractionDialog plate={plate} date={date} time={time} />
           <Button size="lg" asChild>
             <Link href="/reservations/new">
               <PlusIcon aria-hidden />
               {t("new")}
             </Link>
           </Button>
+          </>
         }
       />
 
       <div className="mb-4 flex flex-col gap-3">
         <SearchBar placeholder={t("list.search")} />
-        <details className="group rounded-xl border bg-card" open={Boolean(plate)}>
-          <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-4 font-semibold">
-            <SirenIcon className="size-5 text-muted-foreground" aria-hidden />
-            {t("infraction.title")}
-          </summary>
-          <form method="get" className="grid gap-3 border-t p-4 sm:grid-cols-[2fr_1fr_1fr_auto] sm:items-end">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="inf-plate">{t("infraction.plate")}</Label>
-              <Input id="inf-plate" name="plate" defaultValue={plate} dir="ltr" required placeholder="12345-A-6" className="uppercase" />
+        {plate && date ? (
+          <section className="rounded-xl border bg-card shadow-xs" aria-labelledby="inf-title" data-testid="infraction-panel">
+            <div className="flex items-center justify-between gap-2 border-b px-4 py-2">
+              <h2 id="inf-title" className="flex min-w-0 items-center gap-2 font-semibold">
+                <SirenIcon className="size-5 shrink-0 text-destructive" aria-hidden />
+                <span className="min-w-0 truncate">{t("infraction.title")}</span>
+              </h2>
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/reservations" aria-label={t("infraction.close")}>
+                  <XIcon aria-hidden />
+                </Link>
+              </Button>
             </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="inf-date">{t("infraction.date")}</Label>
-              <DateInput id="inf-date" name="date" defaultValue={date} required />
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="inf-time">{t("infraction.time")}</Label>
-              <Input id="inf-time" name="time" type="time" defaultValue={time} />
-            </div>
-            <Button type="submit" size="lg">
-              <SearchIcon aria-hidden />
-              {t("infraction.submit")}
-            </Button>
-          </form>
-          {plate && date ? (
-            <div className="border-t p-4">
+            <div className="p-4">
               <InfractionResults agencyId={agency.id} plate={plate} date={date} time={time} />
             </div>
-          ) : null}
-        </details>
+          </section>
+        ) : null}
       </div>
 
       {rows.length === 0 ? (
@@ -108,10 +99,6 @@ export default async function ReservationsPage({ searchParams }: PageProps<"/[lo
         )
       ) : (
         <SelectionProvider>
-          <div className="mb-2 flex items-center gap-2 ps-3 text-sm text-muted-foreground lg:hidden">
-            <SelectAllBox ids={rows.map((r) => r.id)} label={t("bulk.selectAll")} />
-            {t("bulk.selectAll")}
-          </div>
           <div className="flex flex-col gap-8">
           {returns.length ? (
             <section aria-labelledby="returns-title" data-testid="returns">

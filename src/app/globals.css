@@ -122,6 +122,19 @@
   html {
     -webkit-text-size-adjust: 100%;
   }
+  /* iPhone Safari draws date/time boxes wider than their column: keep them inside it */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 0;
+    max-width: 100%;
+  }
+  input::-webkit-date-and-time-value {
+    text-align: start;
+    min-height: 1.5em;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);

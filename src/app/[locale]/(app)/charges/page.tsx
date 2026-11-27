@@ -7,7 +7,7 @@ import { Ltr } from "@/components/app/ltr";
 import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
 import { SearchBar } from "@/components/app/search-bar";
-import { StatTile } from "@/components/app/stat-tile";
+import { SegmentTabs } from "@/components/app/segment-tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DateInput } from "@/components/ui/fields";
@@ -71,6 +71,10 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
       priority: "primary",
       nowrap: true,
       className: "w-36",
+      // Phones: a narrow "21/11" column
+      phone: "column",
+      phoneOrder: 1,
+      phoneCell: (r) => <Ltr className="font-semibold">{formatDate(r.date).slice(0, 5)}</Ltr>,
       cell: (r) => (
         <span className="flex flex-col leading-tight">
           <Ltr>{formatDate(r.date)}</Ltr>
@@ -99,6 +103,8 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
       key: "for",
       header: t("for"),
       priority: "high",
+      // Phones: the car (or « Agence ») is the title of the row
+      phone: "title",
       cell: (r) =>
         r.vehicle ? (
           <span className="flex flex-col leading-tight">
@@ -113,9 +119,10 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
       key: "detail",
       header: t("detail"),
       priority: "low",
+      phoneCell: (r) => (r.campaign_name || r.note ? <span className="font-normal text-muted-foreground" dir="auto">{[r.campaign_name, r.note].filter(Boolean).join(" · ")}</span> : null),
       cell: (r) => (r.campaign_name || r.note ? <span className="text-muted-foreground" dir="auto">{[r.campaign_name, r.note].filter(Boolean).join(" · ")}</span> : <span className="text-muted-foreground">—</span>),
     },
-    { key: "amount", header: t("amount"), priority: "high", align: "end", cell: (r) => <Ltr className="font-bold tabular-nums">{formatMoney(r.amount)}</Ltr> },
+    { key: "amount", header: t("amount"), priority: "high", align: "end", phone: "column", phoneOrder: 2, cell: (r) => <Ltr className="font-bold tabular-nums">{formatMoney(r.amount)}</Ltr> },
   ];
   const day = (d: string) => new Date(`${d}T12:00:00Z`);
   const periodLabel =
@@ -140,7 +147,7 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={WalletIcon}
         title={t("title")}
         action={
           <>
@@ -155,76 +162,109 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
         }
       />
 
-      <div className="mb-4 flex flex-col gap-3">
-        {/* Period: a month, a whole year, or any dates */}
-        <nav aria-label={t("periodLabel")} className="flex flex-wrap gap-2">
-          {(
+      <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
+        {/* Period: a month, a whole year, or any dates — one segmented bar */}
+        <SegmentTabs
+          label={t("periodLabel")}
+          active={period.kind}
+          items={(
             [
-              ["month", `/charges?month=${period.kind === "range" ? from.slice(0, 7) : period.kind === "year" ? (String(period.year) === current.slice(0, 4) ? current : `${period.year}-01`) : period.month}`],
-              ["year", `/charges?year=${from.slice(0, 4)}`],
-              ["range", `/charges?from=${from}&to=${to}`],
+              ["month", `/charges?month=${period.kind === "range" ? from.slice(0, 7) : period.kind === "year" ? (String(period.year) === current.slice(0, 4) ? current : `${period.year}-01`) : period.month}`, CalendarIcon],
+              ["year", `/charges?year=${from.slice(0, 4)}`, CalendarRangeIcon],
+              ["range", `/charges?from=${from}&to=${to}`, CalendarSearchIcon],
             ] as const
-          ).map(([k, href]) => (
-            <Link
-              key={k}
-              href={href}
-              aria-current={period.kind === k ? "page" : undefined}
-              data-testid={`period-${k}`}
-              className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold",
-                period.kind === k ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-accent",
-              )}
-            >
-              {k === "month" ? <CalendarIcon className="size-4" aria-hidden /> : k === "year" ? <CalendarRangeIcon className="size-4" aria-hidden /> : <CalendarSearchIcon className="size-4" aria-hidden />}
-              {t(`period.${k}`)}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          {period.kind === "range" ? (
-            <form method="get" className="flex flex-wrap items-end gap-2" data-testid="period-form">
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="ch-from">{t("from")}</Label>
-                <DateInput id="ch-from" name="from" defaultValue={from} required className="w-44" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <Label htmlFor="ch-to">{t("to")}</Label>
-                <DateInput id="ch-to" name="to" defaultValue={to} required className="w-44" />
-              </div>
-              {q ? <input type="hidden" name="q" value={q} /> : null}
-              <Button type="submit" size="lg">
-                <SearchIcon aria-hidden />
-                {t("show")}
-              </Button>
-            </form>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" asChild>
-                <Link href={prev!} aria-label={period.kind === "month" ? t("previousMonth") : t("previousYear")}>
-                  <ChevronLeftIcon className="rtl:rotate-180" aria-hidden />
-                </Link>
-              </Button>
-              <span className="min-w-40 text-center text-lg font-semibold first-letter:uppercase" data-testid="charges-month">{periodLabel}</span>
-              <Button variant="outline" size="icon" asChild>
-                <Link href={next!} aria-label={period.kind === "month" ? t("nextMonth") : t("nextYear")}>
-                  <ChevronRightIcon className="rtl:rotate-180" aria-hidden />
-                </Link>
-              </Button>
+          ).map(([k, href, icon]) => ({ key: k, href, icon, label: t(`period.${k}`), testId: `period-${k}` }))}
+        />
+        {period.kind === "range" ? (
+          <form method="get" className="grid grid-cols-2 items-end gap-2 rounded-xl border bg-card p-3 shadow-xs sm:flex sm:flex-wrap" data-testid="period-form">
+            <div className="flex min-w-0 flex-col gap-1">
+              <Label htmlFor="ch-from">{t("from")}</Label>
+              <DateInput id="ch-from" name="from" defaultValue={from} required className="sm:w-44" />
             </div>
-          )}
-          <div className="lg:w-80">
-            <SearchBar placeholder={t("search")} />
+            <div className="flex min-w-0 flex-col gap-1">
+              <Label htmlFor="ch-to">{t("to")}</Label>
+              <DateInput id="ch-to" name="to" defaultValue={to} required className="sm:w-44" />
+            </div>
+            {q ? <input type="hidden" name="q" value={q} /> : null}
+            <Button type="submit" size="lg" className="col-span-2">
+              <SearchIcon aria-hidden />
+              {t("show")}
+            </Button>
+          </form>
+        ) : (
+          // ‹  Novembre 2026  ›
+          <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-xl border bg-card p-1.5 shadow-xs lg:min-w-80">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={prev!} aria-label={period.kind === "month" ? t("previousMonth") : t("previousYear")}>
+                <ChevronLeftIcon className="rtl:rotate-180" aria-hidden />
+              </Link>
+            </Button>
+            <span className="text-center text-base font-semibold first-letter:uppercase" data-testid="charges-month">
+              {periodLabel}
+            </span>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={next!} aria-label={period.kind === "month" ? t("nextMonth") : t("nextYear")}>
+                <ChevronRightIcon className="rtl:rotate-180" aria-hidden />
+              </Link>
+            </Button>
           </div>
+        )}
+        <div className="lg:ms-auto lg:w-80">
+          <SearchBar placeholder={t("search")} />
         </div>
-        {period.kind === "range" ? <p className="text-sm text-muted-foreground" data-testid="charges-month">{periodLabel}</p> : null}
+        {period.kind === "range" ? (
+          <p className="text-sm text-muted-foreground" data-testid="charges-month">
+            {periodLabel}
+          </p>
+        ) : null}
       </div>
 
-      <ul className="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <li><StatTile label={t("tiles.total")} value={<Ltr>{formatMoney(sum(all))}</Ltr>} icon={WalletIcon} testId="charges-total" /></li>
-        <li><StatTile label={t("tiles.cars")} value={<Ltr>{formatMoney(sum(all.filter((r) => r.vehicle_id)))}</Ltr>} icon={CarIcon} /></li>
-        <li><StatTile label={t("tiles.agency")} value={<Ltr>{formatMoney(sum(all.filter((r) => !r.vehicle_id)))}</Ltr>} icon={StoreIcon} /></li>
-        <li><StatTile label={t("tiles.ads")} value={<Ltr>{formatMoney(sum(ads))}</Ltr>} icon={MegaphoneIcon} hint={campaigns.length ? campaigns.join(", ") : undefined} /></li>
-      </ul>
+      {/* One summary card: the total, then how it splits (cars / agency / ads) on one bar */}
+      {(() => {
+        const total = sum(all);
+        const parts = [
+          { key: "cars", label: t("tiles.cars"), value: sum(all.filter((r) => r.vehicle_id && r.category !== "publicite")), icon: CarIcon, bar: "bg-[var(--series-1)]" },
+          { key: "agency", label: t("tiles.agency"), value: sum(all.filter((r) => !r.vehicle_id && r.category !== "publicite")), icon: StoreIcon, bar: "bg-[var(--series-2)]" },
+          { key: "ads", label: t("tiles.ads"), value: sum(ads), icon: MegaphoneIcon, bar: "bg-muted-foreground/60", hint: campaigns.length ? campaigns.join(", ") : undefined },
+        ];
+        return (
+          <section className="mb-6 rounded-xl border bg-card p-4 shadow-xs sm:p-5" aria-labelledby="charges-sum">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-col">
+                <h2 id="charges-sum" className="text-sm font-medium text-muted-foreground">
+                  {t("tiles.total")}
+                </h2>
+                <span className="text-3xl font-bold tracking-tight tabular-nums" data-testid="charges-total">
+                  <Ltr>{formatMoney(total)}</Ltr>
+                </span>
+              </div>
+              <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-warning-soft text-warning" aria-hidden>
+                <WalletIcon className="size-5" />
+              </span>
+            </div>
+            <div className="mt-4 flex h-2.5 w-full gap-0.5 overflow-hidden rounded-full bg-muted" aria-hidden>
+              {total > 0
+                ? parts
+                    .filter((x) => x.value > 0)
+                    .map((x) => <span key={x.key} className={cn("h-full first:rounded-s-full last:rounded-e-full", x.bar)} style={{ width: `${(x.value / total) * 100}%` }} />)
+                : null}
+            </div>
+            <ul className="mt-3 divide-y">
+              {parts.map((x) => (
+                <li key={x.key} className="flex items-center gap-3 py-2 text-sm">
+                  <span className={cn("size-2.5 shrink-0 rounded-full", x.bar)} aria-hidden />
+                  <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                    <span>{x.label}</span>
+                    {x.hint ? <span className="truncate text-xs text-muted-foreground">{x.hint}</span> : null}
+                  </span>
+                  <span className="text-xs text-muted-foreground tabular-nums">{total > 0 ? `${Math.round((x.value / total) * 100)} %` : ""}</span>
+                  <Ltr className="font-semibold tabular-nums">{formatMoney(x.value)}</Ltr>
+                </li>
+              ))}
+            </ul>
+          </section>
+        );
+      })()}
 
       {period.kind === "year" && all.length ? (
         <section aria-labelledby="by-month" className="mb-6 rounded-xl border bg-card p-4" data-testid="charges-by-month">
@@ -257,6 +297,7 @@ export default async function ChargesPage({ searchParams }: PageProps<"/[locale]
           columns={columns}
           rows={rows}
           rowKey={(r) => r.id}
+          phoneActions="column"
           footer={
             <span className="flex items-center justify-between gap-2 font-semibold">
               <span>{t("countLine", { count: rows.length })}</span>

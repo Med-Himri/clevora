@@ -14,7 +14,7 @@ export function ExcelExport({ fileName, header, rows, label }: { fileName: strin
   };
   return (
     <Button variant="outline" size="lg" onClick={download}>
-      <FileSpreadsheetIcon aria-hidden />
+      <FileSpreadsheetIcon className="text-success" aria-hidden />
       {label}
     </Button>
   );

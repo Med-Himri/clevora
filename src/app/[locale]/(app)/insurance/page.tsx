@@ -72,9 +72,10 @@ export default async function InsurancePage({
   type Row = (typeof rows)[number];
 
   /** Date with a coloured dot, and how long is left underneath. */
-  const paper = (date: string | null, s: DateStatus) => {
+  /** Phones (dot = false): the coloured date and the days left, without the dot, so the table fits. */
+  const paper = (date: string | null, s: DateStatus, dot = true) => {
     if (s.state === "unknown")
-      return <StatusPill tone="neutral" label={t("unknown")} />;
+      return <StatusPill tone="neutral" label={t("unknown")} dot={dot} />;
     const tone =
       s.state === "expired"
         ? "danger"
@@ -84,6 +85,7 @@ export default async function InsurancePage({
     return (
       <StatusPill
         tone={tone}
+        dot={dot}
         label={<Ltr>{formatDate(date)}</Ltr>}
         detail={
           s.state === "expired"
@@ -115,6 +117,7 @@ export default async function InsurancePage({
       priority: "high",
       phone: "column",
       cell: (c) => paper(c.insurance_expires_on, c.ins),
+      phoneCell: (c) => paper(c.insurance_expires_on, c.ins, false),
     },
     {
       key: "vis",
@@ -122,12 +125,13 @@ export default async function InsurancePage({
       priority: "high",
       phone: "column",
       cell: (c) => paper(c.technical_visit_expires_on, c.vis),
+      phoneCell: (c) => paper(c.technical_visit_expires_on, c.vis, false),
     },
   ];
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={ShieldCheckIcon}
         title={t("title")}
         subtitle={t("subtitle", { days: alertDays })}
       />
@@ -159,6 +163,7 @@ export default async function InsurancePage({
                       : "default",
                 rows: shown.filter((r) => r.group === g),
               }))}
+              phoneActions="column"
               actions={(c) => (
                 <PapersSheet
                   vehicleId={c.id}

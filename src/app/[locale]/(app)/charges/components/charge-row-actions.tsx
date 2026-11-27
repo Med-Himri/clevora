@@ -66,15 +66,12 @@ export function ChargeRowActions({
   if (compact) {
     return (
       <>
-        {receiptPath ? (
-          <Button variant="ghost" size="icon" onClick={openReceipt} aria-label={t("viewReceipt")} title={t("viewReceipt")} className="text-muted-foreground">
-            <ReceiptIcon aria-hidden />
-          </Button>
-        ) : null}
         <RowMenu
           label={t("menu")}
           testId="charge-menu"
           items={[
+            // The receipt is in the menu too, so a row has a single « ⋯ » button
+            ...(receiptPath ? [{ label: t("viewReceipt"), icon: ReceiptIcon, onSelect: openReceipt }] : []),
             { label: t("edit"), icon: PencilIcon, onSelect: () => setEdit(true), disabled: !writable },
             { label: t("delete"), icon: Trash2Icon, onSelect: () => setConfirm(true), disabled: !writable, destructive: true, separatorBefore: true },
           ]}

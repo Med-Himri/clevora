@@ -860,7 +860,10 @@
       "cin": "CIN",
       "contract": "Contrat",
       "driver1": "Conducteur 1",
-      "driver2": "Conducteur 2"
+      "driver2": "Conducteur 2",
+      "button": "Infraction",
+      "hint": "Une amende ou un radar ? Trouvez qui conduisait la voiture à ce moment-là.",
+      "close": "Fermer"
     },
     "driver": {
       "found": "Client trouvé : {name}",
@@ -1217,7 +1220,8 @@
     "dayLabel": "{date} : {out, plural, =0 {aucune voiture dehors} one {# voiture dehors} other {# voitures dehors}}, {dep, plural, =0 {aucun départ} one {# départ} other {# départs}}, {ret, plural, =0 {aucun retour} one {# retour} other {# retours}}",
     "legendDeparture": "Départ",
     "legendReturn": "Retour",
-    "legendOut": "Voitures dehors"
+    "legendOut": "Voitures dehors",
+    "thisWeek": "Cette semaine"
   },
   "insurance": {
     "title": "Assurance et visite technique",
@@ -1328,7 +1332,7 @@
     "deleteTitle": "Supprimer cette charge ?",
     "deleteBody": "Elle sera retirée des totaux et des statistiques.",
     "monthly": "Mensuelle",
-    "export": "Exporter (Excel)",
+    "export": "Excel",
     "previousMonth": "Mois précédent",
     "nextMonth": "Mois suivant",
     "empty": "Aucune charge ce mois-ci",
@@ -1387,7 +1391,7 @@
     "perCarHint": "Classées par bénéfice net = chiffre d'affaires − charges de la voiture (les charges de l'agence ne sont pas réparties).",
     "car": "Voiture",
     "carCharges": "Charges de la voiture",
-    "exportExcel": "Exporter (Excel)",
+    "exportExcel": "Excel",
     "exportPdf": "Rapport PDF",
     "credit": "Crédit clients",
     "creditHint": "{count, plural, =0 {Tout est payé} one {# client doit encore payer} other {# clients doivent encore payer}}",
@@ -1414,7 +1418,13 @@
     "ranking": "Classement des voitures",
     "rankingHint": "Bénéfice de chaque voiture sur la période (revenus − ses charges).",
     "rankingEmpty": "Pas encore de location sur cette période.",
-    "daysRentedHint": "{count, plural, one {# jour loué} other {# jours loués}}"
+    "daysRentedHint": "{count, plural, one {# jour loué} other {# jours loués}}",
+    "periodsShort": {
+      "months": "12 mois",
+      "days": "30 jours",
+      "custom": "Dates"
+    },
+    "subtitle": "Revenus, charges et bénéfice de l'agence."
   },
   "assistant": {
     "title": "Assistant IA",

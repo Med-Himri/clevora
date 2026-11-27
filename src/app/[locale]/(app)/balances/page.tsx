@@ -158,7 +158,7 @@ export default async function BalancesPage({
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle")} />
+      <PageHeader icon={HandCoinsIcon} title={t("title")} subtitle={t("subtitle")} />
       {rows.length === 0 ? (
         <EmptyState
           icon={CoinsIcon}

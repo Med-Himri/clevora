@@ -161,21 +161,34 @@ export function SelectionBar({
   const { selected, clear } = useSelection();
   if (selected.size === 0) return null;
   return (
-    <div
-      role="region"
-      aria-label={countLabel(selected.size)}
-      className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border bg-card p-2 shadow-lg sm:flex-row sm:items-center md:bottom-4 md:start-[calc(4rem+0.75rem)] xl:start-[calc(16rem+0.75rem)]"
-      data-testid="selection-bar"
-    >
-      <div className="flex min-w-0 items-center justify-between gap-2 ps-2">
-        <span className="text-sm font-semibold whitespace-nowrap" aria-live="polite">
-          {countLabel(selected.size)}
-        </span>
-        <button type="button" onClick={clear} className="min-h-11 rounded-lg px-2 text-sm whitespace-nowrap text-muted-foreground underline-offset-4 hover:underline">
-          {clearLabel}
-        </button>
+    <>
+      {/* Room under the list, so the last rows can scroll above the bar */}
+      <div className="h-40 md:h-24" aria-hidden />
+      <div
+        role="region"
+        aria-label={countLabel(selected.size)}
+        className="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-40 mx-auto flex max-w-3xl flex-col gap-2 rounded-xl border bg-card p-2 shadow-lg sm:flex-row sm:items-center md:bottom-4 md:start-[calc(4rem+0.75rem)] xl:start-[calc(16rem+0.75rem)]"
+        data-testid="selection-bar"
+      >
+        <div className="flex min-w-0 items-center justify-between gap-2 ps-2">
+          <span
+            className="text-sm font-semibold whitespace-nowrap"
+            aria-live="polite"
+          >
+            {countLabel(selected.size)}
+          </span>
+          <button
+            type="button"
+            onClick={clear}
+            className="min-h-11 rounded-lg px-2 text-sm whitespace-nowrap text-muted-foreground underline-offset-4 hover:underline"
+          >
+            {clearLabel}
+          </button>
+        </div>
+        <div className="grid auto-cols-fr grid-flow-col gap-2 sm:ms-auto sm:flex">
+          {children}
+        </div>
       </div>
-      <div className="grid auto-cols-fr grid-flow-col gap-2 sm:ms-auto sm:flex">{children}</div>
-    </div>
+    </>
   );
 }

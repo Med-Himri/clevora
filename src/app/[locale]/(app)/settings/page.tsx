@@ -1,4 +1,4 @@
-import { BellIcon, BuildingIcon, ClipboardCheckIcon, DatabaseIcon, FileTextIcon, MonitorIcon, ScaleIcon, SparklesIcon, type LucideIcon } from "lucide-react";
+import { BellIcon, BuildingIcon, ClipboardCheckIcon, DatabaseIcon, FileTextIcon, MonitorIcon, ScaleIcon, SettingsIcon, SparklesIcon, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/app/page-header";
@@ -84,7 +84,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/[locale
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={isAdmin ? t("subtitleAdmin") : t("subtitleStaff")} />
+      <PageHeader icon={SettingsIcon} title={t("title")} subtitle={isAdmin ? t("subtitleAdmin") : t("subtitleStaff")} />
       <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)]">
         <nav aria-label={t("sections")}>
           <ul className="flex flex-wrap gap-2 lg:flex-col">

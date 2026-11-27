@@ -1,3 +1,4 @@
+import { UsersIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/app/page-header";
@@ -23,7 +24,7 @@ export default async function TeamPage() {
 
   return (
     <>
-      <PageHeader title={t("title")} subtitle={t("subtitle", { count: members.length })} action={<InviteDialog />} />
+      <PageHeader icon={UsersIcon} title={t("title")} subtitle={t("subtitle", { count: members.length })} action={<InviteDialog />} />
       <div className="flex flex-col gap-6">
         <MemberList members={members} currentUserId={user.id} activeAdmins={activeAdmins} />
         <InvitationList invitations={invitations} />

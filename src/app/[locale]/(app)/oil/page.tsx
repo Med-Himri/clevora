@@ -204,7 +204,7 @@ export default async function OilPage({
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={DropletIcon}
         title={t("title")}
         subtitle={t("subtitle", { km: nf(alertKm) })}
       />

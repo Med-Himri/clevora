@@ -860,7 +860,10 @@
       "cin": "البطاقة الوطنية",
       "contract": "العقد",
       "driver1": "السائق 1",
-      "driver2": "السائق 2"
+      "driver2": "السائق 2",
+      "button": "مخالفة",
+      "hint": "غرامة أو رادار؟ اعرف من كان يسوق السيارة في ذلك الوقت.",
+      "close": "إغلاق"
     },
     "driver": {
       "found": "تم العثور على الزبون: {name}",
@@ -1217,7 +1220,8 @@
     "dayLabel": "{date}: {out, plural, =0 {لا سيارة في الخارج} one {سيارة واحدة في الخارج} other {# سيارات في الخارج}}، {dep, plural, =0 {لا خروج} one {خروج واحد} other {# خروج}}، {ret, plural, =0 {لا رجوع} one {رجوع واحد} other {# رجوع}}",
     "legendDeparture": "خروج",
     "legendReturn": "رجوع",
-    "legendOut": "سيارات في الخارج"
+    "legendOut": "سيارات في الخارج",
+    "thisWeek": "هذا الأسبوع"
   },
   "insurance": {
     "title": "التأمين والفحص التقني",
@@ -1328,7 +1332,7 @@
     "deleteTitle": "حذف هذا المصروف؟",
     "deleteBody": "سيُحذف من المجاميع والإحصائيات.",
     "monthly": "شهري",
-    "export": "تصدير (Excel)",
+    "export": "Excel",
     "previousMonth": "الشهر السابق",
     "nextMonth": "الشهر التالي",
     "empty": "لا توجد مصاريف هذا الشهر",
@@ -1387,7 +1391,7 @@
     "perCarHint": "مرتبة حسب الربح الصافي = رقم المعاملات − مصاريف السيارة (مصاريف الوكالة غير موزعة).",
     "car": "السيارة",
     "carCharges": "مصاريف السيارة",
-    "exportExcel": "تصدير (Excel)",
+    "exportExcel": "Excel",
     "exportPdf": "تقرير PDF",
     "credit": "ديون الزبناء",
     "creditHint": "{count, plural, =0 {كل شيء مؤدى} one {زبون واحد ما زال مدينا} other {# زبناء ما زالوا مدينين}}",
@@ -1414,7 +1418,13 @@
     "ranking": "ترتيب السيارات",
     "rankingHint": "ربح كل سيارة خلال الفترة (المداخيل − مصاريفها).",
     "rankingEmpty": "لا يوجد كراء في هذه الفترة بعد.",
-    "daysRentedHint": "{count, plural, one {يوم كراء واحد} other {# أيام كراء}}"
+    "daysRentedHint": "{count, plural, one {يوم كراء واحد} other {# أيام كراء}}",
+    "periodsShort": {
+      "months": "12 شهرًا",
+      "days": "30 يومًا",
+      "custom": "تواريخ"
+    },
+    "subtitle": "مداخيل الوكالة ومصاريفها وأرباحها."
   },
   "assistant": {
     "title": "المساعد الذكي",

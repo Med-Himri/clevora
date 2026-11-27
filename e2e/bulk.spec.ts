@@ -1,7 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
 import { addMember, addVehicle, admin, createTestAgency, expectNoHorizontalScroll, login, uid } from "./helpers";
 
-const tick = (page: Page, name: RegExp) => page.getByRole("checkbox", { name }).filter({ visible: true }).check();
+// Like a person: bring the box to the middle of the screen (the selection bar sits at the bottom), then tick it
+const tick = async (page: Page, name: RegExp) => {
+  const box = page.getByRole("checkbox", { name }).filter({ visible: true });
+  await box.evaluate((el) => el.scrollIntoView({ block: "center" }));
+  await box.check();
+};
 
 test("cars: tick several, delete; cars with history are kept and can be marked sold", async ({ page }) => {
   const agency = await createTestAgency();

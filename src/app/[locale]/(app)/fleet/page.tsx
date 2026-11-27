@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { EmptyState } from "@/components/app/empty-state";
 import { Ltr } from "@/components/app/ltr";
+import { SegmentTabs } from "@/components/app/segment-tabs";
 import { PageHeader } from "@/components/app/page-header";
 import { ResponsiveList, type Column } from "@/components/app/responsive-list";
 import { SearchBar } from "@/components/app/search-bar";
@@ -175,7 +176,7 @@ export default async function FleetPage({
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={CarIcon}
         title={t("title")}
         subtitle={
           usage
@@ -223,37 +224,16 @@ export default async function FleetPage({
       ) : null}
 
       <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <nav aria-label={t("filters")} className="flex flex-wrap gap-2">
-          {TABS.map((k) => (
-            <Link
-              key={k}
-              href={
-                k === "all"
-                  ? q
-                    ? `/fleet?q=${encodeURIComponent(q)}`
-                    : "/fleet"
-                  : `/fleet?tab=${k}${q ? `&q=${encodeURIComponent(q)}` : ""}`
-              }
-              aria-current={tab === k ? "page" : undefined}
-              className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold",
-                tab === k
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "bg-card hover:bg-accent",
-              )}
-            >
-              {t(`tabs.${k}`)}
-              <span
-                className={cn(
-                  "rounded-full px-1.5 text-xs",
-                  tab === k ? "bg-white/20" : "bg-muted",
-                )}
-              >
-                {counts[k]}
-              </span>
-            </Link>
-          ))}
-        </nav>
+        <SegmentTabs
+          label={t("filters")}
+          active={tab}
+          items={TABS.map((k) => ({
+            key: k,
+            href: k === "all" ? (q ? `/fleet?q=${encodeURIComponent(q)}` : "/fleet") : `/fleet?tab=${k}${q ? `&q=${encodeURIComponent(q)}` : ""}`,
+            label: t(`tabs.${k}`),
+            count: counts[k],
+          }))}
+        />
         <div className="lg:w-80">
           <SearchBar placeholder={t("search")} />
         </div>
@@ -283,15 +263,7 @@ export default async function FleetPage({
         />
       ) : (
         <SelectionProvider>
-          {isAdmin ? (
-            <div className="mb-2 flex items-center gap-2 ps-3 text-sm text-muted-foreground lg:hidden">
-              <SelectAllBox
-                ids={rows.map((v) => v.id)}
-                label={t("bulk.selectAll")}
-              />
-              {t("bulk.selectAll")}
-            </div>
-          ) : null}
+
           <ResponsiveList
             rows={rows}
             columns={columns}

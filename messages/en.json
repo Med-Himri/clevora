@@ -860,7 +860,10 @@
       "cin": "ID card",
       "contract": "Contract",
       "driver1": "Driver 1",
-      "driver2": "Driver 2"
+      "driver2": "Driver 2",
+      "button": "Violation",
+      "hint": "A fine or a speed camera? Find who was driving the car at that moment.",
+      "close": "Close"
     },
     "driver": {
       "found": "Client found: {name}",
@@ -1217,7 +1220,8 @@
     "dayLabel": "{date}: {out, plural, =0 {no car out} one {# car out} other {# cars out}}, {dep, plural, =0 {no departure} one {# departure} other {# departures}}, {ret, plural, =0 {no return} one {# return} other {# returns}}",
     "legendDeparture": "Departure",
     "legendReturn": "Return",
-    "legendOut": "Cars out"
+    "legendOut": "Cars out",
+    "thisWeek": "This week"
   },
   "insurance": {
     "title": "Insurance and inspection",
@@ -1328,7 +1332,7 @@
     "deleteTitle": "Delete this expense?",
     "deleteBody": "It will be removed from the totals and statistics.",
     "monthly": "Monthly",
-    "export": "Export (Excel)",
+    "export": "Excel",
     "previousMonth": "Previous month",
     "nextMonth": "Next month",
     "empty": "No expense this month",
@@ -1387,7 +1391,7 @@
     "perCarHint": "Ranked by net profit = revenue − that car's expenses (agency expenses are not split).",
     "car": "Car",
     "carCharges": "Car expenses",
-    "exportExcel": "Export (Excel)",
+    "exportExcel": "Excel",
     "exportPdf": "PDF report",
     "credit": "Client credit",
     "creditHint": "{count, plural, =0 {Everything is paid} one {# client still owes} other {# clients still owe}}",
@@ -1414,7 +1418,13 @@
     "ranking": "Cars ranking",
     "rankingHint": "Profit of each car over the period (income − its expenses).",
     "rankingEmpty": "No rental yet in this period.",
-    "daysRentedHint": "{count, plural, one {# day rented} other {# days rented}}"
+    "daysRentedHint": "{count, plural, one {# day rented} other {# days rented}}",
+    "periodsShort": {
+      "months": "12 months",
+      "days": "30 days",
+      "custom": "Dates"
+    },
+    "subtitle": "The agency's income, charges and profit."
   },
   "assistant": {
     "title": "AI assistant",

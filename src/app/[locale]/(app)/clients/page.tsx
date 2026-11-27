@@ -111,7 +111,7 @@ export default async function ClientsPage({
 
   return (
     <>
-      <PageHeader
+      <PageHeader icon={UsersRoundIcon}
         title={t("title")}
         subtitle={t("subtitle", { count: total })}
         action={add}

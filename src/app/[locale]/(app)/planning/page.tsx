@@ -1,5 +1,5 @@
 import type * as React from "react";
-import { CarIcon, ChevronLeftIcon, ChevronRightIcon, TruckIcon } from "lucide-react";
+import { CalendarRangeIcon, CarIcon, ChevronLeftIcon, ChevronRightIcon, TruckIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Ltr } from "@/components/app/ltr";
@@ -93,31 +93,137 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
     m.ended_on ? addDays(m.ended_on, -1) : (m.expected_end_on && m.expected_end_on >= today ? m.expected_end_on : weekEnd);
 
   const weekLabel = `${format.dateTime(new Date(`${weekStart}T12:00:00Z`), { day: "numeric", month: "short" })} – ${format.dateTime(new Date(`${weekEnd}T12:00:00Z`), { day: "numeric", month: "short", year: "numeric" })}`;
+  const thisWeek = mondayOf(today) === weekStart;
+  // The week switcher: ‹  the week (and "Aujourd'hui" to come back)  ›  on one row at every size
   const nav = (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button variant="outline" size="icon" asChild>
+    <div className="mb-4 grid grid-cols-[auto_1fr_auto] items-center gap-2 rounded-xl border bg-card p-1.5 shadow-xs lg:inline-grid lg:min-w-[28rem]">
+      <Button variant="ghost" size="icon" asChild>
         <Link href={`/planning?week=${addDays(weekStart, -7)}`} aria-label={t("previousWeek")}>
           <ChevronLeftIcon className="rtl:rotate-180" aria-hidden />
         </Link>
       </Button>
-      <Button variant="outline" asChild>
-        <Link href="/planning">{t("today")}</Link>
-      </Button>
-      <Button variant="outline" size="icon" asChild>
+      <div className="flex min-w-0 flex-col items-center leading-tight">
+        <span className="text-center font-semibold first-letter:uppercase" data-testid="week-label">
+          {weekLabel}
+        </span>
+        {thisWeek ? (
+          <span className="text-xs text-muted-foreground">{t("thisWeek")}</span>
+        ) : (
+          <Link href="/planning" className="text-xs font-semibold text-primary underline-offset-2 hover:underline dark:text-ring">
+            {t("today")}
+          </Link>
+        )}
+      </div>
+      <Button variant="ghost" size="icon" asChild>
         <Link href={`/planning?week=${addDays(weekStart, 7)}`} aria-label={t("nextWeek")}>
           <ChevronRightIcon className="rtl:rotate-180" aria-hidden />
         </Link>
       </Button>
-      <span className="ms-1 font-semibold" data-testid="week-label">{weekLabel}</span>
     </div>
   );
 
   // Reservations of the week still without a car (chosen on the contract)
   const carless = list.filter((b) => !b.vehicle_id && b.status === "reserved" && span(bookingDays(b).start, bookingDays(b).end));
 
+  /** The phone grid: one row per day (the day column stays put), one column per car. */
+  const phoneWeek = () => {
+    const cols = `3.75rem repeat(${Math.max(1, cars.length)}, minmax(5.5rem, 1fr))`;
+    const rowOf = (sp2: { start: number; end: number }) => `${sp2.start + 1} / ${sp2.end + 1}`;
+    return (
+      <div className="overflow-x-auto overscroll-x-contain rounded-xl border bg-card md:hidden" data-testid="planning-phone">
+        {cars.length === 0 ? (
+          <p className="p-4 text-muted-foreground">{t("noCars")}</p>
+        ) : (
+          <div className="grid w-max min-w-full text-sm" style={{ gridTemplateColumns: cols, gridTemplateRows: "auto repeat(7, minmax(3.5rem, auto))" }}>
+            {/* Header: the corner, then one cell per car */}
+            <div className="sticky start-0 z-30 border-e border-b bg-muted/60 backdrop-blur" style={{ gridColumn: 1, gridRow: 1 }} aria-hidden />
+            {cars.map((c, ci) => (
+              <Link
+                key={c.id}
+                href={`/fleet/${c.id}`}
+                style={{ gridColumn: ci + 2, gridRow: 1 }}
+                className="flex min-w-0 flex-col justify-center border-s border-b bg-muted/40 px-2 py-2 leading-tight hover:bg-accent"
+              >
+                <span className="line-clamp-2 text-xs font-semibold">{c.brand_model}</span>
+                <Ltr className="text-[11px] text-muted-foreground">{c.plate}</Ltr>
+              </Link>
+            ))}
+            {/* The days, then the empty cells (tap one to book that car that day) */}
+            {days.map((d, di) => (
+              <div
+                key={d}
+                style={{ gridColumn: 1, gridRow: di + 2 }}
+                className={cn("sticky start-0 z-20 flex flex-col items-center justify-center border-e border-t bg-card px-1 text-center leading-tight", d === today && "bg-primary text-primary-foreground dark:bg-ring dark:text-background")}
+              >
+                <span className={cn("text-[11px] font-semibold uppercase", d === today ? "opacity-90" : "text-muted-foreground")}>
+                  {format.dateTime(new Date(`${d}T12:00:00Z`), { weekday: "short" })}
+                </span>
+                <Ltr className="font-bold tabular-nums">{format.dateTime(new Date(`${d}T12:00:00Z`), { day: "2-digit", month: "2-digit" })}</Ltr>
+              </div>
+            ))}
+            {cars.map((c, ci) =>
+              days.map((d, di) => (
+                <Link
+                  key={`${c.id}-${d}`}
+                  href={`/reservations/new?vehicle=${c.id}&date=${d}`}
+                  style={{ gridColumn: ci + 2, gridRow: di + 2 }}
+                  className={cn("border-s border-t hover:bg-accent/60", d === today && "bg-primary/5", d < today && "pointer-events-none bg-muted/30")}
+                  aria-label={t("bookCell", { car: `${c.brand_model} ${c.plate}`, date: d })}
+                  tabIndex={d < today ? -1 : undefined}
+                />
+              )),
+            )}
+            {/* Maintenance, then the bookings: blocks running down the days of their car */}
+            {cars.map((c, ci) =>
+              (maintenance ?? [])
+                .filter((m) => m.vehicle_id === c.id)
+                .map((m) => {
+                  const sp2 = span(m.starts_on, maintenanceEnd(m));
+                  if (!sp2) return null;
+                  return (
+                    <div
+                      key={`m-${m.id}`}
+                      style={{ gridColumn: ci + 2, gridRow: rowOf(sp2), backgroundImage: "repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in oklab, var(--warning) 35%, transparent) 6px 12px)" }}
+                      className="pointer-events-none z-0 m-1 flex items-start rounded-md border border-warning/50 p-1.5 text-[11px] font-semibold text-warning"
+                      data-testid="planning-maintenance"
+                    >
+                      <span className="[overflow-wrap:anywhere]">{tr(m.reason)}</span>
+                    </div>
+                  );
+                }),
+            )}
+            {cars.map((c, ci) =>
+              list
+                .filter((b) => b.vehicle_id === c.id)
+                .map((b) => {
+                  const bd = bookingDays(b);
+                  const sp2 = span(bd.start, bd.end);
+                  if (!sp2) return null;
+                  return (
+                    <Link
+                      key={`b-${b.id}`}
+                      href={`/reservations/${b.id}`}
+                      style={{ gridColumn: ci + 2, gridRow: rowOf(sp2) }}
+                      className={cn("z-10 m-1 flex min-w-0 flex-col gap-1 rounded-md border p-1.5 text-[11px] leading-tight font-semibold shadow-xs", STATUS_STYLE[b.status])}
+                      data-testid="planning-booking"
+                      title={b.client?.full_name ?? ""}
+                    >
+                      {b.delivery ? <TruckIcon className="size-3.5 shrink-0" aria-label={t("delivery")} /> : null}
+                      <span className="[overflow-wrap:anywhere]">{b.client?.full_name}</span>
+                    </Link>
+                  );
+                }),
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <>
-      <PageHeader title={t("title")} action={nav} />
+      <PageHeader icon={CalendarRangeIcon} title={t("title")} />
+      {nav}
       {carless.length ? (
         <section aria-labelledby="carless-title" className="mb-4 rounded-xl border border-warning/40 bg-warning-soft p-3" data-testid="planning-carless">
           <h2 id="carless-title" className="mb-2 flex items-center gap-2 text-sm font-semibold">
@@ -138,9 +244,12 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
         </section>
       ) : null}
 
-      {/* Week grid at every size: the car column stays put while the days scroll sideways inside the grid (phones, tablets) */}
-      <div className="overflow-x-auto overscroll-x-contain rounded-xl border bg-card" data-testid="planning-grid">
-        <div className="min-w-[560px] md:min-w-[760px]">
+      {/* Phones: days down the side, cars across the top (the cars scroll sideways inside the grid) */}
+      {phoneWeek()}
+
+      {/* Tablets and laptops: cars down the side, days across the top */}
+      <div className="hidden overflow-x-auto overscroll-x-contain rounded-xl border bg-card md:block" data-testid="planning-grid">
+        <div className="min-w-[760px]">
           <div className="sticky top-0 z-20 grid grid-cols-[112px_repeat(7,minmax(64px,1fr))] md:grid-cols-[150px_repeat(7,minmax(80px,1fr))] border-b bg-card text-sm">
             <div className="sticky start-0 z-10 bg-card p-2 font-semibold">{t("car")}</div>
             {days.map((d) => (
@@ -210,7 +319,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/[locale
           {cars.length === 0 ? <p className="p-4 text-muted-foreground">{t("noCars")}</p> : null}
         </div>
       </div>
-      <div className="mt-3 hidden flex-wrap gap-3 text-xs text-muted-foreground md:flex">
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-info-soft ring-1 ring-info/40" />{t("legend.reserved")}</span>
         <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-primary" />{t("legend.onRental")}</span>
         <span className="flex items-center gap-1"><span className="size-3 rounded-sm bg-muted ring-1 ring-border" />{t("legend.returned")}</span>

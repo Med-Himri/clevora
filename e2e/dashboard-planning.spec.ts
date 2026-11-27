@@ -18,7 +18,7 @@ test("staff do not see the revenue tile", async ({ page }) => {
   await expect(page.getByTestId("stat-revenue")).toHaveCount(0);
 });
 
-test("planning: bookings on the week grid at every size; an empty cell starts a booking for that car and day", async ({ page }) => {
+test("planning: bookings on the week grid at every size; an empty cell starts a booking for that car and day", async ({ page }, testInfo) => {
   const agency = await createTestAgency();
   const plate = `PL${uid().slice(-4).toUpperCase()}-A-6`;
   const vehicleId = await addVehicle(agency.agencyId, { plate, brand_model: "Renault Clio" });
@@ -38,13 +38,14 @@ test("planning: bookings on the week grid at every size; an empty cell starts a 
   await page.goto("/planning");
   await expectNoHorizontalScroll(page);
   {
-    // Same week grid at every size (phones scroll the days sideways inside the grid)
-    await expect(page.getByTestId("planning-booking").filter({ hasText: "Client Planning" })).toBeAttached();
+    // Phones: days down the side, cars across (scrolling sideways inside the grid); larger screens: cars down the side
+    await expect(page.getByTestId(testInfo.project.name === "phone" ? "planning-phone" : "planning-grid")).toBeVisible();
+    await expect(page.getByTestId("planning-booking").filter({ hasText: "Client Planning", visible: true })).toBeAttached();
     // next week is empty: tap a cell to book
     await page.getByRole("link", { name: "Semaine suivante" }).click();
     await page.waitForURL(/week=/);
     const week = new URL(page.url()).searchParams.get("week")!;
-    await page.getByRole("link", { name: `Réserver Renault Clio ${plate} le ${week}` }).click();
+    await page.getByRole("link", { name: `Réserver Renault Clio ${plate} le ${week}` }).filter({ visible: true }).click();
     await page.waitForURL(/\/reservations\/new\?vehicle=/);
     await expect(page.getByTestId("available-cars").getByRole("radio", { name: /Renault Clio/ })).toHaveAttribute("aria-checked", "true");
     await expect(page.getByLabel("Date de départ")).toHaveValue(week);
