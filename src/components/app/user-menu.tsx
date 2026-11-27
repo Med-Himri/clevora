@@ -30,12 +30,9 @@ export function UserMenu({
   platformAdmin?: boolean;
 }) {
   const t = useTranslations("app.menu");
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase())
-    .join("");
+  // First letter of the first name + first letter of the last name: « Yassine Bennani » → YB
+  const words = name.split(/\s+/).filter((w) => /^\p{L}/u.test(w));
+  const initials = (words.length > 1 ? [words[0], words[words.length - 1]] : words).map((w) => w[0]?.toUpperCase()).join("");
 
   return (
     <DropdownMenu>
@@ -43,7 +40,8 @@ export function UserMenu({
         className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg px-1.5 text-start hover:bg-accent sm:px-2"
         aria-label={t("open")}
       >
-        <span className="flex min-w-0 max-w-[5.5rem] flex-col leading-tight sm:max-w-56">
+        {/* Phones: only the avatar (name and role are in the menu); tablet & laptop: name + role */}
+        <span className="hidden min-w-0 flex-col leading-tight sm:flex sm:max-w-56">
           <span className="truncate text-sm font-semibold" data-testid="header-user-name">
             {name}
           </span>
@@ -53,7 +51,8 @@ export function UserMenu({
         </span>
         <span
           aria-hidden
-          className="hidden size-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-bold sm:inline-flex"
+          className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-brand text-sm font-bold text-brand-foreground sm:size-9 sm:bg-muted sm:text-foreground"
+          data-testid="header-avatar"
         >
           {initials || "?"}
         </span>
@@ -62,6 +61,7 @@ export function UserMenu({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <span className="block truncate font-semibold">{name}</span>
+          <span className="block truncate text-xs font-normal text-muted-foreground" data-testid="menu-user-role">{roleLabel}</span>
           <span className="block truncate text-xs font-normal text-muted-foreground">{email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

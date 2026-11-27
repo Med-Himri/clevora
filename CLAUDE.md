@@ -41,7 +41,7 @@ Enforce roles in RLS AND hide forbidden UI. Never rely on UI hiding alone.
 - Mobile-first and fully responsive: phone 360–480px, tablet 768–1024px, laptop 1280px+. NO horizontal page scroll at any size.
 - Phone: bottom navigation (5 main items + "Plus"), sticky header, full-width forms, tables become cards.
 - Tablet: collapsible icon rail sidebar. Laptop: fixed sidebar + fixed header.
-- Header: agency logo and name, the user's name with the role in small text under it.
+- Header: agency logo and name, the user's name with the role in small text under it (phones: only a round avatar with the initials of the first and last name; name and role are in its menu).
 - Touch targets at least 44px. Inputs at least 16px font on mobile (no iOS zoom).
 - Yes/No questions use two big buttons (Oui / Non), never small checkboxes.
 - Lists are grouped by urgency, most urgent first (late, today, tomorrow, after tomorrow, later).

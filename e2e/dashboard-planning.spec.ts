@@ -18,7 +18,7 @@ test("staff do not see the revenue tile", async ({ page }) => {
   await expect(page.getByTestId("stat-revenue")).toHaveCount(0);
 });
 
-test("planning: bookings on the grid (or the day list on phones); an empty cell starts a booking for that car and day", async ({ page }, testInfo) => {
+test("planning: bookings on the week grid at every size; an empty cell starts a booking for that car and day", async ({ page }) => {
   const agency = await createTestAgency();
   const plate = `PL${uid().slice(-4).toUpperCase()}-A-6`;
   const vehicleId = await addVehicle(agency.agencyId, { plate, brand_model: "Renault Clio" });
@@ -37,11 +37,9 @@ test("planning: bookings on the grid (or the day list on phones); an empty cell 
   await login(page, agency.email, agency.password);
   await page.goto("/planning");
   await expectNoHorizontalScroll(page);
-  if (testInfo.project.name === "phone") {
-    await expect(page.getByTestId("planning-day")).toContainText("Client Planning");
-    await expect(page.getByTestId("planning-grid")).toBeHidden();
-  } else {
-    await expect(page.getByTestId("planning-booking").filter({ hasText: "Client Planning" })).toBeVisible();
+  {
+    // Same week grid at every size (phones scroll the days sideways inside the grid)
+    await expect(page.getByTestId("planning-booking").filter({ hasText: "Client Planning" })).toBeAttached();
     // next week is empty: tap a cell to book
     await page.getByRole("link", { name: "Semaine suivante" }).click();
     await page.waitForURL(/week=/);
